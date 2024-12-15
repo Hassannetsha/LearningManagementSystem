@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 
 @Entity
 @Table
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
      public enum Role {
      ROLE_ADMIN, ROLE_INSTRUCTOR, ROLE_STUDENT
@@ -15,12 +15,12 @@ public class User {
     // Example: id, username, password, email, etc.
     // Add annotations for JPA mapping
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
     private String password;
     private String email;
-     @Enumerated(EnumType.STRING) // Store enum values as strings
+    @Enumerated(EnumType.STRING) // Store enum values as strings
     private Role role;
 
     public User(String username, String password, String email, Role role) {

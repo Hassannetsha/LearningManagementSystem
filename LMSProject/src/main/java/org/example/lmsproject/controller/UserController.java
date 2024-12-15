@@ -8,31 +8,29 @@ import org.example.lmsproject.service.UserService;
 // import org.springframework.http.HttpStatus;
 // import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+//@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService service;
+
     @Autowired
     UserController(UserService service) {
         this.service = service;
     }
 
-    @GetMapping("/users")
+    @GetMapping("/api/users")
     public String getAllUsers() {
-        System.out.println("Endpoint hit: /users");
         List<User> users = service.findAllUsers();
-        return "Hiiii";
+        return users.stream().map(User::getUsername).collect(Collectors.joining(", "));
     }
 
-    @PostMapping("/addUser")
+    @PostMapping("/api/addUser")
     public String addNewUser(@RequestBody User user) {
         System.out.println("Endpoint hit: /addUser");
         String response = service.addUser(user);
@@ -40,7 +38,7 @@ public class UserController {
     }
 
     // Endpoint for adding an Admin
-    @PostMapping("/addAdmin")
+    @PostMapping("/api/addAdmin")
     public String addAdmin(@RequestBody Admin admin) {
         System.out.println("Endpoint hit: /addAdmin");
         System.out.println("Admin Details: " + admin.toString());
@@ -50,14 +48,14 @@ public class UserController {
     }
 
     // Endpoint for adding an Instructor
-    @PostMapping("/addInstructor")
+    @PostMapping("/api/addInstructor")
     public String addInstructor(@RequestBody Instructor instructor) {
         String response = service.addUser(instructor);
         return "Instructor " + instructor.getUsername() + " Added Successfully\n" + response;
     }
 
     // Endpoint for adding a Student
-    @PostMapping("/addStudent")
+    @PostMapping("/api/addStudent")
     public String addStudent(@RequestBody Student student) {
         String response = service.addUser(student);
         return "Student " + student.getUsername() + " Added Successfully\n" + response;
@@ -68,17 +66,15 @@ public class UserController {
         return "Hello World!";
     }
 
-    @GetMapping("/admin")
-    public String admin() {
-        return "Hello World!";
-    }
-
-    @GetMapping("/start")
-    public String start() {
-        return "Hello World , startt!";
-    }
-
-
+//    @GetMapping("/admin")
+//    public String admin() {
+//        return "Hello World!";
+//    }
+//
+//    @GetMapping("/start")
+//    public String start() {
+//        return "Hello World , startt!";
+//    }
 
 
 }

@@ -52,29 +52,26 @@ public class UserService implements UserDetailsService {// service hia elly f el
     public String addUser(User user) {
         System.out.println(user.getUsername());
         user.setPassword(encoder.encode(user.getPassword()));
-        user.setRole(User.Role.ROLE_ADMIN);
-        userRepository.save(user);
-        return "USER Added";
-//        if (user instanceof Admin) {
-//            user.setRole(User.Role.ROLE_ADMIN);
-//            System.out.println("Adding Admin: " + user.getUsername());
-//        } else if (user instanceof Instructor) {
-//            user.setRole(User.Role.ROLE_INSTRUCTOR);
-//            System.out.println("Adding Instructor: " + user.getUsername());
-//        } else if (user instanceof Student) {
-//            user.setRole(User.Role.ROLE_STUDENT);
-//            System.out.println("Adding Student: " + user.getUsername());
-//        } else {
-//            System.out.println("Adding a generic user: " + user.getUsername());
-//        }
-//        // Save the user to the repository (JPA handles polymorphism)
-//        try {
-//            userRepository.save(user);
-//        } catch (Exception e) {
-//            System.err.println("Error saving user: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-//        return user.getClass().getSimpleName() + " Added Successfully";
+        if (user instanceof Admin) {
+            user.setRole(User.Role.ROLE_ADMIN);
+            System.out.println("Adding Admin: " + user.getUsername());
+        } else if (user instanceof Instructor) {
+            user.setRole(User.Role.ROLE_INSTRUCTOR);
+            System.out.println("Adding Instructor: " + user.getUsername());
+        } else if (user instanceof Student) {
+            user.setRole(User.Role.ROLE_STUDENT);
+            System.out.println("Adding Student: " + user.getUsername());
+        } else {
+            System.out.println("Adding a generic user: " + user.getUsername());
+        }
+        // Save the user to the repository (JPA handles polymorphism)
+        try {
+            userRepository.save(user);
+        } catch (Exception e) {
+            System.err.println("Error saving user: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return user.getClass().getSimpleName() + " Added Successfully";
     }
 
     public List<User> findAllUsers() {
