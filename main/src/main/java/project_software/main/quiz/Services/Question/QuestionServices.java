@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import project_software.main.quiz.DTOs.Questions.QuestionDTO;
 import project_software.main.quiz.Entities.Question.MCQQuestionEntity;
-import project_software.main.quiz.Entities.Question.QuestionDTO;
 import project_software.main.quiz.Entities.Question.QuestionEntity;
 import project_software.main.quiz.Entities.Question.TrueOrFalseQuestionEntity;
 import project_software.main.quiz.Repositories.Question.QuestionRepository;

@@ -1,4 +1,4 @@
-package project_software.main.quiz.Entities.Question;
+package project_software.main.quiz.DTOs.Questions;
 
 import java.util.List;
 

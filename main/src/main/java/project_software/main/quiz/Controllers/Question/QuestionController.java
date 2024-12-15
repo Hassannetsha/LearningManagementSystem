@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import project_software.main.quiz.Entities.Question.QuestionDTO;
+import project_software.main.quiz.DTOs.Questions.QuestionDTO;
 import project_software.main.quiz.Entities.Question.QuestionEntity;
 import project_software.main.quiz.Services.Question.QuestionServices;
 
