@@ -1,0 +1,41 @@
+package org.example.lmsproject;
+
+import org.example.lmsproject.model.Admin;
+import org.example.lmsproject.model.User;
+import org.example.lmsproject.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+// import org.springframework.security.crypto.password.PasswordEncoder;
+
+@SpringBootApplication
+public class LmsProjectApplication {
+
+    @Autowired
+    // private PasswordEncoder passwordEncoder;
+
+    public static void main(String[] args) {
+        SpringApplication.run(LmsProjectApplication.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner commandLineRunner(UserService userService) {
+        return args -> {
+            // Check if the database is empty (no users exist)
+            if (userService.findAllUsers().isEmpty()) {
+                // Add the initial user
+                User user = new User();
+                user.setUsername("admin2"); // Set the username
+                user.setPassword("zinab27"); // Set the password (encoded)
+                user.setRole(User.Role.ROLE_ADMIN); // Set the role
+                userService.addUser(user); // Save the user to the database
+                System.out.println("Initial admin user added.");
+                System.out.println(user.getUsername() + " === " + user.getPassword());
+            } else {
+                System.out.println("Users already exist in the database.");
+            }
+        };
+    }
+}
