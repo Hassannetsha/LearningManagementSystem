@@ -8,6 +8,7 @@ import org.example.lmsproject.service.UserService;
 // import org.springframework.http.HttpStatus;
 // import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class UserController {
         this.service = service;
     }
 
-    @GetMapping("/api/users")
+    @GetMapping("/api/getUsers")
     public String getAllUsers() {
         List<User> users = service.findAllUsers();
         return users.stream().map(User::getUsername).collect(Collectors.joining(", "));
@@ -60,6 +61,28 @@ public class UserController {
         String response = service.addUser(student);
         return "Student " + student.getUsername() + " Added Successfully\n" + response;
     }
+
+
+    @GetMapping("/api/getUser/{id}")
+    public String getUser(@PathVariable Long id){
+        User user = service.getUser(id);
+        return "User: " + user.toString();
+    }
+
+    //Endpoint for updating a User
+    @PutMapping("/api/updateUser/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
+        String response = service.updateUser(id, updatedUser);
+        return ResponseEntity.ok(response);
+    }
+
+    //Endpoint for deleting a User
+    @DeleteMapping("/api/deleteUser/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        String response = service.deleteUser(id);
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/")
     public String hello() {

@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
@@ -15,8 +16,13 @@ import org.springframework.security.config.annotation.web.configurers.CsrfConfig
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
+
+    private final UserService userDetailsService;
+
     @Autowired
-    private UserService userDetailsService;
+    SecurityConfiguration(UserService userService){
+        this.userDetailsService = userService;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,8 +35,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/start").hasAnyRole("ADMIN", "STUDENT", "INSTRUCTOR") // Allow specific roles
                         .requestMatchers("/hello").permitAll() // Open access
                 )
-                .formLogin(login -> login
-                        .permitAll() // Allow access to login page
+                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll // Allow access to login page
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")

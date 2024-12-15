@@ -16,11 +16,12 @@ import org.springframework.stereotype.Service;
 
 // import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 // import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {// service hia elly f el nos bttklm m3 el repo w el
-                                                        // api(conroller)
+    // api(conroller)
     private final UserRepository userRepository;
     private final PasswordEncoder encoder;
 
@@ -76,5 +77,41 @@ public class UserService implements UserDetailsService {// service hia elly f el
 
     public List<User> findAllUsers() {
         return userRepository.findAll();
+    }
+
+    public String updateUser(Long id, User updatedUser) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            User existingUser = optionalUser.get();
+            // Update fields
+            if (updatedUser.getUsername() != null) {
+                existingUser.setUsername(updatedUser.getUsername());
+            }
+            if (updatedUser.getEmail() != null) {
+                existingUser.setEmail(updatedUser.getEmail());
+            }
+            if (updatedUser.getPassword() != null) {
+                existingUser.setPassword(encoder.encode(updatedUser.getPassword()));
+            }
+            // Save the updated user back to the database
+            userRepository.save(existingUser);
+            return "User updated successfully: " + existingUser.getUsername();
+        } else {
+            return "User with ID " + id + " not found.";
+        }
+    }
+
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public String deleteUser(Long id) {
+        User user = getUser(id);
+        if (user != null) {
+            userRepository.delete(user);
+            return "User deleted successfully: " + user.getUsername();
+        } else {
+            return "User with ID " + id + " not found.";
+        }
     }
 }
