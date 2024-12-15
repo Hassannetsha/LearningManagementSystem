@@ -10,7 +10,7 @@ public class Admin extends User{
         super(username, password, email, Role.ROLE_ADMIN);
     }
     public Admin() {
-        super();
+        setRole(Role.ROLE_ADMIN);
     }
     // Add additional methods for admin functionality
 }

@@ -50,30 +50,30 @@ public class UserService implements UserDetailsService {// service hia elly f el
 
     }
 
-    public String addUser(User user) {
-        System.out.println(user.getUsername());
-        user.setPassword(encoder.encode(user.getPassword()));
-        if (user instanceof Admin) {
-            user.setRole(User.Role.ROLE_ADMIN);
-            System.out.println("Adding Admin: " + user.getUsername());
-        } else if (user instanceof Instructor) {
-            user.setRole(User.Role.ROLE_INSTRUCTOR);
-            System.out.println("Adding Instructor: " + user.getUsername());
-        } else if (user instanceof Student) {
-            user.setRole(User.Role.ROLE_STUDENT);
-            System.out.println("Adding Student: " + user.getUsername());
-        } else {
-            System.out.println("Adding a generic user: " + user.getUsername());
-        }
-        // Save the user to the repository (JPA handles polymorphism)
-        try {
-            userRepository.save(user);
-        } catch (Exception e) {
-            System.err.println("Error saving user: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return user.getClass().getSimpleName() + " Added Successfully";
-    }
+//    public String addUser(User user) {
+//        System.out.println(user.getUsername());
+//        user.setPassword(encoder.encode(user.getPassword()));
+//        if (user instanceof Admin) {
+//            user.setRole(User.Role.ROLE_ADMIN);
+//            System.out.println("Adding Admin: " + user.getUsername());
+//        } else if (user instanceof Instructor) {
+//            user.setRole(User.Role.ROLE_INSTRUCTOR);
+//            System.out.println("Adding Instructor: " + user.getUsername());
+//        } else if (user instanceof Student) {
+//            user.setRole(User.Role.ROLE_STUDENT);
+//            System.out.println("Adding Student: " + user.getUsername());
+//        } else {
+//            System.out.println("Adding a generic user: " + user.getUsername());
+//        }
+//        // Save the user to the repository (JPA handles polymorphism)
+//        try {
+//            userRepository.save(user);
+//        } catch (Exception e) {
+//            System.err.println("Error saving user: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+//        return user.getClass().getSimpleName() + " Added Successfully";
+//    }
 
     public List<User> findAllUsers() {
         return userRepository.findAll();
@@ -113,5 +113,19 @@ public class UserService implements UserDetailsService {// service hia elly f el
         } else {
             return "User with ID " + id + " not found.";
         }
+    }
+    public User createUserByRole(User user) {
+        return switch (user.getRole()) {
+            case ROLE_ADMIN -> new Admin(user.getUsername(), user.getPassword(), user.getEmail());
+            case ROLE_INSTRUCTOR -> new Instructor(user.getUsername(), user.getPassword(), user.getEmail());
+            case ROLE_STUDENT -> new Student(user.getUsername(), user.getPassword(), user.getEmail());
+            default -> throw new IllegalArgumentException("Invalid role: " + user.getRole());
+        };
+    }
+
+    public String addUser(User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return "User added successfully";
     }
 }

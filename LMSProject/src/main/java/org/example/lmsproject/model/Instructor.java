@@ -8,11 +8,11 @@ import jakarta.persistence.PrimaryKeyJoinColumn;
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
 public class Instructor extends User{
-    Instructor(String username, String password, String email) {
+    public Instructor(String username, String password, String email) {
         super(username, password, email, Role.ROLE_INSTRUCTOR);
     }
     public Instructor() {
-        super();
+        setRole(Role.ROLE_INSTRUCTOR);
     }
 //    @OneToMany(mappedBy = "instructor")
 //    private List<Course> courses;

@@ -33,9 +33,6 @@ public class User {
     public User() {
     }
 
-    public User(User user) {
-    }
-
     public Long getId() {
         return id;
     }

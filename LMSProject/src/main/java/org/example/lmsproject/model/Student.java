@@ -12,7 +12,7 @@ public class Student extends User {
     }
 
     public Student() {
-        super();
+        setRole(Role.ROLE_STUDENT);
     }
 
     // Additional attributes specific to Student can go here

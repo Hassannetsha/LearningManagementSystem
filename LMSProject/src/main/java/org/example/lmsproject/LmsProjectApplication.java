@@ -26,13 +26,13 @@ public class LmsProjectApplication {
             // Check if the database is empty (no users exist)
             if (userService.findAllUsers().isEmpty()) {
                 // Add the initial user
-                User user = new User();
+                User user = new Admin();
                 user.setUsername("admin2"); // Set the username
+                user.setEmail("firstAdmin@gmail.com"); // Set the email
                 user.setPassword("zinab27"); // Set the password (encoded)
-                user.setRole(User.Role.ROLE_ADMIN); // Set the role
+//                user.setRole(User.Role.ROLE_ADMIN); // Set the role
                 userService.addUser(user); // Save the user to the database
                 System.out.println("Initial admin user added.");
-                System.out.println(user.getUsername() + " === " + user.getPassword());
             } else {
                 System.out.println("Users already exist in the database.");
             }
