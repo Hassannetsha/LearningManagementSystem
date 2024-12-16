@@ -10,13 +10,13 @@ public class Attendance {
 
     @ManyToOne
     @JoinColumn(name = "lesson_id")
-    private Lesson lesson;  // The lesson for which attendance is being recorded
+    private Lesson lesson;  
 
     @ManyToOne
     @JoinColumn(name = "student_id")
-    private User student;  // The student who attended the lesson
+    private User student;  
 
-    private boolean isPresent;  // Indicates whether the student attended
+    private boolean isPresent;  
     private boolean isEnrolled;
 
     // Getters and setters
