@@ -1,15 +1,15 @@
 package project_software.lms.quiz.DTOs.Quizzes;
 
-// import java.util.List;
+import java.util.List;
 
 // import project_software.lms.quiz.Entities.Quiz.QuizEntity;
 
 public class QuizSubmissionDTO {
     private Long courseId;
-    private String answers;
+    private List<String> answers;
     private Long quiz;
-    private Long studentId;
-
+    private Long StudentId;
+    // private List<Boolean> TfAnswers;
     public long getCourseId() {
         return courseId;
     }
@@ -18,20 +18,20 @@ public class QuizSubmissionDTO {
         this.courseId = courseId;
     }
 
-    public String getAnswers() {
+    public List<String> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(String answers) {
+    public void setAnswers(List<String> answers) {
         this.answers = answers;
     }
 
     public Long getStudentId() {
-        return studentId;
+        return StudentId;
     }
 
     public void setStudentId(Long StudentId) {
-        this.studentId = StudentId;
+        this.StudentId = StudentId;
     }
 
     public Long getQuiz() {
@@ -43,6 +43,14 @@ public class QuizSubmissionDTO {
     }
     @Override
     public String toString(){
-        return courseId.toString() + "\n" + answers + "\n" + quiz.toString() + "\n" + "\n";
+        return courseId.toString() + "\n" + answers + "\n" + quiz.toString() + "\n" + StudentId.toString() + "\n" ;
     }
+
+    // public List<Boolean> getTfAnswers() {
+    //     return TfAnswers;
+    // }
+
+    // public void setTfAnswers(List<Boolean> TfAnswers) {
+    //     this.TfAnswers = TfAnswers;
+    // }
 }

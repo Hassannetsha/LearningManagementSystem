@@ -2,8 +2,6 @@ package project_software.lms.quiz.Services.Question;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +47,7 @@ public class QuestionServices {
             TrueOrFalseQuestionEntity tf = new TrueOrFalseQuestionEntity();
             tf.setType(question.getType());
             tf.setQuestion(question.getQuestionText());
-            tf.setRightAnswers(question.getCorrectAnswer());
+            tf.setRightAnswer(question.getCorrectAnswer());
             questionEntity = tf;
             questionRepository.save(questionEntity);
         } else {
@@ -113,7 +111,9 @@ public class QuestionServices {
             throw new IllegalStateException("No question Bank found");
         }
     }
-
+    public QuestionBank findQuestionBankByid(Long id){
+        return questionBankRepository.findByid(id);
+    }
     // private Long generateUniqueId() {
     //     return UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
     // }

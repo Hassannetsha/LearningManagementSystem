@@ -25,12 +25,7 @@ public abstract class QuestionEntity {
     private String question;
     @Column(nullable = false)
     private String type;
-    // @ManyToOne
-    // @JoinColumn(name = "quiz_id", nullable = false)
-    // private QuizEntity quiz;
-    // @ManyToOne
-    // @JoinColumn(name = "question_bank_id", nullable = false)
-    // private QuestionBank questionBank;
+
     public String getQuestion() {
         return question;
     }
@@ -51,20 +46,5 @@ public abstract class QuestionEntity {
         return id;
     }
 
-    // public QuizEntity getQuiz() {
-    //     return quiz;
-    // }
-
-    // public void setQuiz(QuizEntity quiz) {
-    //     this.quiz = quiz;
-    // }
-
-    // public QuestionBank getQuestionBank() {
-    //     return questionBank;
-    // }
-
-    // public void setQuestionBank(QuestionBank questionBank) {
-    //     this.questionBank = questionBank;
-    // }
-
+    public abstract int calculateScore(Object userAnswer);
 }

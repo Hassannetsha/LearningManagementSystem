@@ -7,10 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-// import jakarta.persistence.IdClass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-// import project_software.lms.quiz.CompositePrimaryKeys.QuestionBankId;
 
 @Entity
 // @IdClass(QuestionBankId.class)

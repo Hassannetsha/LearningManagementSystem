@@ -1,5 +1,7 @@
 package project_software.lms.quiz.Entities.Quiz;
 
+import java.util.List;
+
 // import java.util.List;
 
 // import jakarta.persistence.CascadeType;
@@ -28,11 +30,12 @@ public class QuizSubmission {
     @Column(nullable=false)
     private Long studentId;
     @Column(nullable=false)
-    private String answers;
+    private List<String> answers;
+    // private List<Boolean> TfAnswers;
     public QuizSubmission(){
         
     }
-    public QuizSubmission(QuizEntity quiz, Long courseId, String answers,Long StudentId) {
+    public QuizSubmission(QuizEntity quiz, Long courseId, List<String> answers,Long StudentId) {
         this.quiz = quiz;
         this.courseId = courseId;
         this.answers = answers;
@@ -50,11 +53,11 @@ public class QuizSubmission {
         this.courseId = courseId;
     }
 
-    public String getAnswers() {
+    public List<String> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(String answers) {
+    public void setAnswers(List<String> answers) {
         this.answers = answers;
     }
 
@@ -77,4 +80,12 @@ public class QuizSubmission {
     public String toString(){
         return courseId.toString() + "\n" + answers + "\n" + quiz.toString() + "\n" + "\n";
     }
+
+    // public List<Boolean> getTfAnswers() {
+    //     return TfAnswers;
+    // }
+
+    // public void setTfAnswers(List<Boolean> TfAnswers) {
+    //     this.TfAnswers = TfAnswers;
+    // }
 }

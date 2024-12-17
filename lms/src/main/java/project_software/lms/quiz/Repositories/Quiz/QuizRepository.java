@@ -13,5 +13,6 @@ import project_software.lms.quiz.Entities.Quiz.QuizEntity;
 public interface QuizRepository extends JpaRepository<QuizEntity, String>{
 
      QuizEntity findByquizId(Long quizId);
+     QuizEntity findByquizName(String quizName);
     
 }
