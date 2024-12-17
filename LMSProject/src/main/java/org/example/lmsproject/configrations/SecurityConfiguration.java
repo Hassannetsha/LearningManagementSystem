@@ -1,56 +1,85 @@
 package org.example.lmsproject.configrations;
 
+import org.example.lmsproject.service.JwtService;
 import org.example.lmsproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final UserService userDetailsService;
+    private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+
 
     @Autowired
-    SecurityConfiguration(UserService userService){
-        this.userDetailsService = userService;
+    public SecurityConfiguration(UserDetailsService userDetailsService, JwtService jwtService) {
+        this.userDetailsService = userDetailsService;
+        this.jwtService = jwtService;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public JwtAuthFilter jwtAuthFilter() {
+        return new JwtAuthFilter(jwtService, userDetailsService);
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         http
                 .csrf(CsrfConfigurer::disable) // Disable CSRF using the new method
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll() // Allow all API endpoints
-                        .requestMatchers("/admin").hasRole("ADMIN") // Only ADMIN can access "/admin"
-                        .requestMatchers("/addAdmin").hasRole("ADMIN") // Only ADMIN can access "/addAdmin"
-                        .requestMatchers("/start").hasAnyRole("ADMIN", "STUDENT", "INSTRUCTOR") // Allow specific roles
-                        .requestMatchers("/hello").permitAll() // Open access
+                        .requestMatchers("/login").permitAll() // Allow all API endpoints
+//                        .requestMatchers("/api/**").authenticated()
+                        .requestMatchers("/instructor/**").hasRole("INSTRUCTOR") // Only ADMIN can access "/admin"
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // Only ADMIN can access "/addAdmin"
+                        .requestMatchers("/student/**").hasRole("STUDENT")
+//                        .requestMatchers("/hello").permitAll()// Open access
+                        .anyRequest().authenticated() // Require authentication for other requests
                 )
-                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll // Allow access to login page
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
-                        .permitAll()
-                );
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // @Bean
+    // public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder
+    // passwordEncoder) throws Exception {
+    // AuthenticationManagerBuilder builder =
+    // http.getSharedObject(AuthenticationManagerBuilder.class);
+    // builder.userDetailsService(userDetailsService)
+    // .passwordEncoder(passwordEncoder);
+    // return builder.build();
+    // }
+
     @Bean
-    public AuthenticationManager authManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
-        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
-        return builder.build();
+    public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(userDetailsService);
+        return provider;
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 }

@@ -8,9 +8,10 @@ import jakarta.persistence.*;
 @Table
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
-     public enum Role {
-     ROLE_ADMIN, ROLE_INSTRUCTOR, ROLE_STUDENT
-     }
+    public enum Role {
+        ROLE_ADMIN, ROLE_INSTRUCTOR, ROLE_STUDENT
+    }
+
     // Define user properties and relationships here
     // Example: id, username, password, email, etc.
     // Add annotations for JPA mapping

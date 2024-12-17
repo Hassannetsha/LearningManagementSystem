@@ -8,6 +8,9 @@ import org.example.lmsproject.model.User_Details;
 import org.example.lmsproject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,14 +25,13 @@ import java.util.Optional;
 @Service
 public class UserService implements UserDetailsService {// service hia elly f el nos bttklm m3 el repo w el
     // api(conroller)
-    private final UserRepository userRepository;
-    private final PasswordEncoder encoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder encoder) {
-        this.userRepository = userRepository;
-        this.encoder = encoder;
-    }
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder encoder;
+    @Autowired
+    private JwtService jwtService;
 
     @Override
     // load user by ID
@@ -50,30 +52,30 @@ public class UserService implements UserDetailsService {// service hia elly f el
 
     }
 
-//    public String addUser(User user) {
-//        System.out.println(user.getUsername());
-//        user.setPassword(encoder.encode(user.getPassword()));
-//        if (user instanceof Admin) {
-//            user.setRole(User.Role.ROLE_ADMIN);
-//            System.out.println("Adding Admin: " + user.getUsername());
-//        } else if (user instanceof Instructor) {
-//            user.setRole(User.Role.ROLE_INSTRUCTOR);
-//            System.out.println("Adding Instructor: " + user.getUsername());
-//        } else if (user instanceof Student) {
-//            user.setRole(User.Role.ROLE_STUDENT);
-//            System.out.println("Adding Student: " + user.getUsername());
-//        } else {
-//            System.out.println("Adding a generic user: " + user.getUsername());
-//        }
-//        // Save the user to the repository (JPA handles polymorphism)
-//        try {
-//            userRepository.save(user);
-//        } catch (Exception e) {
-//            System.err.println("Error saving user: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-//        return user.getClass().getSimpleName() + " Added Successfully";
-//    }
+    // public String addUser(User user) {
+    // System.out.println(user.getUsername());
+    // user.setPassword(encoder.encode(user.getPassword()));
+    // if (user instanceof Admin) {
+    // user.setRole(User.Role.ROLE_ADMIN);
+    // System.out.println("Adding Admin: " + user.getUsername());
+    // } else if (user instanceof Instructor) {
+    // user.setRole(User.Role.ROLE_INSTRUCTOR);
+    // System.out.println("Adding Instructor: " + user.getUsername());
+    // } else if (user instanceof Student) {
+    // user.setRole(User.Role.ROLE_STUDENT);
+    // System.out.println("Adding Student: " + user.getUsername());
+    // } else {
+    // System.out.println("Adding a generic user: " + user.getUsername());
+    // }
+    // // Save the user to the repository (JPA handles polymorphism)
+    // try {
+    // userRepository.save(user);
+    // } catch (Exception e) {
+    // System.err.println("Error saving user: " + e.getMessage());
+    // e.printStackTrace();
+    // }
+    // return user.getClass().getSimpleName() + " Added Successfully";
+    // }
 
     public List<User> findAllUsers() {
         return userRepository.findAll();
@@ -114,6 +116,7 @@ public class UserService implements UserDetailsService {// service hia elly f el
             return "User with ID " + id + " not found.";
         }
     }
+
     public User createUserByRole(User user) {
         return switch (user.getRole()) {
             case ROLE_ADMIN -> new Admin(user.getUsername(), user.getPassword(), user.getEmail());
@@ -128,4 +131,16 @@ public class UserService implements UserDetailsService {// service hia elly f el
         userRepository.save(user);
         return "User added successfully";
     }
+
+    public String verify(User user) {
+        UserDetails userDetails = loadUserByUsername(user.getUsername());
+
+        // Compare raw password with encoded password
+        if (encoder.matches(user.getPassword(), userDetails.getPassword())) {
+            return jwtService.generateToken(user.getUsername());
+        } else {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+    }
+
 }

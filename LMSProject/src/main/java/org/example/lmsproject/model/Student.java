@@ -17,6 +17,6 @@ public class Student extends User {
 
     // Additional attributes specific to Student can go here
 
-    //    @ManyToMany
-    //    private List<Course> courses;
+    // @ManyToMany
+    // private List<Course> courses;
 }
