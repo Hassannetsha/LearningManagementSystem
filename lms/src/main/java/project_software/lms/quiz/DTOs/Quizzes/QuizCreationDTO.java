@@ -1,11 +1,11 @@
 package project_software.lms.quiz.DTOs.Quizzes;
 
-import java.util.List;
+// import java.util.List;
 
 public class QuizCreationDTO {
     private long courseId;
     private String quizName;
-    private List<Long> questionIds;
+    private Long questionBankId;
 
     public long getCourseId() {
         return courseId;
@@ -23,11 +23,11 @@ public class QuizCreationDTO {
         this.quizName = quizName;
     }
 
-    public List<Long> getQuestionIds() {
-        return questionIds;
+    public Long getQuestionBankId() {
+        return questionBankId;
     }
 
-    public void setQuestionIds(List<Long> questionIds) {
-        this.questionIds = questionIds;
+    public void setQuestionBankId(Long questionIds) {
+        this.questionBankId = questionIds;
     }
 }

@@ -4,28 +4,30 @@ import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
+// import jakarta.persistence.IdClass;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import project_software.lms.quiz.CompositePrimaryKeys.QuestionBankId;
+// import project_software.lms.quiz.CompositePrimaryKeys.QuestionBankId;
 
 @Entity
-@IdClass(QuestionBankId.class)
+// @IdClass(QuestionBankId.class)
 @Table(name = "question_bank")
 public class QuestionBank {
     @Id
-    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Id
+    // @Id
     private Long courseId;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = false)
     private List<QuestionEntity> questions;
-
+    // public void setId(Long id){
+    //     this.id = id;
+    // }
     public Long getId() {
         return id;
     }
@@ -44,4 +46,5 @@ public class QuestionBank {
     public void setQuestions(List<QuestionEntity> questions) {
         this.questions = questions;
     }
+
 }

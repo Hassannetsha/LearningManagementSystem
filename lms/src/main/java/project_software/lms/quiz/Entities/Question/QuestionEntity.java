@@ -7,11 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import project_software.lms.quiz.Entities.QuizEntity;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -28,9 +25,9 @@ public abstract class QuestionEntity {
     private String question;
     @Column(nullable = false)
     private String type;
-    @ManyToOne
-    @JoinColumn(name = "quiz_id", nullable = false)
-    private QuizEntity quiz;
+    // @ManyToOne
+    // @JoinColumn(name = "quiz_id", nullable = false)
+    // private QuizEntity quiz;
     // @ManyToOne
     // @JoinColumn(name = "question_bank_id", nullable = false)
     // private QuestionBank questionBank;
@@ -54,13 +51,13 @@ public abstract class QuestionEntity {
         return id;
     }
 
-    public QuizEntity getQuiz() {
-        return quiz;
-    }
+    // public QuizEntity getQuiz() {
+    //     return quiz;
+    // }
 
-    public void setQuiz(QuizEntity quiz) {
-        this.quiz = quiz;
-    }
+    // public void setQuiz(QuizEntity quiz) {
+    //     this.quiz = quiz;
+    // }
 
     // public QuestionBank getQuestionBank() {
     //     return questionBank;
