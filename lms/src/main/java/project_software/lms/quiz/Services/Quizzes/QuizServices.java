@@ -7,22 +7,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 // import project_software.lms.quiz.CompositePrimaryKeys.QuestionBankId;
+
 import project_software.lms.quiz.DTOs.Quizzes.QuizCreationDTO;
+import project_software.lms.quiz.DTOs.Quizzes.QuizSubmissionDTO;
+// import project_software.lms.quiz.DTOs.Quizzes.QuizSubmissionDTO;
 import project_software.lms.quiz.Entities.Question.QuestionBank;
-import project_software.lms.quiz.Entities.QuizEntity;
+import project_software.lms.quiz.Entities.Quiz.QuizEntity;
+import project_software.lms.quiz.Entities.Quiz.QuizSubmission;
+// import project_software.lms.quiz.Entities.Quiz.QuizSubmission;
 import project_software.lms.quiz.Repositories.Question.QuestionBankRepository;
 import project_software.lms.quiz.Repositories.Quiz.QuizRepository;
+import project_software.lms.quiz.Repositories.Quiz.QuizSubmissionRepository;
 
 @Service
 public class QuizServices {
 	
 	private final QuizRepository quizRepository;
 	private final QuestionBankRepository questionBankRepository;
+	private final QuizSubmissionRepository quizSubmissionRepository;
 
 	@Autowired
-	public QuizServices(QuizRepository quizRepository, QuestionBankRepository questionBankRepository) {
+	public QuizServices(QuizRepository quizRepository, QuestionBankRepository questionBankRepository,QuizSubmissionRepository quizSubmissionRepository) {
 		this.quizRepository = quizRepository;
 		this.questionBankRepository = questionBankRepository;
+		this.quizSubmissionRepository = quizSubmissionRepository;
 	}
 
 	public List<QuizEntity> getAllQuizzes() {
@@ -31,60 +39,35 @@ public class QuizServices {
 
 	public void addNewQuiz(QuizCreationDTO quizCreationDTO) {
 		QuizEntity quiz = new QuizEntity();
-		// List<QuestionEntity> questionsIds = new ArrayList<>();
-		// String Message = "These question IDS are not found: ";
-		// boolean entered = false;
-		// System.out.println("entered add function");
-		System.out.println(questionBankRepository.getClass());
 		QuestionBank questionBank = questionBankRepository.findByid(quizCreationDTO.getQuestionBankId());
-		System.out.println("returned a question Bank");
-		System.out.println(questionBank);
-		// for (QuestionBank bank : questionBank) {
-		// System.out.println("entered the loop");
+		// CourseEntity course = courseRepository.findByid(quizSubmissionDTO.getCourseId());
 		if (questionBank != null) {
-			// QuestionBankId questionBankId = new
-			// QuestionBankId(quizCreationDTO.getQuestionBankId(),
-			// quizCreationDTO.getCourseId());
-			System.out.println("found the question Bank");
 			quiz.setCourseId(quizCreationDTO.getCourseId());
-			System.out.println("set the course id");
 			quiz.setQuizName(quizCreationDTO.getQuizName());
-			System.out.println("set the quiz name");
-			// quiz.setQuestionBankId(questionBankId);
-			// System.out.println("set the question ban name");
 			quiz.setQuestionBank(questionBank);
-			System.out.println("set the question Bank");
-			System.out.println(quiz);
 			quizRepository.save(quiz);
-			System.out.println("saved the quiz to the data base");
-			// entered = true;
-			// break;
 		}
-		// }
 		else {
 			throw new IllegalStateException(
 					"There is no question bank with this ID: " + quizCreationDTO.getQuestionBankId());
-			// if (!entered) {
 		}
-		// }
-		// for (Long quizId : quizCreationDTO.getQuestionBankIds()) {
-		// QuestionEntity questionEntity = questionRepository.findByid(quizId);
-		// if (questionEntity!=null) {
-		// questionsIds.add(questionEntity);
-		// }
-		// else{
-		// Message+= quizId.toString() + " ";
-		// }
-		// }
-		// quiz.setCourseId(quizCreationDTO.getCourseId());
-		// quiz.setQuizName(quizCreationDTO.getQuizName());
-		// if (!questionsIds.isEmpty()) {
-		// // quiz.setQuestions(questionsIds);
-		// }
-		// if (!Message.equals("These question IDS are not found: ")) {
-		// throw new IllegalStateException(Message);
-		// }
-		// quizRepository.save(quiz);
+	}
+
+	public void addNewQuizSubmission(QuizSubmissionDTO quizSubmissionDTO){
+		QuizEntity quiz = quizRepository.findByquizId(quizSubmissionDTO.getQuiz());
+		// System.out.println(quizSubmissionDTO);
+		// System.out.println(quizSubmissionDTO.getStudentId());
+		// CourseEntity course = courseRepository.findByid(quizSubmissionDTO.getCourseId());
+		// System.out.println("Entered in add");
+		if (quiz!=null) {
+			QuizSubmission quizSubmission = new QuizSubmission(quiz,quizSubmissionDTO.getCourseId(),quizSubmissionDTO.getAnswers(),quizSubmissionDTO.getStudentId());
+			// System.out.println("defined new quiz submission");
+			// System.out.println(quizSubmission);
+			quizSubmissionRepository.save(quizSubmission);
+		}
+		else{
+			throw new IllegalStateException("No quiz found");
+		}
 	}
 
 	public void deleteQuiz(Long quizId) {
@@ -94,5 +77,9 @@ public class QuizServices {
 		} else {
 			throw new IllegalStateException("No quiz found in this course");
 		}
+	}
+
+	public List<QuizSubmission> getAllQuizSubmissions() {
+		return quizSubmissionRepository.findAll();
 	}
 }

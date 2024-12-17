@@ -6,7 +6,7 @@ package project_software.lms.quiz.Repositories.Quiz;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import project_software.lms.quiz.Entities.QuizEntity;
+import project_software.lms.quiz.Entities.Quiz.QuizEntity;
 
 // import com.lms.project_advanced_software.quiz.Entities.QuizEntity;
 @Repository

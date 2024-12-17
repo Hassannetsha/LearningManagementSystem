@@ -1,4 +1,4 @@
-package project_software.lms.quiz.Entities;
+package project_software.lms.quiz.Entities.Quiz;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -24,15 +23,7 @@ public class QuizEntity {
     private long courseId;
     @Column(nullable = false)
     private String quizName;
-    //question_bank_course_id
-    //question_bank_id
-    // @OneToOne
-    // @JoinColumn(name = "question_bank_id", referencedColumnName = "id")
     @OneToOne
-    @JoinColumns({
-        @JoinColumn(name = "question_bank_id", referencedColumnName = "id"),
-        @JoinColumn(name = "question_bank_course_id", referencedColumnName = "courseId")
-    })
     private QuestionBank questionBank;
     public long getCourseId() {
         return courseId;
