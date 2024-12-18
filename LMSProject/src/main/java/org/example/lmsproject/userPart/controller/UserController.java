@@ -1,11 +1,11 @@
-package org.example.lmsproject.controller;
+package org.example.lmsproject.userPart.controller;
 
 //import org.example.lmsproject.model.AuthRequest;
-import org.example.lmsproject.model.User;
+import org.example.lmsproject.userPart.model.User;
 // import org.example.lmsproject.model.Admin;
 // import org.example.lmsproject.model.Instructor;
 // import org.example.lmsproject.model.Student;
-import org.example.lmsproject.service.UserService;
+import org.example.lmsproject.userPart.service.UserService;
 //import org.example.lmsproject.service.JwtService;
 // import org.springframework.http.HttpStatus;
 // import org.springframework.http.ResponseEntity;
@@ -130,4 +130,12 @@ public class UserController {
 //        }
 //    }
 
+    //instructor add course
+//    CourseRepository courseRepo;
+//    @PostMapping("/instructor/addCourse")
+//    public void addCourse(@RequestBody Course course ){
+//        courseRepo.addCourse(course);
+//    }
+
 }
+

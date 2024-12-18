@@ -1,16 +1,13 @@
-package org.example.lmsproject.service;
+package org.example.lmsproject.userPart.service;
 
-import org.example.lmsproject.model.User;
-import org.example.lmsproject.model.Admin;
-import org.example.lmsproject.model.Instructor;
-import org.example.lmsproject.model.Student;
-import org.example.lmsproject.model.User_Details;
-import org.example.lmsproject.repository.UserRepository;
+import org.example.lmsproject.userPart.model.User;
+import org.example.lmsproject.userPart.model.Admin;
+import org.example.lmsproject.userPart.model.Instructor;
+import org.example.lmsproject.userPart.model.Student;
+import org.example.lmsproject.userPart.model.User_Details;
+import org.example.lmsproject.userPart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 // import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

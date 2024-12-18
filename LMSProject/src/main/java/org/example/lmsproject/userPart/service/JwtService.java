@@ -1,4 +1,4 @@
-package org.example.lmsproject.service;
+package org.example.lmsproject.userPart.service;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Claims;

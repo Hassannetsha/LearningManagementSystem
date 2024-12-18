@@ -1,4 +1,4 @@
-package org.example.lmsproject.configrations;
+package org.example.lmsproject.userPart.configrations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

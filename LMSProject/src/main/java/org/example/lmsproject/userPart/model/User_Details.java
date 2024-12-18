@@ -1,4 +1,4 @@
-package org.example.lmsproject.model;
+package org.example.lmsproject.userPart.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

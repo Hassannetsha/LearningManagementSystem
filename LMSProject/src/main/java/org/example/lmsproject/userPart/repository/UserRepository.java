@@ -1,6 +1,6 @@
-package org.example.lmsproject.repository;
+package org.example.lmsproject.userPart.repository;
 
-import org.example.lmsproject.model.User;
+import org.example.lmsproject.userPart.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

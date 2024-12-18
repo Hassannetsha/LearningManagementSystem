@@ -1,6 +1,6 @@
-package org.example.lmsproject.service;
+package org.example.lmsproject.userPart.service;
 
-import org.example.lmsproject.model.AuthRequest;
+import org.example.lmsproject.userPart.model.AuthRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

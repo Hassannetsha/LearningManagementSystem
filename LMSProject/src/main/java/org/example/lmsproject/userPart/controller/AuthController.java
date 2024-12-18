@@ -1,7 +1,7 @@
-package org.example.lmsproject.controller;
+package org.example.lmsproject.userPart.controller;
 
-import org.example.lmsproject.model.AuthRequest;
-import org.example.lmsproject.service.AuthService;
+import org.example.lmsproject.userPart.model.AuthRequest;
+import org.example.lmsproject.userPart.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

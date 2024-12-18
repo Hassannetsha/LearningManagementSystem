@@ -1,8 +1,8 @@
 package org.example.lmsproject;
 
-import org.example.lmsproject.model.Admin;
-import org.example.lmsproject.model.User;
-import org.example.lmsproject.service.UserService;
+import org.example.lmsproject.userPart.model.Admin;
+import org.example.lmsproject.userPart.model.User;
+import org.example.lmsproject.userPart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

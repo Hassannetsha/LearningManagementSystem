@@ -1,4 +1,4 @@
-package org.example.lmsproject.model;
+package org.example.lmsproject.userPart.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrimaryKeyJoinColumn;
