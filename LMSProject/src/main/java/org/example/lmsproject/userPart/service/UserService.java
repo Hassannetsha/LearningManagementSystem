@@ -1,9 +1,6 @@
 package org.example.lmsproject.userPart.service;
 
 import org.example.lmsproject.userPart.model.User;
-import org.example.lmsproject.userPart.model.Admin;
-import org.example.lmsproject.userPart.model.Instructor;
-import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.User_Details;
 import org.example.lmsproject.userPart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 // import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 // import java.util.Optional;
 
 @Service
@@ -49,6 +45,14 @@ public class UserService implements UserDetailsService {// service hia elly f el
 
     }
 
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
     // public String addUser(User user) {
     // System.out.println(user.getUsername());
     // user.setPassword(encoder.encode(user.getPassword()));
@@ -74,60 +78,58 @@ public class UserService implements UserDetailsService {// service hia elly f el
     // return user.getClass().getSimpleName() + " Added Successfully";
     // }
 
-    public List<User> findAllUsers() {
-        return userRepository.findAll();
-    }
+    // public String updateUser(Long id, User updatedUser) {
+    // Optional<User> optionalUser = userRepository.findById(id);
+    // if (optionalUser.isPresent()) {
+    // User existingUser = optionalUser.get();
+    // // Update fields
+    // if (updatedUser.getUsername() != null) {
+    // existingUser.setUsername(updatedUser.getUsername());
+    // }
+    // if (updatedUser.getEmail() != null) {
+    // existingUser.setEmail(updatedUser.getEmail());
+    // }
+    // if (updatedUser.getPassword() != null) {
+    // existingUser.setPassword(encoder.encode(updatedUser.getPassword()));
+    // }
+    // // Save the updated user back to the database
+    // userRepository.save(existingUser);
+    // return "User updated successfully: " + existingUser.getUsername();
+    // } else {
+    // return "User with ID " + id + " not found.";
+    // }
+    // }
+    //
 
-    public String updateUser(Long id, User updatedUser) {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if (optionalUser.isPresent()) {
-            User existingUser = optionalUser.get();
-            // Update fields
-            if (updatedUser.getUsername() != null) {
-                existingUser.setUsername(updatedUser.getUsername());
-            }
-            if (updatedUser.getEmail() != null) {
-                existingUser.setEmail(updatedUser.getEmail());
-            }
-            if (updatedUser.getPassword() != null) {
-                existingUser.setPassword(encoder.encode(updatedUser.getPassword()));
-            }
-            // Save the updated user back to the database
-            userRepository.save(existingUser);
-            return "User updated successfully: " + existingUser.getUsername();
-        } else {
-            return "User with ID " + id + " not found.";
-        }
-    }
+    //
+    // public String deleteUser(Long id) {
+    // User user = getUser(id);
+    // if (user != null) {
+    // userRepository.delete(user);
+    // return "User deleted successfully: " + user.getUsername();
+    // } else {
+    // return "User with ID " + id + " not found.";
+    // }
+    // }
 
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElse(null);
-    }
+    // public User createUserByRole(User user) {
+    // return switch (user.getRole()) {
+    // case ROLE_ADMIN -> new Admin(user.getUsername(), user.getPassword(),
+    // user.getEmail());
+    // case ROLE_INSTRUCTOR -> new Instructor(user.getUsername(),
+    // user.getPassword(), user.getEmail());
+    // case ROLE_STUDENT -> new Student(user.getUsername(), user.getPassword(),
+    // user.getEmail());
+    // default -> throw new IllegalArgumentException("Invalid role: " +
+    // user.getRole());
+    // };
+    // }
 
-    public String deleteUser(Long id) {
-        User user = getUser(id);
-        if (user != null) {
-            userRepository.delete(user);
-            return "User deleted successfully: " + user.getUsername();
-        } else {
-            return "User with ID " + id + " not found.";
-        }
-    }
-
-    public User createUserByRole(User user) {
-        return switch (user.getRole()) {
-            case ROLE_ADMIN -> new Admin(user.getUsername(), user.getPassword(), user.getEmail());
-            case ROLE_INSTRUCTOR -> new Instructor(user.getUsername(), user.getPassword(), user.getEmail());
-            case ROLE_STUDENT -> new Student(user.getUsername(), user.getPassword(), user.getEmail());
-            default -> throw new IllegalArgumentException("Invalid role: " + user.getRole());
-        };
-    }
-
-    public String addUser(User user) {
-        user.setPassword(encoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return "User added successfully";
-    }
+    // public String addUser(User user) {
+    // user.setPassword(encoder.encode(user.getPassword()));
+    // userRepository.save(user);
+    // return "User added successfully";
+    // }
 
     public String verify(User user) {
         UserDetails userDetails = loadUserByUsername(user.getUsername());

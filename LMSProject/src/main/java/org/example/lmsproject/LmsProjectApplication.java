@@ -2,6 +2,7 @@ package org.example.lmsproject;
 
 import org.example.lmsproject.userPart.model.Admin;
 import org.example.lmsproject.userPart.model.User;
+import org.example.lmsproject.userPart.service.AdminService;
 import org.example.lmsproject.userPart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -21,7 +22,7 @@ public class LmsProjectApplication {
     }
 
     @Bean
-    public CommandLineRunner commandLineRunner(UserService userService) {
+    public CommandLineRunner commandLineRunner(UserService userService, AdminService adminService) {
         return args -> {
             // Check if the database is empty (no users exist)
             if (userService.findAllUsers().isEmpty()) {
@@ -31,7 +32,7 @@ public class LmsProjectApplication {
                 user.setEmail("firstAdmin@gmail.com"); // Set the email
                 user.setPassword("zinab27"); // Set the password (encoded)
                 // user.setRole(User.Role.ROLE_ADMIN); // Set the role
-                userService.addUser(user); // Save the user to the database
+                adminService.addUser(user); // Save the user to the database
                 System.out.println("Initial admin user added.");
             } else {
                 System.out.println("Users already exist in the database.");

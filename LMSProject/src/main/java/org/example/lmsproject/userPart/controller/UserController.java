@@ -10,27 +10,19 @@ import org.example.lmsproject.userPart.service.UserService;
 // import org.springframework.http.HttpStatus;
 // import org.springframework.http.ResponseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 //import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 //import org.springframework.security.core.Authentication;
 //import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 //import org.springframework.security.authentication.AuthenticationManager;
 
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-// @CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService service;
-//    @Autowired
-//    private AuthenticationManager authenticationManager;
-//
-//    @Autowired
-//    private JwtService jwtService;
 
     @Autowired
     UserController(UserService service) {
@@ -43,19 +35,29 @@ public class UserController {
         return users.stream().map(User::getUsername).collect(Collectors.joining(", "));
     }
 
+    @GetMapping("/api/getUser/{id}")
+    public String getUser(@PathVariable Long id) {
+        User user = service.getUser(id);
+        return "User: " + user.toString();
+    }
+
+    @GetMapping("/")
+    public String hello() {
+        return "Hello World!";
+    }
+
+    // @Autowired
+    // private AuthenticationManager authenticationManager;
+    //
+    // @Autowired
+    // private JwtService jwtService;
+
     // @PostMapping("/api/addUser")
     // public String addNewUser(@RequestBody User user) {
     // System.out.println("Endpoint hit: /addUser");
     // String response = service.addUser(user);
     // return user.getUsername() + " Added Successfully\n" + response;
     // }
-
-    @PostMapping("/admin/addUser")
-    public String addNewUser(@RequestBody User userRequest) {
-        User user = service.createUserByRole(userRequest);
-        String response = service.addUser(user);
-        return user.getUsername() + " Added Successfully\n" + response;
-    }
 
     // Endpoint for adding an Admin
     // @PostMapping("/api/addAdmin")
@@ -83,31 +85,6 @@ public class UserController {
     // response;
     // }
 
-    @GetMapping("/api/getUser/{id}")
-    public String getUser(@PathVariable Long id) {
-        User user = service.getUser(id);
-        return "User: " + user.toString();
-    }
-
-    // Endpoint for updating a User
-    @PutMapping("/api/updateUser/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        String response = service.updateUser(id, updatedUser);
-        return ResponseEntity.ok(response);
-    }
-
-    // Endpoint for deleting a User
-    @DeleteMapping("/api/deleteUser/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        String response = service.deleteUser(id);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/")
-    public String hello() {
-        return "Hello World!";
-    }
-
     // @GetMapping("/admin")
     // public String admin() {
     // return "Hello World!";
@@ -118,24 +95,19 @@ public class UserController {
     // return "Hello World , startt!";
     // }
 
-//    @PostMapping("/login")
-//    public String login(@RequestBody AuthRequest authRequest) {
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-//        );
-//        if (authentication.isAuthenticated()) {
-//            return jwtService.generateToken(authRequest.getUsername());
-//        } else {
-//            throw new UsernameNotFoundException("Invalid user request!");
-//        }
-//    }
+    // @PostMapping("/login")
+    // public String login(@RequestBody AuthRequest authRequest) {
+    // Authentication authentication = authenticationManager.authenticate(
+    // new UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+    // authRequest.getPassword())
+    // );
+    // if (authentication.isAuthenticated()) {
+    // return jwtService.generateToken(authRequest.getUsername());
+    // } else {
+    // throw new UsernameNotFoundException("Invalid user request!");
+    // }
+    // }
 
-    //instructor add course
-//    CourseRepository courseRepo;
-//    @PostMapping("/instructor/addCourse")
-//    public void addCourse(@RequestBody Course course ){
-//        courseRepo.addCourse(course);
-//    }
+    // instructor add course
 
 }
-

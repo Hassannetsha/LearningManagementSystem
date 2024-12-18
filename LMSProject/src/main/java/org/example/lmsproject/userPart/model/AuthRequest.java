@@ -1,6 +1,5 @@
 package org.example.lmsproject.userPart.model;
 
-
 import lombok.*;
 
 @Setter

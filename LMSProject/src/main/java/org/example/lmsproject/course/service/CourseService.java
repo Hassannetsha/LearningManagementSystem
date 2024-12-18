@@ -31,11 +31,21 @@ public class CourseService {
     public Course updateCourse(long id, Course course) {
         Course existingCourse = courseRepository.findById(id).orElse(null);
         if (existingCourse != null) {
-            existingCourse.setTitle(course.getTitle());
-            existingCourse.setDescription(course.getDescription());
-            existingCourse.setDuration(course.getDuration());
-            existingCourse.setStudents(course.getStudents());
-            existingCourse.setInstructor(course.getInstructor());
+            if (course.getTitle()!=null) {
+                existingCourse.setTitle(course.getTitle());
+            }
+            if (course.getDescription()!=null) {
+                existingCourse.setDescription(course.getDescription());
+            }
+            if (course.getDuration()!=0) {
+                existingCourse.setDuration(course.getDuration());
+            }
+            if (course.getStudents()!=null) {
+                existingCourse.setStudents(course.getStudents());
+            }
+            if (course.getInstructor()!=null) {
+                existingCourse.setInstructor(course.getInstructor());
+            }
             return courseRepository.save(existingCourse);
         }
         return null;

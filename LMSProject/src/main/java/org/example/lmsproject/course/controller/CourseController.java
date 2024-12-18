@@ -45,5 +45,4 @@ public class CourseController {
         courseService.deleteCourse(id);
     }
 
-
 }

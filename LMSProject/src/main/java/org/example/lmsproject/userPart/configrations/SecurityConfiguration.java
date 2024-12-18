@@ -26,7 +26,6 @@ public class SecurityConfiguration {
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
 
-
     @Autowired
     public SecurityConfiguration(UserDetailsService userDetailsService, JwtService jwtService) {
         this.userDetailsService = userDetailsService;
@@ -44,11 +43,11 @@ public class SecurityConfiguration {
                 .csrf(CsrfConfigurer::disable) // Disable CSRF using the new method
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll() // Allow all API endpoints
-//                        .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR") // Only ADMIN can access "/admin"
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Only ADMIN can access "/addAdmin"
                         .requestMatchers("/student/**").hasRole("STUDENT")
-//                        .requestMatchers("/hello").permitAll()// Open access
+                        .requestMatchers("/api/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        // .requestMatchers("/hello").permitAll()// Open access
                         .anyRequest().authenticated() // Require authentication for other requests
                 )
                 .httpBasic(Customizer.withDefaults())

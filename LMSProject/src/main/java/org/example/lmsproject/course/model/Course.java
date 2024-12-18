@@ -41,6 +41,10 @@ public class Course {
         this.students = students;
     }
 
+    public Course() {
+
+    }
+
     public String getTitle() {
         return title;
     }

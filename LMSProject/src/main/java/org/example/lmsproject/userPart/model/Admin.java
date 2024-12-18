@@ -13,5 +13,4 @@ public class Admin extends User {
     public Admin() {
         setRole(Role.ROLE_ADMIN);
     }
-    // Add additional methods for admin functionality
 }
