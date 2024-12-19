@@ -23,7 +23,7 @@ public class CourseService {
         return courseRepository.findById(id).orElse(null);
     }
 
-    public Course createCourse(Course course) {
+    public Course save(Course course) {
         System.out.println("Test " + course.getTitle());
         return courseRepository.save(course);
     }

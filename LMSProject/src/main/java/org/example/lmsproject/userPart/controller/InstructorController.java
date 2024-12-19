@@ -31,7 +31,7 @@ public class InstructorController {
             return ResponseEntity.badRequest().body("Instructor not found");
         }
         course.setInstructor(instructor);
-        courseService.createCourse(course);
+        courseService.save(course);
         return ResponseEntity.ok("Course added successfully " + course.getTitle());
     }
 

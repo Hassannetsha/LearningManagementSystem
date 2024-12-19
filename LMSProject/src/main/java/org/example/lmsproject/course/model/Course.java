@@ -1,8 +1,9 @@
 package org.example.lmsproject.course.model;
 
 import org.example.lmsproject.userPart.model.*;
+import org.example.lmsproject.assignment.model.Assignment;
 import jakarta.persistence.*;
-import org.hibernate.sql.ast.tree.update.Assignment;
+import org.springframework.expression.spel.ast.Assign;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,30 +16,24 @@ public class Course {
     private String title;
     private String description;
     private int duration;
+    private boolean available;
 
     @ManyToOne
     Instructor instructor;
     @ManyToMany
     List<Student> students;
-//    @OneToMany
-//    List<Assignment> assignments;
+    @OneToMany(mappedBy = "course")
+    List<Assignment> assignments;
+    @OneToMany(mappedBy = "course")
+    List <Lesson> lessons;
 //    @OneToMany
 //    List<Quiz> quizzes;
 
-//    public Course() {
-//        this.title = null;
-//        this.description = null;
-//        this.duration = 0;
-//        this.instructor = null;
-//        this.students = new ArrayList<>();
-//    }
-
-    public Course(String title, String description, int duration, Instructor instructor, List<Student> students) {
+    public Course(String title, String description, int duration, boolean available,  Instructor instructor) {
         this.title = title;
         this.description = description;
         this.duration = duration;
         this.instructor = instructor;
-        this.students = students;
     }
 
     public Course() {
@@ -85,9 +80,39 @@ public class Course {
         this.students = students;
     }
 
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+
     public void addStudent(Student student) {
         this.students.add(student);
     }
+
+    public void removeStudent(Student student) {
+        this.students.remove(student);
+    }
+
+    public void addLesson(Lesson lesson) {
+        this.lessons.add(lesson);
+    }
+
+    public void removeLesson(Lesson lesson) {
+        this.lessons.remove(lesson);
+    }
+
+    public void addAssignment(Assignment assignment) {
+        this.assignments.add(assignment);
+    }
+
+    public void removeAssignment(Assignment assignment) {
+        this.assignments.remove(assignment);
+    }
+
+
 
     @Override
     public String toString() {
