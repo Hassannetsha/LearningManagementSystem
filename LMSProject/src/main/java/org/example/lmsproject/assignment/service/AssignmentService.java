@@ -94,7 +94,7 @@ public class AssignmentService {
     }
 
     public List<Assignment> getassignmentsbycourseid(Long courseId){
-        return assignmentrepo.findByCourse_Id(courseId);
+        return assignmentrepo.findByCourse_CourseId(courseId);
 
     }
 

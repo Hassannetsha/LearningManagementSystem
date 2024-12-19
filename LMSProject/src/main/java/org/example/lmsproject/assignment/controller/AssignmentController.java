@@ -20,11 +20,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/assignments")
 public class AssignmentController {
-    @Autowired
-    AssignmentService assignmentservice;
+    private final AssignmentService assignmentservice;
+    private final AssignmentSubmissionRepository submissionrepo;
 
     @Autowired
-    AssignmentSubmissionRepository submissionrepo;
+    public AssignmentController(AssignmentService assignmentservice, AssignmentSubmissionRepository submissionrepo) {
+        this.assignmentservice = assignmentservice;
+        this.submissionrepo = submissionrepo;
+    }
+
+
 
     @PostMapping("/create")
     public ResponseEntity<Assignment> createAssignment(@RequestParam Long courseid, @RequestParam String title,

@@ -1,4 +1,4 @@
-package com.example.demo.Service;
+package org.example.lmsproject.course.service;
 
 import org.springframework.stereotype.Service;
 

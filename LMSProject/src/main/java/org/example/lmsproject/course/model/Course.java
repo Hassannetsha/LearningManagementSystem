@@ -12,7 +12,7 @@ import java.util.List;
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long courseId;
+    private Long courseId;
     private String title;
     private String description;
     private int duration;
