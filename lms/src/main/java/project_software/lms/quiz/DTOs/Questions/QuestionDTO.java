@@ -8,7 +8,7 @@ public class QuestionDTO  {
 
     private List<String> options;
     private String correctOption;
-
+    private Long courseId;
     private Boolean correctAnswer;
 
     public String getType() {
@@ -53,5 +53,13 @@ public class QuestionDTO  {
     @Override
     public String toString(){
         return type + "\n" + questionText + "\n" + options + "\n" + correctOption + "\n" + correctAnswer;
+    }
+
+    public Long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Long courseId) {
+        this.courseId = courseId;
     }
 }

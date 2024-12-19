@@ -1,4 +1,4 @@
-package project_software.lms.quiz.Entities.Question;
+package project_software.lms.quiz.model.Question;
 
 import java.util.List;
 

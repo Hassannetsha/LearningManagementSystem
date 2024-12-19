@@ -1,6 +1,6 @@
-package project_software.lms.quiz.Entities.Quiz;
+package project_software.lms.quiz.model.Quiz;
 
-import java.util.ArrayList;
+// import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -23,6 +23,8 @@ public class FeedBack {
     @JoinColumn(name = "quizId", referencedColumnName = "quizId", nullable = false)
     private QuizEntity quiz;
     @Column(nullable = false)
+    // @ManyToOne
+    // private User student;
     private Long studentId;
     @Column(nullable = false)
     private List<String> answers;
@@ -73,14 +75,6 @@ public class FeedBack {
         return quiz.toString() + "\n"  + studentId.toString() + "\n" + ans + "\n";
     }
 
-    // public String getMessage() {
-    //     return message;
-    // }
-
-    // public void setMessage(String message) {
-    //     this.message = message;
-    // }
-
     public int getGrade() {
         return grade;
     }
@@ -88,5 +82,13 @@ public class FeedBack {
     public void setGrade(int grade) {
         this.grade = grade;
     }
+
+    // public User getStudent() {
+    //     return student;
+    // }
+
+    // public void setStudent(User student) {
+    //     this.student = student;
+    // }
     
 }

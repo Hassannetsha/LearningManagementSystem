@@ -1,14 +1,16 @@
-package project_software.lms.quiz.Entities.Quiz;
+package project_software.lms.quiz.model.Quiz;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+// import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import project_software.lms.quiz.Entities.Question.QuestionBank;
+import project_software.lms.quiz.model.Question.QuestionBank;
 
 @Entity
 @Table(name = "quiz", uniqueConstraints = @UniqueConstraint(columnNames = {"quizName", "courseId"}))
@@ -18,10 +20,12 @@ public class QuizEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long quizId;
     @Column(nullable = false)
+    // @ManyToOne
+    // private Course course;
     private Long courseId;
     @Column(nullable = false)
     private String quizName;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private QuestionBank questionBank;
     public long getCourseId() {
         return courseId;
@@ -48,14 +52,6 @@ public class QuizEntity {
         return quizId;
     }
 
-    // public List<QuestionEntity> getQuestions() {
-    //     return questions;
-    // }
-
-    // public void setQuestions(List<QuestionEntity> questions) {
-    //     this.questions = questions;
-    // }
-
     public QuestionBank getQuestionBank() {
         return questionBank;
     }
@@ -63,4 +59,12 @@ public class QuizEntity {
     public void setQuestionBank(QuestionBank questionBank) {
         this.questionBank = questionBank;
     }
+
+    // public Course getCourse() {
+    //     return course;
+    // }
+
+    // public void setCourse(Course course) {
+    //     this.course = course;
+    // }
 }

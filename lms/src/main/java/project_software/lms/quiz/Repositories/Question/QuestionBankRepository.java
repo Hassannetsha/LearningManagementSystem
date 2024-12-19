@@ -5,8 +5,7 @@ package project_software.lms.quiz.Repositories.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-// import project_software.lms.quiz.CompositePrimaryKeys.QuestionBankId;
-import project_software.lms.quiz.Entities.Question.QuestionBank;
+import project_software.lms.quiz.model.Question.QuestionBank;
 @Repository
 public interface QuestionBankRepository extends JpaRepository<QuestionBank, Long>{
     

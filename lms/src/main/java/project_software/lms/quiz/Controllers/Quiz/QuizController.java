@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import project_software.lms.quiz.DTOs.Quizzes.QuizCreationDTO;
 import project_software.lms.quiz.DTOs.Quizzes.QuizSubmissionDTO;
-import project_software.lms.quiz.Entities.Question.QuestionBank;
-import project_software.lms.quiz.Entities.Quiz.FeedBack;
-import project_software.lms.quiz.Entities.Quiz.QuizEntity;
-import project_software.lms.quiz.Entities.Quiz.QuizSubmission;
 import project_software.lms.quiz.Services.Quizzes.QuizServices;
+import project_software.lms.quiz.model.Quiz.FeedBack;
+import project_software.lms.quiz.model.Quiz.QuizEntity;
+import project_software.lms.quiz.model.Quiz.QuizSubmission;
 
 @RestController
 @RequestMapping(path = "/api/Quizzes")
@@ -46,7 +45,7 @@ public class QuizController {
     public void updateQuiz(@PathVariable("quizId") Long quizId, @RequestParam(required = false) Long courseId,
             @RequestParam(required = false) String quizName,
             @RequestParam(required = false) Long questionBankId) {
-                quizServices.updateQuiz(quizId,quizName,questionBankId);
+        quizServices.updateQuiz(quizId, courseId, quizName, questionBankId);
     }
 
     @PostMapping(path = "/Submissions")
