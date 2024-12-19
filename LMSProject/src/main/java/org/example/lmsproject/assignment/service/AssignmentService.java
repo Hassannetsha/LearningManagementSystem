@@ -6,6 +6,7 @@ import org.example.lmsproject.assignment.repository.AssignmentSubmissionReposito
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.course.repository.CourseRepository;
+import org.example.lmsproject.userPart.repository.StudentRepository;
 import org.example.lmsproject.userPart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AssignmentService {
     @Autowired
     AssignmentSubmissionRepository submissionrepo;
     @Autowired
-    private UserRepository userrepo;
+    private StudentRepository studentRepository;
 
     @Autowired
     private CourseRepository courserepo;
@@ -47,7 +48,7 @@ public class AssignmentService {
         if (LocalDateTime.now().isAfter(assignment.getDeadline().atStartOfDay())) {
             throw new RuntimeException("Deadline for this assignment has passed.");
         }
-        User student = userrepo.findById(studentid)
+        User student = studentRepository.findById(studentid)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
 
         AssignmentSubmission submission = new AssignmentSubmission();

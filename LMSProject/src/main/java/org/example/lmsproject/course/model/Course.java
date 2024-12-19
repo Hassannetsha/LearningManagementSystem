@@ -16,11 +16,11 @@ public class Course {
     private String title;
     private String description;
     private int duration;
-    private boolean available;
+    private Boolean available;
 
     @ManyToOne
     Instructor instructor;
-    @ManyToMany
+    @ManyToMany(mappedBy = "courses")
     List<Student> students;
     @OneToMany(mappedBy = "course")
     List<Assignment> assignments;
@@ -29,15 +29,20 @@ public class Course {
 //    @OneToMany
 //    List<Quiz> quizzes;
 
-    public Course(String title, String description, int duration, boolean available,  Instructor instructor) {
+    public Course(String title, String description, int duration, Boolean available,  Instructor instructor) {
         this.title = title;
         this.description = description;
         this.duration = duration;
+        this.available = available;
         this.instructor = instructor;
     }
 
     public Course() {
 
+    }
+
+    public Long getCourseId() {
+        return courseId;
     }
 
     public String getTitle() {
@@ -80,11 +85,27 @@ public class Course {
         this.students = students;
     }
 
-    public boolean isAvailable() {
+    public List<Assignment> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<Assignment> assignments) {
+        this.assignments = assignments;
+    }
+
+    public List<Lesson> getLessons() {
+        return lessons;
+    }
+
+    public void setLessons(List<Lesson> lessons) {
+        this.lessons = lessons;
+    }
+
+    public Boolean isAvailable() {
         return available;
     }
 
-    public void setAvailable(boolean available) {
+    public void setAvailable(Boolean available) {
         this.available = available;
     }
 
@@ -121,8 +142,11 @@ public class Course {
                 ", title='" + title + '\'' +
                 ", description='" + description + '\'' +
                 ", duration=" + duration +
+                ", available=" + available +
                 ", instructor=" + instructor +
                 ", students=" + students +
+                ", assignments=" + assignments +
+                ", lessons=" + lessons +
                 '}';
     }
 }

@@ -1,7 +1,9 @@
 package org.example.lmsproject.userPart.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrimaryKeyJoinColumn;
+import org.example.lmsproject.course.model.Course;
+import jakarta.persistence.*;
+
+import java.util.List;
 // import jakarta.persistence.OneToMany;
 
 // import java.util.List;
@@ -15,6 +17,6 @@ public class Instructor extends User {
     public Instructor() {
         setRole(Role.ROLE_INSTRUCTOR);
     }
-    // @OneToMany(mappedBy = "instructor")
-    // private List<Course> courses;
+     @OneToMany(mappedBy = "instructor")
+     private List<Course> courses;
 }
