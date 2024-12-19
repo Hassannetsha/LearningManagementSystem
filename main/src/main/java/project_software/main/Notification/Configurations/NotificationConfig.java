@@ -16,12 +16,6 @@ public class NotificationConfig {
     @Bean
     CommandLineRunner commandLineRunner(NotificationRepository repository) {
         return args -> {
-            // Notification one = new Notification("param", LocalDate.of(2024, 12, 17),1);
-            // Notification two = new Notification(false, "2", LocalDate.of(2024, 12, 7),2);
-            // Notification three = new Notification(false, "3", LocalDate.of(2024, 12, 1),3);
-            // Notification unexpected = new Notification(false, "the spanish inquisition", LocalDate.of(1478, 11, 1),9);
-
-            // repository.saveAll(List.of(one,two,three,unexpected));
         };
     }
 }

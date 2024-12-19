@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import project_software.main.Notification.Entities.Mailbox;
 import project_software.main.Notification.Entities.Notification;
 import project_software.main.Notification.Services.MailboxService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,30 +27,40 @@ public class MailboxController {
         this.mailboxService = mailboxService;
     }
 
+    @GetMapping(path = "{mailboxID}")
+    public Mailbox  getMailbox(@PathVariable("mailboxID") Long id) {
+        return mailboxService.getMailbox(id);
+    }
+
     @GetMapping(path = "{userID}")
-    public List<Notification> getNotificationsByUserId(@PathVariable("userID") Long id) {
-        return mailboxService.getNotificationsByUserId(id);
+    public List<Notification> getNotifications(@PathVariable("userID") Long id) {
+        return mailboxService.getNotifications(id);
     }
 
     @PostMapping
-    public void postNotification(@RequestParam Long userId, @RequestParam String message) {
-        mailboxService.postNotificationToMailbox(userId, message);
+    public void addNotification(@RequestParam Long userId, @RequestParam Object message) {
+        mailboxService.addNotification(userId, message);
+    }
+
+    @PostMapping(path = "bulk")
+    public void addBulkNotifications(@RequestParam List<Long> userIDs, @RequestParam String message) {
+        mailboxService.addBulkNotifications(userIDs, message);
     }
 
     @PutMapping(path = "markAllAsRead/{userId}")
     public void markAllAsRead(@PathVariable("userId") Long id) {
-        mailboxService.markAllNotificationsAsRead(id);
+        mailboxService.markAllAsRead(id);
     }
 
     @PutMapping(path = "markAllAsUnread/{userId}")
     public void markAllAsUnread(@PathVariable("userId") Long id) {
-        mailboxService.markAllNotificationsAsUnread(id);
+        mailboxService.markAllAsUnread(id);
     }
 
-    @DeleteMapping(path = "delete/{notificationId}")
-    public void deleteNotification(@PathVariable("notificationId") Long id) {
-        mailboxService.deleteNotification(id);
-    }
+    // @DeleteMapping(path = "delete/{notificationId}")
+    // public void deleteNotification(@PathVariable("notificationId") Long id) {
+    //     mailboxService.deleteNotification(id);
+    // }
 
     @DeleteMapping(path = "clear/{userID}")
     public void clearNotifications(@PathVariable("userID") Long id) {

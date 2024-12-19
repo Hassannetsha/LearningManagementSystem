@@ -4,7 +4,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import project_software.main.Notification.Entities.Mailbox;
 import project_software.main.Notification.Entities.Notification;
+import project_software.main.Notification.Services.MailboxService;
 import project_software.main.Notification.Services.NotificationService;
 
 import java.util.List;
@@ -22,49 +24,52 @@ import org.springframework.web.bind.annotation.PutMapping;
 public class NotificationController {
 
     private final NotificationService notificationService;
+    private final MailboxService mailboxService;
 
     @Autowired
-    public NotificationController(NotificationService notificationService) {
+    public NotificationController(NotificationService notificationService, MailboxService mailboxService) {
         this.notificationService = notificationService;
+        this.mailboxService = mailboxService;
     }
 
-    @GetMapping
-    public List<Notification> getNotifications() {
-        return notificationService.getNotifications();
-    }
+    // @GetMapping
+    // public List<Notification> getNotifications() {
+    //     return notificationService.getNotifications();
+    // }
 
-    @GetMapping(path = "{userID}")
-    public List<Notification> getNotificationsByUserID(@PathVariable("userID") long id) {
-        return notificationService.getNotificationsByUserID(id);
-    }
+    // @GetMapping(path = "{userID}")
+    // public List<Notification> getNotificationsByUserID(@PathVariable("userID") long id) {
+    //     return notificationService.getNotificationsByUserID(id);
+    // }
 
     @PostMapping
-    public void postNotification(@RequestBody Notification notification) {
-        notificationService.postNotification(notification);
+    public Notification createNotification(@RequestParam Long mailboxId, @RequestBody Object messageObject) {
+        Mailbox mailbox = mailboxService.getMailbox(mailboxId); 
+        return notificationService.createNotification(mailbox, messageObject);
     }
 
-    @PostMapping(path = "bulk")
-    public void postBulkNotifications(@RequestParam List<Long> userIDs, @RequestParam String message) {
-        notificationService.postBulkNotifications(userIDs, message);
-    }
+    // @PostMapping(path = "bulk")
+    // public void postBulkNotifications(@RequestParam List<Long> userIDs, @RequestParam String message) {
+    //     notificationService.postBulkNotifications(userIDs, message);
+    // }
 
     @DeleteMapping(path = "delete/{notificationID}")
     public void deleteNotification(@PathVariable("notificationID") long id) {
         notificationService.deleteNotification(id);
     }
 
-    @PutMapping(path = "markAsRead/{notificationID}")
-    public void markAsRead(@PathVariable("notificationID") long id) {
-        notificationService.markAsRead(id);
-    }
+    // @PutMapping(path = "markAsRead/{notificationID}")
+    // public void markAsRead(@PathVariable("notificationID") long id) {
+    //     notificationService.markAsRead(id);
+    // }
 
-    @PutMapping(path = "markAllAsRead/{userID}")
-    public void markAllAsRead(@PathVariable("userID") long id) {
-        notificationService.markAllAsRead(id);
-    }
+    // @PutMapping(path = "markAllAsRead/{userID}")
+    // public void markAllAsRead(@PathVariable("userID") long id) {
+    //     notificationService.markAllAsRead(id);
+    // }
 
-    @PutMapping(path = "markAsUnread/{notificationID}")
-    public void markAsUnread(@PathVariable("notificationID") long id) {
-        notificationService.markAsUnread(id);
-    }
+    // @PutMapping(path = "markAsUnread/{notificationID}")
+    // public void markAsUnread(@PathVariable("notificationID") long id) {
+    //     notificationService.markAsUnread(id);
+    // }
 }

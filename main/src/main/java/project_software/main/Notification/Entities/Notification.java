@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import project_software.main.Notification.MessageMapper.MessageMapper;
 
 @Entity
 @Table
@@ -28,7 +29,7 @@ public class Notification {
 
     private Long id;
     private Boolean isRead;
-    private String message;
+    private Object message;
     private LocalDate date;
 
     @ManyToOne
@@ -37,11 +38,10 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(Mailbox mailbox, String message) {
+    public Notification(Mailbox mailbox, Object messageObject) {
         this.isRead = false;
-        this.message = message;
-        this.date = LocalDate.now();
         this.mailbox = mailbox;
+        this.message = MessageMapper.toString(messageObject);
     }
 
     public Long getId() {
@@ -56,7 +56,7 @@ public class Notification {
         this.isRead = isRead;
     }
 
-    public String getMessage() {
+    public Object getMessage() {
         return message;
     }
 

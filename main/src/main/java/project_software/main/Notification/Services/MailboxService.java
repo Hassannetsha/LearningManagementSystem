@@ -14,29 +14,45 @@ import project_software.main.Notification.Repositories.NotificationRepository;
 @Service
 public class MailboxService {
     private final MailboxRepository mailboxRepository;
-    private final NotificationRepository notificationRepository;
+    // private final NotificationRepository notificationRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public MailboxService(MailboxRepository mailboxRepository, NotificationRepository notificationRepository) {
+    public MailboxService(MailboxRepository mailboxRepository, NotificationRepository notificationRepository,
+            NotificationService notificationService) {
         this.mailboxRepository = mailboxRepository;
-        this.notificationRepository = notificationRepository;
+        // this.notificationRepository = notificationRepository;
+        this.notificationService = notificationService;
     }
 
-    public List<Notification> getNotificationsByUserId(Long userId) {
+
+    public Mailbox getMailbox(Long mailboxId) {
+        return mailboxRepository.findById(mailboxId)
+                .orElseThrow(() -> new IllegalStateException("Mailbox not found for ID " + mailboxId));
+    }
+
+    public List<Notification> getNotifications(Long userId) {
         Mailbox mailbox = mailboxRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
         return mailbox.getNotifications();
     }
 
-    public void postNotificationToMailbox(Long userId, String message) {
+    public void addNotification(Long userId, Object message) {
         Mailbox mailbox = mailboxRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
-        Notification notification = new Notification(mailbox, message);
-        notificationRepository.save(notification);
+        notificationService.createNotification(mailbox, message);
+    }
+
+    public void addBulkNotifications(List<Long> userIds, Object message) {
+        userIds.forEach(userId -> {
+            Mailbox mailbox = mailboxRepository.findByUserId(userId)
+                    .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
+            notificationService.createNotification(mailbox, message);
+        });
     }
 
     @Transactional
-    public void markAllNotificationsAsRead(Long userId) {
+    public void markAllAsRead(Long userId) {
         Mailbox mailbox = mailboxRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
         mailbox.getNotifications().forEach(notification -> notification.setIsRead(true));
@@ -55,17 +71,18 @@ public class MailboxService {
     // }
 
     @Transactional
-    public void markAllNotificationsAsUnread(Long userId) {
+    public void markAllAsUnread(Long userId) {
         Mailbox mailbox = mailboxRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
         mailbox.getNotifications().forEach(notification -> notification.setIsRead(false));
     }
 
-    public void deleteNotification(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new IllegalStateException("Notification ID{" + notificationId + "} Doesn't Exist"));
-        notificationRepository.delete(notification);
-    }
+    // public void deleteNotification(Long notificationId) {
+    // Notification notification = notificationRepository.findById(notificationId)
+    // .orElseThrow(() -> new IllegalStateException("Notification ID{" +
+    // notificationId + "} Doesn't Exist"));
+    // notificationRepository.delete(notification);
+    // }
 
     @Transactional
     public void clearNotifications(Long userId) {

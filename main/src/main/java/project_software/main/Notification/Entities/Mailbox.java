@@ -14,7 +14,7 @@ public class Mailbox {
 
     // @OneToOne
     // @JoinColumn(name = "user_id", nullable = false, unique = true)
-    // private User user; 
+    // private User user;
 
     @OneToMany(mappedBy = "mailbox", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications;
