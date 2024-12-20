@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/assignments")
 public class AssignmentController {
     private final AssignmentService assignmentservice;
     private final AssignmentSubmissionRepository submissionrepo;
@@ -31,20 +30,20 @@ public class AssignmentController {
 
 
 
-    @PostMapping("/create")
+    @PostMapping("/instructor/assignments/create")
     public ResponseEntity<Assignment> createAssignment(@RequestParam Long courseid, @RequestParam String title,
                                                        @RequestParam String description, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadline) {
         Assignment assignment = assignmentservice.createAssignment(courseid, title, description, deadline);
         return ResponseEntity.ok(assignment);
     }
 
-    @GetMapping("/course")
+    @GetMapping("/api/getassignmentbycourse")
     public ResponseEntity<List<Assignment>> getassignmentsbycourseid(@RequestParam Long courseid) {
         List<Assignment> assignments = assignmentservice.getassignmentsbycourseid(courseid);
         return ResponseEntity.ok(assignments);
     }
 
-    @PostMapping("/submit")
+    @PostMapping("/student/submitassignment")
     public ResponseEntity<AssignmentSubmission> submitassignment(
             @RequestParam Long assignmentid,
             @RequestParam Long studentid,
@@ -56,8 +55,7 @@ public class AssignmentController {
             return ResponseEntity.badRequest().body(null);
         }
     }
-    @PostMapping("/gradesubmission")
-    //@PreAuthorize("hasRole('INSTRUCTOR')")
+    @PostMapping("/instructor/gradesubmission")
     public ResponseEntity<AssignmentSubmission> gradesubmission(
             @RequestParam Long submissionid,
             @RequestParam Integer grade,
@@ -65,7 +63,7 @@ public class AssignmentController {
         AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade, feedback);
         return ResponseEntity.ok(submission);
     }
-    @PutMapping("/update")
+    @PutMapping("/instructor/update")
     public ResponseEntity<Assignment> updateAssignment(
             @RequestParam Long assignmentId,
             @RequestParam String title,
@@ -74,21 +72,19 @@ public class AssignmentController {
         Assignment updatedAssignment = assignmentservice.updateassignment(assignmentId, title, description, deadline);
         return ResponseEntity.ok(updatedAssignment);
     }
-    @DeleteMapping("/deleteassignment")
-    //@PreAuthorize("hasRole('INSTRUCTOR')")
+    @DeleteMapping("/instructor/deleteassignment")
     public ResponseEntity<Void> deleteAssignment(@RequestParam Long assignmentId) {
         assignmentservice.deleteassignment(assignmentId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/submissions/feedback_grade")
-    //@PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/student/feedback_grade")
     public ResponseEntity<FeedbackResponse> getFeedback(@RequestParam Long submissionId) {
         FeedbackResponse feedbackResponse = assignmentservice.getsubmissionfeedbackandgrade(submissionId);
         return ResponseEntity.ok(feedbackResponse);
     }
 
-    @GetMapping("/submissions/file")
+    @GetMapping("/instructor/getsubmitedfilecontent")
     public ResponseEntity<String> getFileContent(@RequestParam Long submissionId) {
         AssignmentSubmission submission = submissionrepo.findById(submissionId)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
