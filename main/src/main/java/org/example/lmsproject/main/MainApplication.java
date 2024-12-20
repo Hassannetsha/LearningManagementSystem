@@ -1,4 +1,4 @@
-package project_software.main;
+package org.example.lmsproject.main;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

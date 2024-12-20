@@ -2,10 +2,8 @@ package org.example.lmsproject.course.model;
 
 import org.example.lmsproject.userPart.model.*;
 import org.example.lmsproject.assignment.model.Assignment;
+//import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import jakarta.persistence.*;
-import org.springframework.expression.spel.ast.Assign;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -26,8 +24,8 @@ public class Course {
     List<Assignment> assignments;
     @OneToMany(mappedBy = "course")
     List <Lesson> lessons;
-//    @OneToMany
-//    List<Quiz> quizzes;
+//    @OneToMany(mappedBy = "quizzes")
+//    List<QuizEntity> quizzes;
 
     public Course(String title, String description, int duration, Boolean available,  Instructor instructor) {
         this.title = title;
@@ -133,20 +131,16 @@ public class Course {
         this.assignments.remove(assignment);
     }
 
-
-
     @Override
     public String toString() {
         return "Course{" +
-                "courseId=" + courseId +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", duration=" + duration +
-                ", available=" + available +
-                ", instructor=" + instructor +
-                ", students=" + students +
-                ", assignments=" + assignments +
-                ", lessons=" + lessons +
-                '}';
+                "\n    courseId=" + courseId +
+                ",\n    title='" + title + '\'' +
+                ",\n    description='" + description + '\'' +
+                ",\n    duration=" + duration +
+                ",\n    available=" + available +
+                ",\n    instructorId=" + instructor.getId() +
+                "}";
     }
+
 }

@@ -7,13 +7,23 @@ import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.repository.StudentRepository;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
+
+    @Value("${upload.directory}")
+    private String uploadDirectory;
 
     @Autowired
     private CourseRepository courseRepository;
@@ -22,12 +32,34 @@ public class CourseService {
     @Autowired
     private StudentRepository studentRepository;
 
-    public List<Course> getAllCourses() {
-        return courseRepository.findAll();
+
+    public boolean courseExists(long courseId) {
+        return courseRepository.existsById(courseId);
     }
 
-    public List<Course> getAvailableCourses() {
-        return courseRepository.findAll().stream().filter(Course::isAvailable).collect(Collectors.toList());
+    public String getAllCourses() {
+         List<Course> courses = courseRepository.findAll();
+        String jsonResponse = courses.stream()
+                .map(Course::toString)
+                .collect(Collectors.joining(",\n\n    ", "[\n    ", "]\n")); // Join all course strings into a JSON array format
+
+        return jsonResponse;
+    }
+
+    public String getAvailableCourses() {
+        List<Course> availableCourses = courseRepository.findAll().stream().filter(Course::isAvailable).collect(Collectors.toList());
+        String jsonResponse = availableCourses.stream()
+                .map(Course::toString)
+                .collect(Collectors.joining(",\n\n    ", "[\n    ", "]\n"));
+        return jsonResponse;
+    }
+
+    public String viewCourse(long id) {
+        Course course = courseRepository.findById(id).orElse(null);
+        if (course == null) {
+            return "";
+        }
+        return course.toString();
     }
 
     public Course getCourseById(long id) {
@@ -75,28 +107,24 @@ public class CourseService {
         return null;
     }
 
-    public List<Student> viewEnrolledStudents(long id) {
+    public String viewEnrolledStudents(long id) {
         Course course = getCourseById(id);
-        return course != null ? course.getStudents() : List.of();
+        List<Long> studentIds = course.getStudents().stream()
+                .map(Student::getId)
+                .toList();
+
+        // Convert the list of IDs to a JSON-style string
+        return "{\"students\": " + studentIds.toString() + "}";
     }
 
-    public void enrollStudentInCourse(long courseId, String studentUsername) {
+    public boolean enrollStudentInCourse(long courseId, String studentUsername) {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
         Student student = studentService.findStudentByUsername(studentUsername);
-        if (student != null) {
-            course.addStudent(student);
-            courseRepository.save(course);
-        } else {
-            throw new RuntimeException("Student not found");
-        }
-    }
 
-    public boolean removeStudentFromCourse(long courseId, long studentId) {
-        Course course = courseRepository.findById(courseId).orElse(null);
-        Student student = studentService.getStudentById(studentId);
-        if (course != null && student != null) {
-            course.removeStudent(student);
-            student.getCourse().remove(course);
+        if (student != null) {
+            System.out.println("Student: " + student.getId());
+            course.addStudent(student);
+            student.getCourses().add(course);
             courseRepository.save(course);
             studentRepository.save(student);
             return true;
@@ -104,7 +132,36 @@ public class CourseService {
         return false;
     }
 
-    // Delete a course by ID
+    public boolean removeStudentFromCourse(long courseId, long studentId) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        Student student = studentService.getStudentById(studentId);
+        if (course != null && student != null) {
+            course.removeStudent(student);
+            student.getCourses().remove(course);
+            courseRepository.save(course);
+            studentRepository.save(student);
+            return true;
+        }
+        return false;
+    }
+
+    public String uploadMaterial(long id, MultipartFile file){
+        Course course = courseRepository.findById(id).orElse(null);
+        try {
+            File directory = new File(uploadDirectory);
+            if (!directory.exists()) {
+                System.out.println("Directory does not exist");
+                directory.mkdirs();
+            }
+            byte[] bytes = file.getBytes();
+            System.out.println(uploadDirectory+file.getOriginalFilename());
+            Path path = Paths.get(uploadDirectory + file.getOriginalFilename());
+            Files.write(path, bytes);
+            System.out.println("File written");
+        }catch (IOException e){}
+        return "File uploaded successfully";
+    }
+
     public void deleteCourse(long id) {
         courseRepository.deleteById(id);
     }

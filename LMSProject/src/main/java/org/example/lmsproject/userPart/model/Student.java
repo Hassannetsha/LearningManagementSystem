@@ -23,7 +23,7 @@ public class Student extends User {
         setRole(Role.ROLE_STUDENT);
     }
 
-    public List<Course> getCourse() {
+    public List<Course> getCourses() {
         return courses;
     }
 
