@@ -2,12 +2,15 @@ package org.example.lmsproject.quiz.model.Question;
 
 import java.util.List;
 
+import org.example.lmsproject.course.model.Course;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -20,20 +23,20 @@ public class QuestionBank {
     private Long id;
     @Column(nullable=false)
     private String questionBankName;
-    @Column(nullable=false)
-    private Long courseId;
+    @ManyToOne
+    private Course course;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QuestionEntity> questions;
     public Long getId() {
         return id;
     }
-    public Long getCourseId() {
-        return courseId;
-    }
+    // public Long getCourseId() {
+    //     return courseId;
+    // }
 
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
+    // public void setCourseId(Long courseId) {
+    //     this.courseId = courseId;
+    // }
 
     public List<QuestionEntity> getQuestions() {
         return questions;
@@ -52,5 +55,13 @@ public class QuestionBank {
     }
     public void removeQuestion(QuestionEntity question) {
         this.questions.remove(question);
+    }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
     }
 }

@@ -3,6 +3,8 @@ package org.example.lmsproject.quiz.model.Quiz;
 // import java.util.ArrayList;
 import java.util.List;
 
+import org.example.lmsproject.userPart.model.Student;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,10 +24,10 @@ public class FeedBack {
     @ManyToOne
     @JoinColumn(name = "quizId", referencedColumnName = "quizId", nullable = false)
     private QuizEntity quiz;
-    @Column(nullable = false)
-    // @ManyToOne
-    // private User student;
-    private Long studentId;
+    // @Column(nullable = false)
+    @ManyToOne
+    private Student student;
+    // private Long studentId;
     @Column(nullable = false)
     private List<String> answers;
     @Column(nullable = false)
@@ -33,9 +35,10 @@ public class FeedBack {
     public FeedBack(){
 
     }
-    public FeedBack(QuizEntity quiz, Long id) {
+    public FeedBack(QuizEntity quiz, Student student) {
         this.quiz = quiz;
-        this.studentId = id;
+        this.student = student;
+        // this.studentId = id;
         // this.message = message;
     } 
 
@@ -55,13 +58,13 @@ public class FeedBack {
         this.answers = answers;
     }
 
-    public Long getStudentId() {
-        return studentId;
-    }
+    // public Long getStudentId() {
+    //     return studentId;
+    // }
 
-    public void setStudentId(Long id) {
-        this.studentId = id;
-    }
+    // public void setStudentId(Long id) {
+    //     this.studentId = id;
+    // }
 
     public Long getId() {
         return id;
@@ -72,7 +75,7 @@ public class FeedBack {
         for (String answer : this.answers) {
             ans += answer;
         }
-        return quiz.toString() + "\n"  + studentId.toString() + "\n" + ans + "\n";
+        return quiz.toString() + "\n"  + student.getId() + "\n" + ans + "\n";
     }
 
     public int getGrade() {
@@ -90,5 +93,13 @@ public class FeedBack {
     // public void setStudent(User student) {
     //     this.student = student;
     // }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
     
 }

@@ -2,6 +2,11 @@ package org.example.lmsproject.quiz.Controllers.Question;
 
 import java.util.List;
 
+import org.example.lmsproject.quiz.DTOs.Questions.QuestionBankDTO;
+import org.example.lmsproject.quiz.DTOs.Questions.QuestionDTO;
+import org.example.lmsproject.quiz.Services.Question.QuestionServices;
+import org.example.lmsproject.quiz.model.Question.QuestionBank;
+import org.example.lmsproject.quiz.model.Question.QuestionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,18 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.example.lmsproject.quiz.DTOs.Questions.QuestionBankDTO;
-import org.example.lmsproject.quiz.DTOs.Questions.QuestionDTO;
-import org.example.lmsproject.quiz.Services.Question.QuestionServices;
-import org.example.lmsproject.quiz.model.Question.QuestionBank;
-import org.example.lmsproject.quiz.model.Question.QuestionEntity;
-
 // import org.example.lmsproject.quiz.DTOs.Questions.QuestionDTO;
 // import org.example.lmsproject.quiz.Entities.Question.QuestionEntity;
 // import org.example.lmsproject.quiz.Services.Question.QuestionServices;
 
 @RestController
-@RequestMapping(path = "/api/Questions")
+@RequestMapping(path = "/instructor/questions")
 public class QuestionController {
     private final QuestionServices questionServices;
 

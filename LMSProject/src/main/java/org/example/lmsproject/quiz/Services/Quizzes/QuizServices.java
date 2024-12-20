@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
+import org.example.lmsproject.course.model.Course;
+import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.quiz.DTOs.Quizzes.QuizCreationDTO;
 import org.example.lmsproject.quiz.DTOs.Quizzes.QuizSubmissionDTO;
 import org.example.lmsproject.quiz.Repositories.Quiz.FeedBackRepository;
@@ -22,6 +19,13 @@ import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
 import org.example.lmsproject.quiz.model.Quiz.FeedBack;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.quiz.model.Quiz.QuizSubmission;
+import org.example.lmsproject.userPart.model.Student;
+import org.example.lmsproject.userPart.service.StudentService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class QuizServices {
@@ -31,17 +35,20 @@ public class QuizServices {
 	// private final QuestionBankRepository questionBankRepository;
 	private final QuizSubmissionRepository quizSubmissionRepository;
 	private final FeedBackRepository feedBackRepository;
-
+	private final CourseService courseService;
+	private final StudentService studentService;
 	@Autowired
 	public QuizServices(
 			QuizRepository quizRepository,
 			@Lazy QuestionServices questionServices,
 			QuizSubmissionRepository quizSubmissionRepository,
-			FeedBackRepository feedBackRepository) {
+			FeedBackRepository feedBackRepository, CourseService courseService,StudentService studentService) {
 		this.quizRepository = quizRepository;
 		this.questionServices = questionServices;
 		this.quizSubmissionRepository = quizSubmissionRepository;
 		this.feedBackRepository = feedBackRepository;
+		this.courseService = courseService;
+		this.studentService = studentService;
 	}
 
 	public List<QuizEntity> getAllQuizzes() {
@@ -51,10 +58,17 @@ public class QuizServices {
 	public void addNewQuiz(QuizCreationDTO quizCreationDTO) {
 		QuizEntity quiz = new QuizEntity();
 		QuestionBank questionBank = questionServices.findQuestionBankByid(quizCreationDTO.getQuestionBankId());
+		Course course = courseService.getCourseById(quizCreationDTO.getCourseId());
 		// CourseEntity course =
 		// courseRepository.findByid(quizSubmissionDTO.getCourseId());
 		if (questionBank != null) {
-			quiz.setCourseId(quizCreationDTO.getCourseId());
+			if (course != null) {
+
+				quiz.setCourse(course);
+			} else {
+				throw new IllegalStateException(
+						"There is no course with this ID: " + quizCreationDTO.getCourseId());
+			}
 			quiz.setQuizName(quizCreationDTO.getQuizName());
 			quiz.setQuestionBank(questionBank);
 			quizRepository.save(quiz);
@@ -70,15 +84,27 @@ public class QuizServices {
 			for (String ans : quizSubmissionDTO.getAnswers()) {
 				System.out.println(ans);
 			}
-			QuizSubmission quizSubmission = new QuizSubmission(quiz, quizSubmissionDTO.getCourseId(),
-					quizSubmissionDTO.getAnswers(), quizSubmissionDTO.getStudentId());
-			System.out.println("before save quiz submission");
-			quizSubmissionRepository.save(quizSubmission);
-			System.out.println("before feedback");
-			FeedBack feedBack = new FeedBack(quizSubmission.getQuiz(), quizSubmission.getStudentId());
-			feedBack.setGrade(calculateGrade(quizSubmission, feedBack));
-			System.out.println(feedBack.toString());
-			feedBackRepository.save(feedBack);
+			Course course = courseService.getCourseById(quizSubmissionDTO.getCourseId());
+			if (course != null) {
+				Student student = studentService.getStudentById(quizSubmissionDTO.getStudentId());
+				if (student != null) {
+					QuizSubmission quizSubmission = new QuizSubmission(quiz, course,
+							quizSubmissionDTO.getAnswers(), student);
+					System.out.println("before save quiz submission");
+					quizSubmissionRepository.save(quizSubmission);
+					System.out.println("before feedback");
+					FeedBack feedBack = new FeedBack(quizSubmission.getQuiz(), student);
+					feedBack.setGrade(calculateGrade(quizSubmission, feedBack));
+					System.out.println(feedBack.toString());
+					//notificationController.send(feedBack);
+					feedBackRepository.save(feedBack);
+				}
+				else{
+					throw new IllegalStateException("Student not found");
+				}
+			} else {
+				throw new IllegalStateException("Course not found");
+			}
 		} else {
 			throw new IllegalStateException("No quiz found");
 		}
@@ -150,16 +176,16 @@ public class QuizServices {
 					throw new IllegalStateException("No question Bank found");
 				}
 			}
-			// if (course!=null) {
-			if (!Objects.equals(quiz.getCourseId(), courseId)) {
-				quiz.setCourseId(courseId);
+			Course course = courseService.getCourseById(courseId);
+			if (course != null) {
+				if (!Objects.equals(quiz.getCourse(), course)) {
+					quiz.setCourse(course);
+				} else {
+					throw new IllegalStateException("The quiz with id: " + quizId + " has the same course id");
+				}
 			} else {
-				throw new IllegalStateException("The quiz with id: " + quizId + " has the same course id");
+				throw new IllegalStateException("No course Bank found");
 			}
-			// }
-			// else{
-			// throw new IllegalStateException("No course Bank found");
-			// }
 		} else {
 			throw new IllegalStateException("No quiz found");
 		}
@@ -168,31 +194,33 @@ public class QuizServices {
 	public QuizEntity findById(Long quizId) {
 		return quizRepository.findByquizId(quizId);
 	}
-	// public QuizEntity findByCourse(Course course) {
-	// 	QuizEntity quizEntity =  quizRepository.findBycourse(course);
-	// 	if (quizEntity!=null) {
-	// 		return quizEntity;
-	// 	}
-	// 	throw new IllegalStateException("No quizzes for this course");
-	// }
-	
-	public QuizEntity findByQuestionBank(QuestionBank questionBank){
-        return quizRepository.findByquestionBank(questionBank);
-    }
-	public QuizSubmission findInQuizSubmission(QuizEntity quizEntity){
-        return quizSubmissionRepository.findByquiz(quizEntity);
-    }
 
-    public FeedBack findInFeedBacks(QuizEntity quizEntity) {
-        return feedBackRepository.findByquiz(quizEntity);
-    }
+	public QuizEntity findByCourse(Course course) {
+		QuizEntity quizEntity = quizRepository.findBycourse(course);
+		if (quizEntity != null) {
+			return quizEntity;
+		}
+		throw new IllegalStateException("No quizzes for this course");
+	}
 
-    public void deleteFeedBack(FeedBack feedBack) {
-        feedBackRepository.delete(feedBack);
-    }
+	public QuizEntity findByQuestionBank(QuestionBank questionBank) {
+		return quizRepository.findByquestionBank(questionBank);
+	}
 
-    public void deleteQuizSubmission(QuizSubmission quizSubmission) {
-        quizSubmissionRepository.delete(quizSubmission);
-    }
-	
+	public QuizSubmission findInQuizSubmission(QuizEntity quizEntity) {
+		return quizSubmissionRepository.findByquiz(quizEntity);
+	}
+
+	public FeedBack findInFeedBacks(QuizEntity quizEntity) {
+		return feedBackRepository.findByquiz(quizEntity);
+	}
+
+	public void deleteFeedBack(FeedBack feedBack) {
+		feedBackRepository.delete(feedBack);
+	}
+
+	public void deleteQuizSubmission(QuizSubmission quizSubmission) {
+		quizSubmissionRepository.delete(quizSubmission);
+	}
+
 }

@@ -32,7 +32,7 @@ public class UserService implements UserDetailsService {// service hia elly f el
         try {
             // Long userId = Long.parseLong(id);// Parse the id from the input string
             // System.out.println("ID==" + userId);
-            User user = userRepository.findByUsername(username)
+            User user = userRepository.findByusername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + username));
             System.out.println(user.getUsername());
             System.out.println("&&&" + user.getPassword());

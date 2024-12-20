@@ -43,6 +43,7 @@ public class SecurityConfiguration {
                 .csrf(CsrfConfigurer::disable) // Disable CSRF using the new method
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll() // Allow all API endpoints
+                        .requestMatchers("/signup").permitAll() // Allow all API endpoints
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR") // Only ADMIN can access "/admin"
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Only ADMIN can access "/addAdmin"
                         .requestMatchers("/student/**").hasRole("STUDENT")

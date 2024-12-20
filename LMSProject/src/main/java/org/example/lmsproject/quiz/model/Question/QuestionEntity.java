@@ -1,5 +1,7 @@
 package org.example.lmsproject.quiz.model.Question;
 
+import org.example.lmsproject.course.model.Course;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.ManyToOne;
 // import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 // import jakarta.persistence.UniqueConstraint;
@@ -26,10 +29,10 @@ public abstract class QuestionEntity {
     private String question;
     @Column(nullable = false)
     private String type;
-    @Column(nullable = false)
-    // @ManyToOne
-    // private Course course;
-    private Long courseId;
+    // @Column(nullable = false)
+    @ManyToOne
+    private Course course;
+    // private Long courseId;
     public String getQuestion() {
         return question;
     }
@@ -52,13 +55,13 @@ public abstract class QuestionEntity {
 
     public abstract int calculateScore(Object userAnswer);
 
-    public Long getCourseId() {
-        return courseId;
-    }
+    // public Long getCourseId() {
+    //     return courseId;
+    // }
 
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
-    }
+    // public void setCourseId(Long courseId) {
+    //     this.courseId = courseId;
+    // }
 
     // public Course getCourse() {
     //     return course;
@@ -67,4 +70,12 @@ public abstract class QuestionEntity {
     // public void setCourse(Course course) {
     //     this.course = course;
     // }
+
+    public Course getCourse() {
+        return course;
+    }
+
+    public void setCourse(Course course) {
+        this.course = course;
+    }
 }

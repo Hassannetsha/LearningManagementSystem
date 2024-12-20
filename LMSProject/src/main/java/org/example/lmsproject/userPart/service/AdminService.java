@@ -4,22 +4,28 @@ import org.example.lmsproject.userPart.model.Admin;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.User;
+import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+
+import org.example.lmsproject.userPart.model.Request;
 
 @Service
 public class AdminService {
     private final  PasswordEncoder encoder;
     private final UserRepository userRepo;
+    private final RequestRepository requestRepo;
 
     @Autowired
-    public AdminService(PasswordEncoder encoder, UserRepository userRepo) {
+    public AdminService(PasswordEncoder encoder, UserRepository userRepo,RequestRepository requestRepo) {
         this.encoder = encoder;
         this.userRepo = userRepo;
+        this.requestRepo = requestRepo;
     }
 
 
@@ -71,4 +77,25 @@ public class AdminService {
             return "User with ID " + id + " not found.";
         }
     }
+
+
+    public void sendRequest(Request userRequest) {
+        if (userRequest.getUsername()!=null&&userRequest.getPassword()!=null&&userRequest.getEmail()!=null&&userRequest.getRole()!=null) {
+            requestRepo.save(userRequest);
+        }
+        else{
+            throw new IllegalArgumentException("Invalid request");
+        }
+        
+        // notificationController
+    }
+
+
+    public List<Request> getRequests() {
+        return requestRepo.findAll();
+    }
+    public Request getRequestByID(Long id) {
+        return requestRepo.findByid(id);
+    }
+
 }
