@@ -7,8 +7,12 @@ import org.example.lmsproject.quiz.model.Quiz.FeedBack;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.userPart.model.Student;
 
+import java.util.List;
+
 @Repository
 public interface  FeedBackRepository extends JpaRepository<FeedBack, Long>  {
     FeedBack findByquiz(QuizEntity quizEntity);
     FeedBack findBystudent(Student student);
+
+    List<FeedBack> findByStudentId(Long studentId);
 }

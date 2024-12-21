@@ -1,8 +1,12 @@
 package org.example.lmsproject.course.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.example.lmsproject.userPart.model.User;
 import jakarta.persistence.*;
 
+@Getter
+@Setter
 @Entity
 public class Attendance {
     @Id
@@ -19,31 +23,6 @@ public class Attendance {
 
     private boolean isPresent;  
     private boolean isEnrolled;
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Lesson getLesson() {
-        return lesson;
-    }
-
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
-    }
-
-    public User getStudent() {
-        return student;
-    }
-
-    public void setStudent(User student) {
-        this.student = student;
-    }
 
     public boolean isPresent() {
         return isPresent;
