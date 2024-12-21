@@ -1,51 +1,31 @@
 package org.example.lmsproject.reportExcel.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.Setter;
 
+@Setter
+@Getter
+@Entity
 public class StudentPerformance {
-    private String studentName;
-    private String course;
-    private double grade;
-    private int attendance;
+    private String username;
+    @Id
+    private Long id;
+    private double quizGrade;
+    private double attendancePercentage;
+    private double assignmentScore;  // if you want to track assignments
 
-    // Constructors
-    public StudentPerformance(String studentName, String course, double grade, int attendance) {
-        this.studentName = studentName;
-        this.course = course;
-        this.grade = grade;
-        this.attendance = attendance;
+    // Constructor, getters, and setters
+    public StudentPerformance(String username,Long id, double quizGrade, double attendancePercentage, double assignmentScore) {
+        this.username = username;
+        this.quizGrade = quizGrade;
+        this.attendancePercentage = attendancePercentage;
+        this.assignmentScore = assignmentScore;
+        this.id = id;
     }
 
-    // Getters and Setters
-    public String getStudentName() {
-        return studentName;
-    }
+    public StudentPerformance() {
 
-    public void setStudentName(String studentName) {
-        this.studentName = studentName;
-    }
-
-    public String getCourse() {
-        return course;
-    }
-
-    public void setCourse(String course) {
-        this.course = course;
-    }
-
-    public double getGrade() {
-        return grade;
-    }
-
-    public void setGrade(double grade) {
-        this.grade = grade;
-    }
-
-    public int getAttendance() {
-        return attendance;
-    }
-
-    public void setAttendance(int attendance) {
-        this.attendance = attendance;
     }
 }
-

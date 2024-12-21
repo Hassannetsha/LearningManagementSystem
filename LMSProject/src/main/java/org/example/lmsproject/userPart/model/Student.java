@@ -4,10 +4,12 @@ import aj.org.objectweb.asm.ConstantDynamic;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
+import lombok.Getter;
 import org.example.lmsproject.course.model.Course;
 
 import java.util.List;
 
+@Getter
 @Entity
 @PrimaryKeyJoinColumn(name = "id") // Maps the Student's id to the User's id
 public class Student extends User {
@@ -23,9 +25,6 @@ public class Student extends User {
         setRole(Role.ROLE_STUDENT);
     }
 
-    public List<Course> getCourses() {
-        return courses;
-    }
 
     // Additional attributes specific to Student can go here
 

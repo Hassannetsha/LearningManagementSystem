@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface AssignmentSubmissionRepository extends JpaRepository<AssignmentSubmission, Long> {
     List<AssignmentSubmission> findByAssignmentId(Long assignmentId);
+
+    List<AssignmentSubmission> findByStudentId(Long studentId);
 }
