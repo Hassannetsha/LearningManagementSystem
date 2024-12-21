@@ -1,5 +1,6 @@
 package org.example.lmsproject.course.model;
 
+import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.userPart.model.*;
 import org.example.lmsproject.assignment.model.Assignment;
 //import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
@@ -20,12 +21,14 @@ public class Course {
     Instructor instructor;
     @ManyToMany(mappedBy = "courses")
     List<Student> students;
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Assignment> assignments;
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     List <Lesson> lessons;
-//    @OneToMany(mappedBy = "quizzes")
-//    List<QuizEntity> quizzes;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<QuizEntity> quizzes;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<CourseMaterial> courseMaterials;
 
     public Course(String title, String description, int duration, Boolean available,  Instructor instructor) {
         this.title = title;
@@ -113,6 +116,22 @@ public class Course {
 
     public void removeStudent(Student student) {
         this.students.remove(student);
+    }
+
+    public void addMaterial(CourseMaterial material ) {
+        this.courseMaterials.add(material);
+    }
+
+    public void removeMaterial(CourseMaterial material ) {
+        this.students.remove(material);
+    }
+
+    public List<QuizEntity> getQuizzes() {
+        return quizzes;
+    }
+
+    public void setQuizzes(List<QuizEntity> quizzes) {
+        this.quizzes = quizzes;
     }
 
     public void addLesson(Lesson lesson) {
