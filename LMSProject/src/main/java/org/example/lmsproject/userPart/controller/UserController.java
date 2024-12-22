@@ -29,7 +29,7 @@ public class UserController {
         this.service = service;
     }
 
-    @GetMapping("/api/getUsers")
+    @GetMapping("/admin/getUsers")
     public String getAllUsers() {
         List<User> users = service.findAllUsers();
         return users.stream().map(User::getUsername).collect(Collectors.joining(", "));
@@ -41,10 +41,10 @@ public class UserController {
         return "User: " + user.toString();
     }
 
-    @GetMapping("/")
-    public String hello() {
-        return "Hello World!";
-    }
+    //    @GetMapping("/")
+    //    public String hello() {
+    //        return "Hello World!";
+    //    }
 
     // @Autowired
     // private AuthenticationManager authenticationManager;
