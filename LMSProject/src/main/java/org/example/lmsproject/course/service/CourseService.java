@@ -25,7 +25,7 @@ public class CourseService {
     private final CourseEnrollRequestService courseEnrollRequestService;
 
     // added for Notification Logic (& added in constructor)
-    private MailboxService mailboxService;
+    private final MailboxService mailboxService;
     //
     @Autowired
     public CourseService(CourseRepository courseRepository, StudentService studentService,
@@ -122,6 +122,7 @@ public class CourseService {
             return ResponseEntity.badRequest().body("Student not found");
 
         CourseEnrollRequest enrollRequest = new CourseEnrollRequest();
+        enrollRequest.setStatus("Pending");
         enrollRequest.setCourse(course);
         enrollRequest.setStudent(student);
         course.getCourseEnrollRequests().add(enrollRequest);
@@ -150,11 +151,18 @@ public class CourseService {
             return ResponseEntity.badRequest().body("Enrollment request not found");
         }
 
-        enrollRequest.setAccepted(isAccepted);
+        enrollRequest.setStatus((isAccepted)? "Accepted" : "Rejected");
         courseEnrollRequestService.save(enrollRequest);
 
         Course course = enrollRequest.getCourse();
         Student student = enrollRequest.getStudent();
+
+        // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+        // Mapper Should Handle Acceptance or Refusal
+        mailboxService.addNotification(student.getId(), enrollRequest);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if (isAccepted) {
             course.addStudent(student);
@@ -165,13 +173,6 @@ public class CourseService {
         }
         courseRepository.save(course);
         studentService.save(student);
-
-        // added Notification Logic //////////////////////////////////////////////////////////////////////////
-
-        // Mapper Should Handle Acceptance or Refusal
-        mailboxService.addNotification(student.getId(), enrollRequest);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         return ResponseEntity.ok("Student has been rejected");
     }

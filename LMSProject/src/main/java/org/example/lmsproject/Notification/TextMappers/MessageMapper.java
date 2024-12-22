@@ -5,6 +5,8 @@ import org.example.lmsproject.assignment.model.Assignment;
 import org.example.lmsproject.assignment.model.AssignmentSubmission;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
+import org.example.lmsproject.userPart.model.Request;
+import org.example.lmsproject.userPart.model.Response;
 
 public class MessageMapper {
     public static String toString(Object message) {
@@ -24,17 +26,24 @@ public class MessageMapper {
                     ((QuizEntity) message).getQuizName(),
                     ((QuizEntity) message).getCourse().getTitle());
         }  else if (message instanceof CourseEnrollRequest) {
-            if () { // Elmafrood law elrequest matradesh 3aleh aslan (String lel Instructor)
-                return String.format("%s has requested to enroll in your course: %s",
-                        ((CourseEnrollRequest) message).getStudent().getUsername());
-            } else if (((CourseEnrollRequest) message).isAccepted()) {
+            if (((CourseEnrollRequest) message).getStatus().equalsIgnoreCase("Pending")) {
+                return String.format("%s has requested to enroll in the course: %s.",
+                        ((CourseEnrollRequest) message).getStudent().getUsername(),
+                        ((CourseEnrollRequest) message).getCourse().getTitle());
+            } else if (((CourseEnrollRequest) message).getStatus().equalsIgnoreCase("Accepted")) {
                 return String.format("You have been accepted into the course '%s'. Congratulations!",
-                        ((CourseEnrollRequest) message).getStudent().getUsername());
+                        ((CourseEnrollRequest) message).getCourse().getTitle());
             } else {
-                return String.format("Your enrollment request for the course '%s' has been declined." +
-                                "Please contact the course instructor for any inquiries",
+                return String.format("Your enrollment request for the course '%s' has been declined.",
                         ((CourseEnrollRequest) message).getCourse().getTitle());
             }
+        }  else if (message instanceof Request) {
+            return String.format("There is a new request:\nUsername: %s\nEmail: %s\nRole Requested: %s.",
+                    ((Request) message).getUsername(),
+                    ((Request) message).getEmail(),
+                    ((Request) message).getRole());
+        } else if (message instanceof Response) {
+            return "Welcome to the LMS! You are now a part of the system.";
         }
         return "";
     }

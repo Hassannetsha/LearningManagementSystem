@@ -10,7 +10,7 @@ public class CourseEnrollRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long courseEnrollmentId;
+    private long courseEnrollmentId;
     @Getter
     @Setter
     @ManyToOne
@@ -22,7 +22,7 @@ public class CourseEnrollRequest {
 
     @Setter
     @Getter
-    boolean isAccepted;
+    String status;
 
     public CourseEnrollRequest() {}
 
@@ -33,7 +33,7 @@ public class CourseEnrollRequest {
                 "\n    courseEnrollId=" + courseEnrollmentId +
                 ",\n    course=" + course.getCourseId() +
                 ",\n    student=" +  student.getId() +
-                ",\n    isEnrolled=" + isAccepted +
+                ",\n    isEnrolled=" + status +
                 "}";
     }
 }

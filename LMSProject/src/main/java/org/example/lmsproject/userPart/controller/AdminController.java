@@ -1,5 +1,7 @@
 package org.example.lmsproject.userPart.controller;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.userPart.model.Admin;
 import org.example.lmsproject.userPart.model.Request;
 import org.example.lmsproject.userPart.model.Response;
 import org.example.lmsproject.userPart.model.User;
@@ -14,6 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     @Autowired
     AdminService adminService;
+
+    @Autowired
+    MailboxService mailboxService;
+
+
 
     @PostMapping("/addUser")
     public String addNewUser(@RequestBody User userRequest) {
@@ -33,6 +40,13 @@ public class AdminController {
                 new_user.setPassword(request.getPassword());
                 User user = adminService.createUserByRole(new_user);
                 String responseMessage = adminService.addUser(user);
+
+                // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+                mailboxService.addNotification(new_user.getId(), response);
+
+                /////////////////////////////////////////////////////////////////////////////////////////////////////
+
                 return user.getUsername() + " Added Successfully\n" + responseMessage;
             }
             else{
