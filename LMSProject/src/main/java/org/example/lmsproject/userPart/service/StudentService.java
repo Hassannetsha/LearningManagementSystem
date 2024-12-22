@@ -26,4 +26,8 @@ public class StudentService {
         return  studentRepository.findAll().stream().filter(student -> student.getUsername().equals(username)).findFirst().orElse(null);
     }
 
+    public void save(Student student) {
+        studentRepository.save(student);
+    }
+
 }

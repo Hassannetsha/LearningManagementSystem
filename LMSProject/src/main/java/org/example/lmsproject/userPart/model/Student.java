@@ -1,10 +1,9 @@
 package org.example.lmsproject.userPart.model;
 
-import aj.org.objectweb.asm.ConstantDynamic;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.PrimaryKeyJoinColumn;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
+import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.Course;
 
 import java.util.List;
@@ -16,6 +15,11 @@ public class Student extends User {
 
     @ManyToMany
     private List<Course> courses;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @Setter
+    @Getter
+    private List<CourseEnrollRequest> courseEnrollRequests;
 
     public Student(String username, String password, String email) {
         super(username, password, email, Role.ROLE_STUDENT);
