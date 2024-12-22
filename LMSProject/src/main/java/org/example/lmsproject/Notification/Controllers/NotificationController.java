@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
-@RequestMapping(path = "api/notification")
+@RequestMapping(path = "user/notification")
 public class NotificationController {
 
     private final NotificationService notificationService;

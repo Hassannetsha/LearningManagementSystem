@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
-@RequestMapping(path = "api/mailbox")
+@RequestMapping(path = "user/mailbox")
 public class MailboxController {
 
     private final MailboxService mailboxService;
@@ -30,7 +30,7 @@ public class MailboxController {
         this.mailboxService = mailboxService;
     }
 
-    @GetMapping(path = "{mailboxID}")
+    @GetMapping(path = "getNotifications/{mailboxID}")
     public Mailbox  getMailbox(@PathVariable("mailboxID") Long id) {
         return mailboxService.getMailbox(id);
     }
