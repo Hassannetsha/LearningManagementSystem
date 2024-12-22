@@ -1,29 +1,32 @@
 package org.example.lmsproject.course.service;
 
 import org.example.lmsproject.course.model.Course;
+import org.example.lmsproject.course.model.CourseMaterial;
+import org.example.lmsproject.course.repository.CourseMaterialRepository;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.repository.StudentRepository;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.FileInputStream;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
 
-    @Value("${upload.directory}")
-    private String uploadDirectory;
+
 
     @Autowired
     private CourseRepository courseRepository;
@@ -31,6 +34,10 @@ public class CourseService {
     private StudentService studentService;
     @Autowired
     private StudentRepository studentRepository;
+    @Autowired
+    private CourseMaterialService courseMaterialService;
+    @Autowired
+    private CourseMaterialRepository courseMaterialRepository;
 
 
     public boolean courseExists(long courseId) {
@@ -145,21 +152,34 @@ public class CourseService {
         return false;
     }
 
-    public String uploadMaterial(long id, MultipartFile file){
+    public ResponseEntity<String> uploadMaterial(long id, MultipartFile file) {
         Course course = courseRepository.findById(id).orElse(null);
-        try {
-            File directory = new File(uploadDirectory);
-            if (!directory.exists()) {
-                System.out.println("Directory does not exist");
-                directory.mkdirs();
-            }
-            byte[] bytes = file.getBytes();
-            System.out.println(uploadDirectory+file.getOriginalFilename());
-            Path path = Paths.get(uploadDirectory + file.getOriginalFilename());
-            Files.write(path, bytes);
-            System.out.println("File written");
-        }catch (IOException e){}
-        return "File uploaded successfully";
+        if (course == null) {
+            return ResponseEntity.status(404).body("Course not found");
+        }
+
+        ResponseEntity<String> uploadResponse = courseMaterialService.uploadMaterial(course, file);
+        if (uploadResponse.getStatusCode() != HttpStatus.OK) {
+            return uploadResponse;
+        }
+
+        CourseMaterial courseMaterial = courseMaterialService.getByFilename(file.getOriginalFilename());
+        if (courseMaterial != null) {
+            course.addMaterial(courseMaterial);
+            courseRepository.save(course);
+            return ResponseEntity.ok("File uploaded and associated with the course successfully");
+        }
+
+        return ResponseEntity.ok("File upload failed to associate with the course");
+    }
+
+
+    public ResponseEntity<byte[]> getMaterial(String filename) {
+        return courseMaterialService.getMaterial(filename);
+    }
+
+    public ResponseEntity<String> deleteMaterial(long id, String filename) {
+        return courseMaterialService.deleteMaterial(filename);
     }
 
     public void deleteCourse(long id) {

@@ -55,11 +55,15 @@ package org.example.lmsproject.reportExcel.controller;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.quiz.Services.Quizzes.QuizServices;
+import org.example.lmsproject.reportExcel.service.ChartService;
 import org.example.lmsproject.reportExcel.service.PerformanceTrackingService;
 import org.example.lmsproject.reportExcel.model.StudentPerformance;
 import org.example.lmsproject.userPart.model.Student;
+import org.example.lmsproject.userPart.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,24 +75,37 @@ import java.util.List;
 @RequestMapping("/instructor/performance")
 public class AnalyticsController {
 
+
+    private final StudentRepository studentRepository;
+    private final ChartService chartService;
     private final PerformanceTrackingService performanceTrackingService;
     private final CourseRepository courseRepository;
 
     @Autowired
-    public AnalyticsController(PerformanceTrackingService performanceTrackingService, CourseRepository courseRepository) {
+    public AnalyticsController(StudentRepository studentRepository, ChartService chartService, PerformanceTrackingService performanceTrackingService, CourseRepository courseRepository) {
+        this.studentRepository = studentRepository;
+        this.chartService = chartService;
         this.performanceTrackingService = performanceTrackingService;
         this.courseRepository = courseRepository;
     }
+
     @GetMapping("/student/{studentId}")
     public ResponseEntity<StudentPerformance> getStudentPerformance(@PathVariable Long studentId) {
-        StudentPerformance performance = performanceTrackingService.getStudentPerformance(studentId);
-        return ResponseEntity.ok(performance);
+        if (studentRepository.findById(studentId).isPresent()) {
+            StudentPerformance performance = performanceTrackingService.getPerformanceForStudent(studentId);
+            return ResponseEntity.ok(performance);  // Returns 200 OK with student performance data
+        } else {
+            return ResponseEntity.status(404).body(null);  // You can also return a custom error message here
+        }
     }
+
+
     @GetMapping("/generate-report/{courseId}")
     public ResponseEntity<byte[]> generateReport(@PathVariable Long courseId) throws IOException {
         List<Student> students = courseRepository.findById(courseId).map(Course::getStudents).orElse(null);
         if (students == null || students.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);  // Return an error if no students are found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).
+                    body("No students found for the given course.".getBytes());  // Return a custom error message
         }
         byte[] excelReport = performanceTrackingService.generateStudentPerformanceReportForCourse(courseId);
         return ResponseEntity.ok()
@@ -97,4 +114,53 @@ public class AnalyticsController {
                 .body(excelReport);
     }
 
+
+    @PostMapping("/performance-bar/{courseId}")
+    public ResponseEntity<byte[]> generatePerformanceBarChart(@PathVariable Long courseId) throws Exception {
+        List<Student> students = courseRepository.findById(courseId).map(Course::getStudents).orElse(null);
+        if (students == null || students.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No students found for the given course.".getBytes());
+        }
+        List<StudentPerformance> performanceList = performanceTrackingService.getPerformanceForStudents(students);
+        byte[] chartImage = chartService.generatePerformanceChart(performanceList);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"performance_bar_chart.png\"")
+                .contentType(MediaType.IMAGE_PNG)
+                .body(chartImage);
+    }
+
+    @PostMapping("/course-completion-pie/{courseId}")
+    public ResponseEntity<byte[]> generateCourseCompletionPieChart(@PathVariable Long courseId) throws Exception {
+        List<Student> students;
+        students=courseRepository.findById(courseId).map(Course::getStudents).orElse(null);
+        if (students == null || students.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No students found for the given course.".getBytes());
+        }
+        List<StudentPerformance> performanceList = performanceTrackingService.getPerformanceForStudents(students);
+        byte[] chartImage = chartService.generateCourseCompletionChart(performanceList);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"course_completion_pie_chart.png\"")
+                .contentType(MediaType.IMAGE_PNG)
+                .body(chartImage);
+    }
+
+    @PostMapping("/progress-radar/{courseId}")
+    public ResponseEntity<byte[]> generateProgressRadarChart(@PathVariable Long courseId) throws Exception {
+        List<Student> students = courseRepository.findById(courseId).map(Course::getStudents).orElse(null);
+        if (students == null || students.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No students found for the given course.".getBytes());  // Return a custom error message
+
+        }
+        List<StudentPerformance> performanceList = performanceTrackingService.getPerformanceForStudents(students);
+        byte[] chartImage = chartService.generateProgressChart(performanceList);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"progress_radar_chart.png\"")
+                .contentType(MediaType.IMAGE_PNG)
+                .body(chartImage);
+    }
 }

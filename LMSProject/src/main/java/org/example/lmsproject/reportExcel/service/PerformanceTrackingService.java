@@ -28,7 +28,6 @@ public class PerformanceTrackingService {
 
     private final AttendanceRepository attendanceRepository;
     private final AssignmentSubmissionRepository assignmentSubmissionRepository;
-    private final QuizSubmissionRepository quizSubmissionRepository;
     private final StudentRepository studentRepository;
     private final FeedBackRepository feedBackRepository;
     private final CourseRepository courseRepository;
@@ -41,7 +40,6 @@ public class PerformanceTrackingService {
                                       FeedBackRepository feedBackRepository, CourseRepository courseRepository) {
         this.attendanceRepository = attendanceRepository;
         this.assignmentSubmissionRepository = assignmentSubmissionRepository;
-        this.quizSubmissionRepository = quizSubmissionRepository;
         this.studentRepository = studentRepository;
         this.feedBackRepository = feedBackRepository;
         this.courseRepository = courseRepository;
@@ -53,6 +51,7 @@ public class PerformanceTrackingService {
         long attendedLessons = attendances.stream().filter(Attendance::isPresent).count();
         return (double) attendedLessons / totalLessons * 100;
     }
+
 
     public double calculateQuizGrade(Long studentId) {
         List<FeedBack> allQuizzes = feedBackRepository.findByStudentId(studentId);
@@ -72,9 +71,8 @@ public class PerformanceTrackingService {
         return totalScore / submissions.size();  // Average score
     }
 
-    public StudentPerformance getStudentPerformance(Long studentId) {
-
-
+    //per student
+    public StudentPerformance getPerformanceForStudent(Long studentId) {
         String username = studentRepository.findById(studentId).get().getUsername();
         double quizGrade = calculateQuizGrade(studentId);
         double attendancePercentage = calculateAttendancePercentage(studentId);
@@ -86,13 +84,15 @@ public class PerformanceTrackingService {
         List<StudentPerformance> performanceList = new ArrayList<>();
 
         for (Long studentId : studentIds) {
-            performanceList.add(getStudentPerformance(studentId));
+            performanceList.add(getPerformanceForStudent(studentId));
         }
 
         // Generate the report (Excel)
         return generateExcelReport(performanceList);
     }
 
+
+    //for specific course
     public byte[] generateStudentPerformanceReportForCourse(Long courseId) throws IOException {
         Course course = courseRepository.findById(courseId).orElseThrow(() -> new IllegalArgumentException("Course not found"));
         List<Student> students = course.getStudents();
@@ -101,7 +101,7 @@ public class PerformanceTrackingService {
         }
         List<StudentPerformance> performanceList = new ArrayList<>();
         for (Student student : students) {
-            performanceList.add(getStudentPerformance(student.getId()));
+            performanceList.add(getPerformanceForStudent(student.getId()));
         }
 
         return generateExcelReport(performanceList);
@@ -112,7 +112,6 @@ public class PerformanceTrackingService {
     private byte[] generateExcelReport(List<StudentPerformance> performanceList) throws IOException {
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Performance Report");
-
         // Create header row
         Row header = sheet.createRow(0);
         header.createCell(0).setCellValue("Student ID");
@@ -120,7 +119,6 @@ public class PerformanceTrackingService {
         header.createCell(2).setCellValue("Quiz Grade");
         header.createCell(3).setCellValue("Attendance Percentage");
         header.createCell(4).setCellValue("Assignment Score");
-
         // Populate rows with student performance data
         int rowIndex = 1;
         for (StudentPerformance performance : performanceList) {
@@ -131,7 +129,6 @@ public class PerformanceTrackingService {
             row.createCell(3).setCellValue(performance.getAttendancePercentage());
             row.createCell(4).setCellValue(performance.getAssignmentScore());
         }
-
         // Write the output to a byte array
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         workbook.write(byteArrayOutputStream);
@@ -139,4 +136,15 @@ public class PerformanceTrackingService {
 
         return byteArrayOutputStream.toByteArray();
     }
+
+
+    //for all students
+    public List<StudentPerformance> getPerformanceForStudents(List<Student> students) {
+        List<StudentPerformance> performanceList = new ArrayList<>();
+        for (Student student : students) {
+            performanceList.add(getPerformanceForStudent(student.getId()));
+        }
+        return performanceList;
+    }
+
 }

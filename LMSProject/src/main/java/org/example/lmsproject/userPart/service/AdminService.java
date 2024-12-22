@@ -30,6 +30,9 @@ public class AdminService {
 
 
     public User createUserByRole(User user) {
+        if (user==null){
+            throw new IllegalArgumentException("User cannot be null");
+        }
         System.out.println(user.getUsername()+" " + user.getRole());
         return switch (user.getRole()) {
             case ROLE_ADMIN -> new Admin(user.getUsername(), user.getPassword(), user.getEmail());
