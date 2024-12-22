@@ -1,13 +1,20 @@
 package org.example.lmsproject.course.controller;
 
+import java.io.FileInputStream;
 import java.security.Principal;
+import java.util.Optional;
 
 import org.example.lmsproject.course.model.Course;
+import org.example.lmsproject.course.service.CourseMaterialService;
 import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.service.InstructorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +33,7 @@ public class CourseController {
     private final InstructorService instructorService;
 
     @Autowired
-    CourseController(CourseService courseService, InstructorService instructorService) {
+    CourseController(CourseService courseService, InstructorService instructorService, CourseMaterialService courseMaterialService) {
         this.courseService = courseService;
         this.instructorService = instructorService;
     }
@@ -100,7 +107,28 @@ public class CourseController {
         if (!courseService.courseExists(id)){
             return ResponseEntity.badRequest().body("Course does not exist");
         }
-        return ResponseEntity.ok(courseService.uploadMaterial(id, file));
+        return courseService.uploadMaterial(id, file);
+    }
+
+    @GetMapping("/student/courses/{id}/{filename}")
+    public ResponseEntity<byte[]> getMaterial(@PathVariable long id, @PathVariable String filename) {
+        if (!courseService.courseExists(id)) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        ResponseEntity<byte[]> fileResponse = courseService.getMaterial(filename);
+        if (fileResponse.getStatusCode() != HttpStatus.OK) {
+            return fileResponse;
+        }
+        return fileResponse;
+    }
+
+    @DeleteMapping("/instructor/courses/{id}/removeMedia/{filename}")
+    public ResponseEntity<String> removeMaterial(@PathVariable long id, @PathVariable String filename) {
+        if (!courseService.courseExists(id)) {
+            return ResponseEntity.badRequest().body("Course does not exist");
+        }
+        return courseService.deleteMaterial(id, filename);
     }
 
     @DeleteMapping("/instructor/courses/{id}") // instructor
