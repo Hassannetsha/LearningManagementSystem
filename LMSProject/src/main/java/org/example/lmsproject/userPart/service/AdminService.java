@@ -86,7 +86,6 @@ public class AdminService {
         else{
             throw new IllegalArgumentException("Invalid request");
         }
-        
         // notificationController
     }
 

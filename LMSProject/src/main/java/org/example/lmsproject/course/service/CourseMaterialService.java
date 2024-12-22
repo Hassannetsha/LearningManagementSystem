@@ -3,30 +3,19 @@ package org.example.lmsproject.course.service;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.CourseMaterial;
 import org.example.lmsproject.course.repository.CourseMaterialRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Optional;
+import java.nio.file.*;
 
 @Service
 public class CourseMaterialService {
 
-    private static final Logger logger = LoggerFactory.getLogger(CourseMaterialService.class);
 
     @Value("${upload.directory}")
     private String uploadDirectory;
@@ -47,7 +36,7 @@ public class CourseMaterialService {
         try {
             File directory = new File(uploadDirectory);
             if (!directory.exists() && !directory.mkdirs()) {
-                logger.error("Failed to create directory: {}", uploadDirectory);
+                System.out.println("Failed to create directory: {}"+ uploadDirectory);
                 return ResponseEntity.status(500).body("Failed to create upload directory");
             }
 
@@ -62,13 +51,11 @@ public class CourseMaterialService {
             return ResponseEntity.ok("File uploaded successfully");
 
         } catch (IOException e) {
-            logger.error("Error occurred while uploading the file: {}", e.getMessage());
+            System.out.println("Error occurred while uploading the file: {}"+ e.getMessage());
             return ResponseEntity.status(500).body("Internal server error occurred while uploading file");
         }
     }
     public ResponseEntity<byte[]> getMaterial(String filename) {
-
-
         CourseMaterial courseMaterial = courseMaterialRepository.findByFilename(filename);
         if (courseMaterial == null) {
             return ResponseEntity.status(404).body(null); // Not found
@@ -77,20 +64,17 @@ public class CourseMaterialService {
         Path filePath = Paths.get(courseMaterial.getPath()).toAbsolutePath().normalize();
 
         if (!Files.exists(filePath)) {
-            logger.error("File not found on the server: {}", filePath);
-            return ResponseEntity.status(404).body(null); // Not found
+            System.out.println("File not found on the server: {}" +  filePath);
+            return ResponseEntity.status(404).body(null);
         }
-
         try {
             byte[] fileContent = Files.readAllBytes(filePath);
 //            Resource file = new UrlResource(filePath.toUri());
 
             String contentType = Files.probeContentType(filePath);
             if (contentType == null) {
-                contentType = "application/octet-stream"; // Default to binary stream if type can't be determined
+                contentType = "application/octet-stream";
             }
-            System.out.println(filePath.toString());
-            System.out.println("Content type: " + contentType);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))
@@ -98,7 +82,6 @@ public class CourseMaterialService {
                     .body(fileContent);
 
         } catch (IOException e) {
-            logger.error("Error occurred while retrieving the file: {}", e.getMessage());
             return ResponseEntity.status(500).body(null); // Internal server error
         }
     }
