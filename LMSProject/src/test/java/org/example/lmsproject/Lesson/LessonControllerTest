@@ -116,10 +116,8 @@ class LessonControllerTest {
         lesson.setTitle("Test Lesson");
         lesson.setDescription("Test Description");
 
-        // Mock the service method to return the lesson
         when(lessonService.createLesson(courseId, lesson)).thenReturn(lesson);
 
-        // Perform the POST request
         mockMvc.perform(post("/instructor/createlesson")
                         .param("courseId", String.valueOf(courseId))
                         .contentType(MediaType.APPLICATION_JSON)
