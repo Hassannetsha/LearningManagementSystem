@@ -35,28 +35,21 @@ public class LessonServiceTest {
 
     @Test
     public void test_generateotp() {
-        // Arrange
         Long lessonid = 1L;
 
-        // Create a mock Course object with an initialized students list containing one student
         Course mockcourse = new Course("Course1", "Description1", 30, true);
         Student mockStudent = new Student();
-        mockStudent.setId(1L);  // Set the student ID or other necessary fields
-        mockcourse.setStudents(Collections.singletonList(mockStudent)); // Add one student
-
-        // Create a mock Lesson object and associate it with the mock Course
+        mockStudent.setId(1L);  
+        mockcourse.setStudents(Collections.singletonList(mockStudent)); 
         Lesson mocklesson = new Lesson();
         mocklesson.setId(lessonid);
         mocklesson.setTitle("Lesson1");
         mocklesson.setCourse(mockcourse);
 
-        // Mock the repository calls only if they are needed by the method
         when(lessonrepo.findById(lessonid)).thenReturn(Optional.of(mocklesson));
 
-        // Act
         String otp = lessonservice.generateOtp(lessonid);
 
-        // Assert
         assertNotNull(otp);
         assertEquals(6, otp.length()); // Ensure OTP length is 6
         assertTrue(otp.matches("\\d{6}")); // Check OTP is numeric
@@ -70,7 +63,6 @@ public class LessonServiceTest {
     public void test_validateotp() {
         Long lessonid = 1L;
 
-        // Arrange: Create the mock lesson and mock course as done in test_generateotp
         Course mockcourse = new Course("Course1", "Description1", 30, true);
         Student mockStudent = new Student();
         mockStudent.setId(1L);
