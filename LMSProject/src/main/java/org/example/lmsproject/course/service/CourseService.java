@@ -79,8 +79,8 @@ public class CourseService {
     }
 
     public void createCourse(Course course, Instructor instructor) {
-        course.setInstructor(instructor);  // Assign the instructor to the course
-        courseRepository.save(course);  // Save the course to the database
+        course.setInstructor(instructor);
+        courseRepository.save(course);
     }
 
     public void updateCourse(long id, Course updatedCourse) {
@@ -97,7 +97,6 @@ public class CourseService {
             courseRepository.save(existingCourse);
         }
     }
-
 
     public String viewEnrolledStudents(long id) {
         Course course = getCourseById(id);
