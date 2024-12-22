@@ -14,6 +14,7 @@ public class Assignment {
     @Column(length = 500)
     private String description;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate deadline;
 
     @ManyToOne

@@ -3,7 +3,9 @@ package org.example.lmsproject.quiz.Services.Quizzes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.quiz.DTOs.Quizzes.QuizCreationDTO;
@@ -37,18 +39,27 @@ public class QuizServices {
 	private final FeedBackRepository feedBackRepository;
 	private final CourseService courseService;
 	private final StudentService studentService;
+
+	// added Notification Logic
+	private MailboxService mailboxService;
+	//
 	@Autowired
 	public QuizServices(
 			QuizRepository quizRepository,
 			@Lazy QuestionServices questionServices,
 			QuizSubmissionRepository quizSubmissionRepository,
-			FeedBackRepository feedBackRepository, CourseService courseService,StudentService studentService) {
+			FeedBackRepository feedBackRepository, CourseService courseService,StudentService studentService, MailboxService mailboxService) {
 		this.quizRepository = quizRepository;
 		this.questionServices = questionServices;
 		this.quizSubmissionRepository = quizSubmissionRepository;
 		this.feedBackRepository = feedBackRepository;
 		this.courseService = courseService;
 		this.studentService = studentService;
+
+		// added Notification Logic
+		this.mailboxService = mailboxService;
+		//
+
 	}
 
 	public List<QuizEntity> getAllQuizzes() {
@@ -71,6 +82,18 @@ public class QuizServices {
 			}
 			quiz.setQuizName(quizCreationDTO.getQuizName());
 			quiz.setQuestionBank(questionBank);
+
+			// added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+			//7a get el users in course
+			List<Long> studentIds = course.getStudents().stream()
+					.map(Student::getId)
+					.collect(Collectors.toList());
+			if (studentIds.isEmpty()) { throw new IllegalStateException("No students are enrolled in this course"); }
+
+			mailboxService.addBulkNotifications(studentIds, quiz);
+
+			/////////////////////////////////////////////////////////////////////////////////////////////////////
 			quizRepository.save(quiz);
 			return quiz;
 		} else {

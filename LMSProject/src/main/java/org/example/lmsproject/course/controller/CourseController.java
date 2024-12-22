@@ -1,29 +1,13 @@
 package org.example.lmsproject.course.controller;
 
-import java.io.FileInputStream;
 import java.security.Principal;
-import java.util.Optional;
-
 import org.example.lmsproject.course.model.Course;
-import org.example.lmsproject.course.service.CourseMaterialService;
 import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.userPart.model.Instructor;
-import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.service.InstructorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -33,7 +17,7 @@ public class CourseController {
     private final InstructorService instructorService;
 
     @Autowired
-    CourseController(CourseService courseService, InstructorService instructorService, CourseMaterialService courseMaterialService) {
+    CourseController(CourseService courseService, InstructorService instructorService) {
         this.courseService = courseService;
         this.instructorService = instructorService;
     }
@@ -48,13 +32,17 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAvailableCourses());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<String> viewCourse(@PathVariable long id) {
-        return ResponseEntity.ok(courseService.viewCourse(id));
+    @GetMapping("/{courseId}")
+    public ResponseEntity<String> viewCourse(@PathVariable long courseId) {
+        return ResponseEntity.ok(courseService.viewCourse(courseId));
     }
 
-    @PostMapping("/instructor/courses/addCourse")
+    @PostMapping("/instructor/courses")
     public ResponseEntity<String> createCourse(@RequestBody Course course, Principal principal) {
+        if (course == null)
+            return ResponseEntity.badRequest().body("Course cannot be null");
+        if (courseService.courseExists(course.getTitle()))
+            return ResponseEntity.badRequest().body("Course already exists");
         String instructorUsername = principal.getName();
         Instructor instructor = instructorService.findByUsername(instructorUsername);
         if (instructor == null) {
@@ -64,75 +52,87 @@ public class CourseController {
         return ResponseEntity.ok("Course created successfully with ID of " + course.getCourseId());
     }
 
-    @PutMapping("/instructor/courses/{id}") // instructor
-    public ResponseEntity<String> updateCourse(@PathVariable long id, @RequestBody Course course) {
-        if (!courseService.courseExists(id))
+    @PutMapping("/instructor/courses/{courseId}") // instructor
+    public ResponseEntity<String> updateCourse(@PathVariable long courseId, @RequestBody Course course) {
+        if (courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
-        courseService.updateCourse(id, course);
-        return ResponseEntity.ok(courseService.viewCourse(id));
+        courseService.updateCourse(courseId, course);
+        return ResponseEntity.ok(courseService.viewCourse(courseId));
     }
 
-    @GetMapping("api/courses/{id}/students")
-    public ResponseEntity<String> viewEnrolledStudents(@PathVariable long id) {
-        if (!courseService.courseExists(id))
+    @GetMapping("api/courses/{courseId}/students")
+    public ResponseEntity<String> viewEnrolledStudents(@PathVariable long courseId) {
+        if (courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
-        return ResponseEntity.ok(courseService.viewEnrolledStudents(id));
+        return ResponseEntity.ok(courseService.viewEnrolledStudents(courseId));
     }
 
-    @PutMapping("/student/courses/{id}")
-    public ResponseEntity<String> enrollInCourse(@PathVariable long id, Principal principal) {
-        if (!courseService.courseExists(id))
+    @PutMapping("/student/courses/{courseId}")
+    public ResponseEntity<String> enrollInCourse(@PathVariable long courseId, Principal principal) {
+        if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
         String studentUsername = principal.getName();
-        System.out.println(studentUsername + " " + id);
-        if(courseService.enrollStudentInCourse(id, studentUsername)) // Delegate to CourseService
-            return ResponseEntity.ok(studentUsername + " enrolled successfully");
-        return ResponseEntity.badRequest().body(studentUsername + " couldn't enroll");
+        return courseService.enrollStudentInCourse(courseId, studentUsername);
     }
 
-    @GetMapping("/instructor/courses/{id}/removeStudent")
-    public ResponseEntity<String> removeStudentFromCourse(@PathVariable long id, @RequestBody Student student) {
-        if (!courseService.courseExists(id))
+    @DeleteMapping("/instructor/courses/{courseId}/students/{studentId}")
+    public ResponseEntity<String> removeStudentFromCourse(@PathVariable long courseId, @PathVariable long studentId) {
+        if (courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
-        Long studentId = student.getId();
-        courseService.removeStudentFromCourse(id, studentId);
-        return ResponseEntity.ok(courseService.viewEnrolledStudents(id));
+        courseService.removeStudentFromCourse(courseId, studentId);
+        return ResponseEntity.ok(courseService.viewEnrolledStudents(courseId));
     }
 
-    @PutMapping("/instructor/courses/{id}/upload")
-    public ResponseEntity<String> uploadMaterial(@PathVariable long id, @RequestParam("file") MultipartFile file) {
+    @PutMapping("/instructor/courses/{courseId}/upload")
+    public ResponseEntity<String> uploadMaterial(@PathVariable long courseId, @RequestParam("file") MultipartFile file) {
         if (file.isEmpty()){
             return ResponseEntity.badRequest().body("File is empty");
         }
-        if (!courseService.courseExists(id)){
+        if (courseService.courseExists(courseId)){
             return ResponseEntity.badRequest().body("Course does not exist");
         }
-        return courseService.uploadMaterial(id, file);
+        return courseService.uploadMaterial(courseId, file);
     }
 
-    @GetMapping("/student/courses/{id}/{filename}")
-    public ResponseEntity<byte[]> getMaterial(@PathVariable long id, @PathVariable String filename) {
-        if (!courseService.courseExists(id)) {
+    @GetMapping("/student/courses/{courseId}/materials/{filename}")
+    public ResponseEntity<byte[]> getMaterial(@PathVariable long courseId, @PathVariable String filename) {
+        if (courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body(null);
         }
-
         ResponseEntity<byte[]> fileResponse = courseService.getMaterial(filename);
-        if (fileResponse.getStatusCode() != HttpStatus.OK) {
-            return fileResponse;
-        }
+        fileResponse.getStatusCode();
         return fileResponse;
     }
 
-    @DeleteMapping("/instructor/courses/{id}/removeMedia/{filename}")
-    public ResponseEntity<String> removeMaterial(@PathVariable long id, @PathVariable String filename) {
-        if (!courseService.courseExists(id)) {
+    @DeleteMapping("/instructor/courses/{id}/materials/{filename}")
+    public ResponseEntity<String> removeMaterial(@PathVariable long courseId, @PathVariable String filename) {
+        if (courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
         }
-        return courseService.deleteMaterial(id, filename);
+        return courseService.deleteMaterial(filename);
     }
 
-    @DeleteMapping("/instructor/courses/{id}") // instructor
-    public void deleteCourse(@PathVariable long id) {
-        courseService.deleteCourse(id);
+    @GetMapping("/instructor/courses/{courseId}/enrollments")
+    public ResponseEntity<String> getEnrollments(@PathVariable long courseId, Principal principal) {
+        Course course = courseService.getCourseById(courseId);
+        if (course == null) {
+            return ResponseEntity.badRequest().body("Course not found");
+        }
+        return ResponseEntity.ok(courseService.getEnrollments(course));
+    }
+
+    @PutMapping("/instructor/courses/{courseId}/enrollments/{requestId}/")
+    public ResponseEntity<String> handleEnrollmentRequest(@PathVariable long courseId, @PathVariable long requestId,
+                                                          @RequestParam boolean isAccepted) {
+        if (!courseService.courseExists(courseId)) {
+            return ResponseEntity.badRequest().body("Course does not exist");
+        }
+        return courseService.updateEnrollmentStatus(requestId, isAccepted);
+
+    }
+
+    @DeleteMapping("/instructor/courses/{courseId}") // instructor
+    public void deleteCourse(@PathVariable long courseId) {
+        courseService.deleteCourse(courseId);
     }
 }

@@ -1,64 +1,65 @@
 package org.example.lmsproject.course.service;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.CourseMaterial;
-import org.example.lmsproject.course.repository.CourseMaterialRepository;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.course.repository.CourseRepository;
-import org.example.lmsproject.userPart.repository.StudentRepository;
+import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.FileInputStream;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
 
+    private final CourseRepository courseRepository;
+    private final StudentService studentService;
+    private final CourseMaterialService courseMaterialService;
+    private final CourseEnrollRequestService courseEnrollRequestService;
 
-
+    // added for Notification Logic (& added in constructor)
+    private final MailboxService mailboxService;
+    //
     @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private StudentService studentService;
-    @Autowired
-    private StudentRepository studentRepository;
-    @Autowired
-    private CourseMaterialService courseMaterialService;
-    @Autowired
-    private CourseMaterialRepository courseMaterialRepository;
-
+    public CourseService(CourseRepository courseRepository, StudentService studentService,
+                         CourseMaterialService courseMaterialService,
+                         CourseEnrollRequestService courseEnrollRequestService,
+                         MailboxService mailboxService) {
+        this.courseRepository = courseRepository;
+        this.studentService = studentService;
+        this.courseMaterialService = courseMaterialService;
+        this.courseEnrollRequestService = courseEnrollRequestService;
+        this.mailboxService = mailboxService;
+    }
 
     public boolean courseExists(long courseId) {
         return courseRepository.existsById(courseId);
     }
 
+    public boolean courseExists(String courseName) {
+        return courseRepository.existsByTitle(courseName);
+    }
+
     public String getAllCourses() {
          List<Course> courses = courseRepository.findAll();
-        String jsonResponse = courses.stream()
-                .map(Course::toString)
-                .collect(Collectors.joining(",\n\n    ", "[\n    ", "]\n")); // Join all course strings into a JSON array format
 
-        return jsonResponse;
+        return courses.stream()
+                .map(Course::toString)
+                .collect(Collectors.joining(",\n\n    ", "[\n    ", "]\n"));
     }
 
     public String getAvailableCourses() {
-        List<Course> availableCourses = courseRepository.findAll().stream().filter(Course::isAvailable).collect(Collectors.toList());
-        String jsonResponse = availableCourses.stream()
+        List<Course> availableCourses = courseRepository.findAll().stream().filter(Course::getAvailable).toList();
+        return availableCourses.stream()
                 .map(Course::toString)
                 .collect(Collectors.joining(",\n\n    ", "[\n    ", "]\n"));
-        return jsonResponse;
     }
 
     public String viewCourse(long id) {
@@ -78,40 +79,23 @@ public class CourseService {
     }
 
     public void createCourse(Course course, Instructor instructor) {
-        course.setInstructor(instructor);  // Assign the instructor to the course
-        courseRepository.save(course);  // Save the course to the database
+        course.setInstructor(instructor);
+        courseRepository.save(course);
     }
 
-    public Course updateCourse(long id, Course course) {
-        Course existingCourse = courseRepository.findById(id).orElse(null);
+    public void updateCourse(long id, Course updatedCourse) {
+        Course existingCourse = getCourseById(id);
         if (existingCourse != null) {
-            if (course.getTitle() != null) {
-                existingCourse.setTitle(course.getTitle());
-            }
-            if (course.getDescription() != null) {
-                existingCourse.setDescription(course.getDescription());
-            }
-            if (course.getDuration() != 0) {
-                existingCourse.setDuration(course.getDuration());
-            }
-            if (course.isAvailable() != null) {
-                existingCourse.setAvailable(course.isAvailable());
-            }
-            if (course.getStudents() != null) {
-                existingCourse.setStudents(course.getStudents());
-            }
-            if (course.getInstructor() != null) {
-                existingCourse.setInstructor(course.getInstructor());
-            }
-            if (course.getAssignments() != null) {
-                existingCourse.setAssignments(course.getAssignments());
-            }
-            if (course.getLessons() != null) {
-                existingCourse.setLessons(course.getLessons());
-            }
-            return courseRepository.save(existingCourse);
+            if (updatedCourse.getTitle() != null) existingCourse.setTitle(updatedCourse.getTitle());
+            if (updatedCourse.getDescription() != null) existingCourse.setDescription(updatedCourse.getDescription());
+            if (updatedCourse.getDuration() != 0) existingCourse.setDuration(updatedCourse.getDuration());
+            if (updatedCourse.getAvailable() != null) existingCourse.setAvailable(updatedCourse.getAvailable());
+            if (updatedCourse.getStudents() != null) existingCourse.setStudents(updatedCourse.getStudents());
+            if (updatedCourse.getInstructor() != null) existingCourse.setInstructor(updatedCourse.getInstructor());
+            if (updatedCourse.getAssignments() != null) existingCourse.setAssignments(updatedCourse.getAssignments());
+            if (updatedCourse.getLessons() != null) existingCourse.setLessons(updatedCourse.getLessons());
+            courseRepository.save(existingCourse);
         }
-        return null;
     }
 
     public String viewEnrolledStudents(long id) {
@@ -120,36 +104,87 @@ public class CourseService {
                 .map(Student::getId)
                 .toList();
 
-        // Convert the list of IDs to a JSON-style string
-        return "{\"students\": " + studentIds.toString() + "}";
+        return "{\"students\": " + studentIds + "}";
     }
 
-    public boolean enrollStudentInCourse(long courseId, String studentUsername) {
-        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
-        Student student = studentService.findStudentByUsername(studentUsername);
+    public ResponseEntity<String> enrollStudentInCourse(long courseId, String studentUsername) {
+        // send a notification to instructor that a new enrollment request has been made
+        // get instructor from course.getInstructor()
 
-        if (student != null) {
-            System.out.println("Student: " + student.getId());
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (course == null)
+            return ResponseEntity.badRequest().body("Course not found");
+        if (!course.getAvailable())
+            return ResponseEntity.badRequest().body("Course is not available");
+        Student student = studentService.findStudentByUsername(studentUsername);
+        if (student == null)
+            return ResponseEntity.badRequest().body("Student not found");
+
+        CourseEnrollRequest enrollRequest = new CourseEnrollRequest();
+        enrollRequest.setStatus("Pending");
+        enrollRequest.setCourse(course);
+        enrollRequest.setStudent(student);
+        course.getCourseEnrollRequests().add(enrollRequest);
+        student.getCourseEnrollRequests().add(enrollRequest);
+        courseEnrollRequestService.save(enrollRequest);
+        courseRepository.save(course);
+        studentService.save(student);
+
+        // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+        //7a get el instructor & ill send the enrollRequest to the mapper
+        User instructor = course.getInstructor();
+        if (instructor==null) { throw new IllegalStateException("No Instructor Affiliated With This Course"); }
+
+        mailboxService.addNotification(instructor.getId(), enrollRequest);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        return ResponseEntity.ok("A new enrollment request has been sent to the instructor");
+    }
+
+    public ResponseEntity<String> updateEnrollmentStatus(long requestId, boolean isAccepted) {
+        // send a notification to student that he has been accepted or rejected
+        CourseEnrollRequest enrollRequest = courseEnrollRequestService.findById(requestId);
+        if (enrollRequest == null) {
+            return ResponseEntity.badRequest().body("Enrollment request not found");
+        }
+
+        enrollRequest.setStatus((isAccepted)? "Accepted" : "Rejected");
+        courseEnrollRequestService.save(enrollRequest);
+
+        Course course = enrollRequest.getCourse();
+        Student student = enrollRequest.getStudent();
+
+        // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+        // Mapper Should Handle Acceptance or Refusal
+        mailboxService.addNotification(student.getId(), enrollRequest);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        if (isAccepted) {
             course.addStudent(student);
             student.getCourses().add(course);
             courseRepository.save(course);
-            studentRepository.save(student);
-            return true;
+            studentService.save(student);
+            return ResponseEntity.ok("Student has been accepted");
         }
-        return false;
+        courseRepository.save(course);
+        studentService.save(student);
+
+        return ResponseEntity.ok("Student has been rejected");
     }
 
-    public boolean removeStudentFromCourse(long courseId, long studentId) {
-        Course course = courseRepository.findById(courseId).orElse(null);
+    public void removeStudentFromCourse(long courseId, long studentId) {
+        Course course = getCourseById(courseId);
         Student student = studentService.getStudentById(studentId);
-        if (course != null && student != null) {
+        if (student != null) {
             course.removeStudent(student);
             student.getCourses().remove(course);
             courseRepository.save(course);
-            studentRepository.save(student);
-            return true;
+            studentService.save(student);
         }
-        return false;
     }
 
     public ResponseEntity<String> uploadMaterial(long id, MultipartFile file) {
@@ -173,12 +208,15 @@ public class CourseService {
         return ResponseEntity.ok("File upload failed to associate with the course");
     }
 
-
     public ResponseEntity<byte[]> getMaterial(String filename) {
         return courseMaterialService.getMaterial(filename);
     }
 
-    public ResponseEntity<String> deleteMaterial(long id, String filename) {
+    public String getEnrollments(Course course) {
+        return courseEnrollRequestService.getEnrollments(course);
+    }
+
+    public ResponseEntity<String> deleteMaterial(String filename) {
         return courseMaterialService.deleteMaterial(filename);
     }
 

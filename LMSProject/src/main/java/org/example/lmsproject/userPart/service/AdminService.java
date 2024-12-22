@@ -1,5 +1,6 @@
 package org.example.lmsproject.userPart.service;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.userPart.model.Admin;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
@@ -12,8 +13,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.example.lmsproject.userPart.model.Request;
+
+import static org.example.lmsproject.userPart.model.User.Role.ROLE_ADMIN;
 
 @Service
 public class AdminService {
@@ -21,11 +25,16 @@ public class AdminService {
     private final UserRepository userRepo;
     private final RequestRepository requestRepo;
 
+
+    // added for Notification Logic (& added in constructor)
+    private final MailboxService mailboxService;
+    //
     @Autowired
-    public AdminService(PasswordEncoder encoder, UserRepository userRepo,RequestRepository requestRepo) {
+    public AdminService(PasswordEncoder encoder, UserRepository userRepo,RequestRepository requestRepo, MailboxService mailboxService) {
         this.encoder = encoder;
         this.userRepo = userRepo;
         this.requestRepo = requestRepo;
+        this.mailboxService = mailboxService;
     }
 
 
@@ -85,14 +94,34 @@ public class AdminService {
     public void sendRequest(Request userRequest) {
         if (userRequest.getUsername()!=null&&userRequest.getPassword()!=null&&userRequest.getEmail()!=null&&userRequest.getRole()!=null) {
             requestRepo.save(userRequest);
+
+            // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+            List<Long> adminUserIds = getAllAdmins().stream()
+                    .map(Admin::getId)
+                    .toList();
+            if (adminUserIds.isEmpty()) { throw new IllegalStateException("No Admin Level Users Found"); }
+
+            mailboxService.addBulkNotifications(adminUserIds, userRequest);
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+
         }
         else{
             throw new IllegalArgumentException("Invalid request");
         }
-        
         // notificationController
     }
 
+
+
+    // added FOR Notification Logic //////////////////////////////////////////////////////////////////////////
+
+    public List<Admin> getAllAdmins(){
+        return userRepo.findAll().stream().filter(u->u.getRole().equals(ROLE_ADMIN)).map(Admin.class::cast).collect(Collectors.toList());
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public List<Request> getRequests() {
         return requestRepo.findAll();

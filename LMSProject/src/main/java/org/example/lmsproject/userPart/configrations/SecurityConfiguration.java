@@ -48,6 +48,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/admin/**").hasRole("ADMIN") // Only ADMIN can access "/addAdmin"
                         .requestMatchers("/student/**").hasRole("STUDENT")
                         .requestMatchers("/api/**").hasAnyRole("INSTRUCTOR", "ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("INSTRUCTOR", "ADMIN", "STUDENT")
                         // .requestMatchers("/hello").permitAll()// Open access
                         .anyRequest().authenticated() // Require authentication for other requests
                 )

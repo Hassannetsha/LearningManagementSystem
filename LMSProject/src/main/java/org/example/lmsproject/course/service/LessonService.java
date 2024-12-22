@@ -1,16 +1,20 @@
 package org.example.lmsproject.course.service;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.Lesson;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.course.repository.LessonRepository;
+import org.example.lmsproject.userPart.model.Student;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LessonService {
@@ -19,6 +23,11 @@ public class LessonService {
 
     @Autowired
     private CourseRepository courseRepository;
+
+    // added Notification Logic
+    @Autowired
+    private MailboxService mailboxService;
+    //
 
     private static final int OTP_LENGTH = 6;
     private Map<Long, String> lessonotp = new HashMap<>();
@@ -30,9 +39,37 @@ public class LessonService {
         long expirationTime = System.currentTimeMillis() + 15 * 60 * 1000; // valide for 15 minutes
         lessonotp.put(lessonId, otp);
         otpexpiration.put(lessonId, expirationTime);
+
+        // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+        //7a get users by getting course from lesson id
+
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new IllegalStateException("Lesson not found"));
+
+        Course course = lesson.getCourse();
+        if (course == null) { throw new IllegalStateException("No course associated with this lesson"); }
+
+        List<Long> studentIds = course.getStudents().stream()
+                .map(Student::getId)
+                .collect(Collectors.toList());
+        if (studentIds.isEmpty()) { throw new IllegalStateException("No students are enrolled in this course"); }
+
+        //shoofo law 3ayzeen tsheelo el exceptions
+        //i will send a string 3ashan mafeesh 1 object atala3 meno Kol el Info, & el OTP sensitive information
+
+        String message = String.format("Your OTP for the lesson '%s' in course '%s' is: %s",
+                lesson.getTitle(),
+                course.getTitle(),
+                otp);
+
+        mailboxService.addBulkNotifications(studentIds, message);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
         return otp;
     }
-    
+
     public boolean validateOtp(Long lessonId, String otp) {
         String generatedOtp = lessonotp.get(lessonId);
         Long expirationTime = otpexpiration.get(lessonId);
