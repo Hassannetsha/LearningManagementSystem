@@ -19,13 +19,6 @@ import java.util.List;
 
 @Service
 public class ChartService {
-
-    /**
-     * Generates a bar chart for student performance.
-     * @param performanceList list of StudentPerformance objects
-     * @return byte[] representing the chart as an image
-     * @throws Exception if an error occurs during chart generation
-     */
     public byte[] generatePerformanceChart(List<StudentPerformance> performanceList) throws Exception {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         for (StudentPerformance performance : performanceList) {
@@ -48,26 +41,17 @@ public class ChartService {
         return createChartImage(barChart);
     }
 
-    /**
-     * Generates a pie chart for course completion based on student performance.
-     * @param performanceList list of StudentPerformance objects
-     * @return byte[] representing the chart as an image
-     * @throws Exception if an error occurs during chart generation
-     */
     public byte[] generateCourseCompletionChart(List<StudentPerformance> performanceList) throws Exception {
         DefaultPieDataset dataset = new DefaultPieDataset();
-
+        int totalStudents = performanceList.size();
         int completed = 0;
-        int incomplete = 0;
-
         for (StudentPerformance performance : performanceList) {
-            if (performance.getQuizGrade() >= 50) {
+            double attendancePercentage = performance.getAttendancePercentage();
+            if (attendancePercentage >= 75) {
                 completed++;
-            } else {
-                incomplete++;
             }
         }
-
+        int incomplete = totalStudents - completed;
         dataset.setValue("Completed", completed);
         dataset.setValue("Incomplete", incomplete);
 
@@ -79,12 +63,7 @@ public class ChartService {
         return createChartImage(pieChart);
     }
 
-    /**
-     * Generates a radar chart for student progress.
-     * @param performanceList list of StudentPerformance objects
-     * @return byte[] representing the chart as an image
-     * @throws Exception if an error occurs during chart generation
-     */
+
     public byte[] generateProgressChart(List<StudentPerformance> performanceList) throws Exception {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
@@ -98,12 +77,6 @@ public class ChartService {
         return createChartImage(radarChart);
     }
 
-    /**
-     * Helper method to create and return the chart image as a byte array.
-     * @param chart the JFreeChart to convert to image
-     * @return byte[] representing the chart as an image
-     * @throws Exception if an error occurs during image creation
-     */
     private byte[] createChartImage(JFreeChart chart) throws Exception {
         BufferedImage chartImage = chart.createBufferedImage(800, 600);
         ByteArrayOutputStream image = new ByteArrayOutputStream();
@@ -111,11 +84,6 @@ public class ChartService {
         return image.toByteArray();
     }
 
-    /**
-     * Creates a radar chart using the dataset.
-     * @param dataset the data to be displayed in the radar chart
-     * @return a JFreeChart instance representing the radar chart
-     */
     private JFreeChart createRadarChart(DefaultCategoryDataset dataset) {
         JFreeChart radarChart = new JFreeChart(
                 "Student Progress",   // Chart title
@@ -123,7 +91,6 @@ public class ChartService {
                 new SpiderWebPlot(dataset), // Create SpiderWebPlot to simulate radar chart
                 false
         );
-
         // Customize the radar chart (SpiderWebPlot)
         SpiderWebPlot plot = (SpiderWebPlot) radarChart.getPlot();
         plot.setOutlineVisible(false); // Hide the plot outline
