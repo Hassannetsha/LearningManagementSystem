@@ -10,7 +10,7 @@ public class CourseEnrollRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int courseEnrollmentId;
+    private Long courseEnrollmentId;
     @Getter
     @Setter
     @ManyToOne

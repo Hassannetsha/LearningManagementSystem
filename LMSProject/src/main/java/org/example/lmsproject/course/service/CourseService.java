@@ -1,11 +1,13 @@
 package org.example.lmsproject.course.service;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.CourseMaterial;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.course.repository.CourseRepository;
+import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -22,14 +24,19 @@ public class CourseService {
     private final CourseMaterialService courseMaterialService;
     private final CourseEnrollRequestService courseEnrollRequestService;
 
+    // added for Notification Logic (& added in constructor)
+    private MailboxService mailboxService;
+    //
     @Autowired
     public CourseService(CourseRepository courseRepository, StudentService studentService,
                          CourseMaterialService courseMaterialService,
-                         CourseEnrollRequestService courseEnrollRequestService) {
+                         CourseEnrollRequestService courseEnrollRequestService,
+                         MailboxService mailboxService) {
         this.courseRepository = courseRepository;
         this.studentService = studentService;
         this.courseMaterialService = courseMaterialService;
         this.courseEnrollRequestService = courseEnrollRequestService;
+        this.mailboxService = mailboxService;
     }
 
     public boolean courseExists(long courseId) {
@@ -122,6 +129,17 @@ public class CourseService {
         courseEnrollRequestService.save(enrollRequest);
         courseRepository.save(course);
         studentService.save(student);
+
+        // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+        //7a get el instructor & ill send the enrollRequest to the mapper
+        User instructor = course.getInstructor();
+        if (instructor==null) { throw new IllegalStateException("No Instructor Affiliated With This Course"); }
+
+        mailboxService.addNotification(instructor.getId(), enrollRequest);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
+
         return ResponseEntity.ok("A new enrollment request has been sent to the instructor");
     }
 
@@ -147,6 +165,13 @@ public class CourseService {
         }
         courseRepository.save(course);
         studentService.save(student);
+
+        // added Notification Logic //////////////////////////////////////////////////////////////////////////
+
+        // Mapper Should Handle Acceptance or Refusal
+        mailboxService.addNotification(student.getId(), enrollRequest);
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         return ResponseEntity.ok("Student has been rejected");
     }
