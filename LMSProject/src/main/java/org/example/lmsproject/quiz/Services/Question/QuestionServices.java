@@ -284,24 +284,31 @@ public class QuestionServices {
         }
     }
 
-    QuestionBank findByQuestionBankId(Long questionBankId) {
-        QuestionBank questionBank = questionBankRepository.findByid(questionBankId);
-        if (questionBank != null) {
-            return questionBank;
-        }
-        throw new IllegalStateException("Question not found");
-    }
+    // public QuestionBank findByQuestionBankId(Long questionBankId) {
+    //     QuestionBank questionBank = questionBankRepository.findByid(questionBankId);
+    //     if (questionBank != null) {
+    //         return questionBank;
+    //     }
+    //     throw new IllegalStateException("Question not found");
+    // }
 
-    QuestionEntity findByCourse(Course course) {
-        QuestionEntity questionEntity = questionRepository.findBycourse(course);
+    public List<QuestionEntity> findQuestionByCourse(Course course) {
+        List<QuestionEntity> questionEntity = questionRepository.findBycourse(course);
         if (questionEntity != null) {
             return questionEntity;
         }
         throw new IllegalStateException("no Questions to this course");
     }
 
-    QuestionEntity findByQuestionId(Long questionId) {
-        QuestionEntity questionEntity = questionRepository.findByid(questionId);
+    public QuestionBank findQuestionBankByCourse(Course course) {
+        QuestionBank questionBank = questionBankRepository.findBycourse(course);
+        if (questionBank != null) {
+            return questionBank;
+        }
+        throw new IllegalStateException("Question not found");
+    }
+    public QuestionEntity findByQuestionText(String question) {
+        QuestionEntity questionEntity = questionRepository.findByquestion(question);
         if (questionEntity != null) {
             return questionEntity;
         }

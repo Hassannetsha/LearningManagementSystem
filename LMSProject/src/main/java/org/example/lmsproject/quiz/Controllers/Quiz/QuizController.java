@@ -30,16 +30,16 @@ public class QuizController {
     }
 
     @PostMapping("/instructor/quizzes")
-    public void addNewQuiz(@RequestBody QuizCreationDTO quiz) {
-        quizServices.addNewQuiz(quiz);
+    public QuizEntity addNewQuiz(@RequestBody QuizCreationDTO quiz) {
+        return quizServices.addNewQuiz(quiz);
     }
 
-    @DeleteMapping(path = "/instructor/quizzes{quizId}")
+    @DeleteMapping(path = "/instructor/quizzes/{quizId}")
     public void deleteQuiz(@PathVariable("quizId") Long quizId) {
         quizServices.deleteQuiz(quizId);
     }
 
-    @PutMapping(path = "/instructor/quizzes{quizId}")
+    @PutMapping(path = "/instructor/quizzes/{quizId}")
     public void updateQuiz(@PathVariable("quizId") Long quizId, @RequestParam(required = false) Long courseId,
             @RequestParam(required = false) String quizName,
             @RequestParam(required = false) Long questionBankId) {

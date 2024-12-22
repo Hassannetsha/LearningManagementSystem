@@ -1,5 +1,7 @@
 package org.example.lmsproject.quiz.model.Question;
 
+import org.example.lmsproject.course.model.Course;
+
 // import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,14 @@ import jakarta.persistence.Entity;
 public class TrueOrFalseQuestionEntity extends QuestionEntity{
     @Column(nullable=false)
     private Boolean rightAnswer;
+
+    public TrueOrFalseQuestionEntity(Long id, String question, String type, Course course, Boolean rightAnswer) {
+        super(id, question, type, course);
+        this.rightAnswer = rightAnswer;
+    }
+
+    public TrueOrFalseQuestionEntity() {
+    }
 
     public Boolean getRightAnswer() {
         return rightAnswer;
