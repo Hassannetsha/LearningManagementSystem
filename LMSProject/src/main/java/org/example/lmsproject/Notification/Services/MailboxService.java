@@ -8,6 +8,7 @@ import org.example.lmsproject.Notification.Entities.Notification;
 import org.example.lmsproject.Notification.Repositories.MailboxRepository;
 import org.example.lmsproject.Notification.TextMappers.EmailMapper;
 import org.example.lmsproject.Notification.TextMappers.MessageMapper;
+import org.example.lmsproject.userPart.model.Response;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,20 +51,20 @@ public class MailboxService {
 
         Mailbox mailbox;
         if (mailboxOptional.isEmpty()) {
-            // Fetch the user for whom the mailbox will be created
             User user = userService.getUser(userId);
             if (user == null) {
                 throw new IllegalArgumentException("User not found for ID: " + userId);
             }
 
-            // Create and save a new mailbox for the user
             mailbox = new Mailbox(user);
             mailboxRepository.save(mailbox);
         } else {
             mailbox = mailboxOptional.get();
         }
 
-        notificationService.createNotification(mailbox, message);
+        if (!(message instanceof Response)) {
+            notificationService.createNotification(mailbox, message);
+        }
 
         String email = mailbox.getUser().getEmail();
         String subject = EmailMapper.getSubject(message);

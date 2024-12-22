@@ -3,6 +3,9 @@ package org.example.lmsproject.Notification.TextMappers;
 import org.example.lmsproject.assignment.model.Assignment;
 import org.example.lmsproject.assignment.model.AssignmentSubmission;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
+import org.example.lmsproject.quiz.model.Question.MCQQuestionEntity;
+import org.example.lmsproject.quiz.model.Question.QuestionEntity;
+import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
 import org.example.lmsproject.quiz.model.Quiz.FeedBack;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.userPart.model.Request;
@@ -38,6 +41,9 @@ public class EmailMapper {
             return "New User Request Submitted";
         } else if (message instanceof Response) {
             return "User Authorization Success";
+        } else if (message instanceof FeedBack) {
+            return String.format("Feedback for Quiz: %s",
+                    ((FeedBack) message).getQuiz().getQuizName());
         }
         return "LMS Notification";
     }
@@ -76,7 +82,30 @@ public class EmailMapper {
                     ((Request) message).getRole());
         } else if (message instanceof Response) {
             return "Congratulations! You have been successfully authorized as a user in the LMS.";
+        } else if (message instanceof FeedBack) {
+            FeedBack feedback = (FeedBack) message;
+            List<QuestionEntity> questions = feedback.getQuiz().getQuestionBank().getQuestions();
+
+            StringBuilder feedbackDetails = new StringBuilder();
+            for (QuestionEntity question : questions) {
+                if (question instanceof MCQQuestionEntity mcq) {
+                    feedbackDetails.append(String.format("%s\nAnswers: %s\nCorrect Answer: %s\n\n",
+                            question.getQuestion(),
+                            String.join(", ", mcq.getAnswers()),
+                            mcq.getRightAnswer()));
+                } else if (question instanceof TrueOrFalseQuestionEntity trueOrFalse) {
+                    feedbackDetails.append(String.format("%s\nCorrect Answer: %s\n\n",
+                            question.getQuestion(),
+                            trueOrFalse.getRightAnswer() ? "True" : "False"));
+                }
+            }
+            return String.format("Student ID: %d\n" +
+                            "%sYour Score: %d",
+                    feedback.getStudent().getId(),
+                    feedbackDetails.toString(),
+                    feedback.getGrade());
         }
+
         return "You have a new notification. Please check the LMS for more details.";
     }
 }
