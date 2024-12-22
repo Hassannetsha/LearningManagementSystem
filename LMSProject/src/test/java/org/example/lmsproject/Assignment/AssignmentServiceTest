@@ -50,7 +50,6 @@ public class AssignmentServiceTest {
         String description = "Test Description";
         LocalDate deadline = LocalDate.of(2024, 12, 31);
 
-        // Modify to use correct constructor with username, password, and email
         Student student1 = new Student("Student1", "password1", "student1@example.com");
         Student student2 = new Student("Student2", "password2", "student2@example.com");
 
@@ -77,33 +76,6 @@ public class AssignmentServiceTest {
         verify(mailboxService, times(1)).addBulkNotifications(anyList(), any(Assignment.class));
     }
 
-
-//    @Test
-//    public void test_submitAssignment() throws Exception {
-//        Long assignmentId = 1L;
-//        Long studentId = 1L;
-//        Assignment mockAssignment = new Assignment();
-//        User mockStudent = new User();
-//        MultipartFile mockFile = mock(MultipartFile.class);
-//        when(mockFile.getOriginalFilename()).thenReturn("submissionFile.txt");
-//        when(mockFile.getBytes()).thenReturn("fileContent".getBytes());
-//
-//        // Mock the repository calls
-//        when(assignmentRepository.findById(assignmentId)).thenReturn(Optional.of(mockAssignment));
-//        when(studentRepository.findById(studentId)).thenReturn(Optional.of(mockStudent));
-//        when(assignmentSubmissionRepository.save(any(AssignmentSubmission.class))).thenReturn(new AssignmentSubmission());
-//
-//        // Act
-//        AssignmentSubmission submission = assignmentService.submitAssignment(assignmentId, studentId, mockFile);
-//
-//        // Assert
-//        assertNotNull(submission);
-//        assertEquals("submissionFile.txt", submission.getFileName());
-//        assertArrayEquals("fileContent".getBytes(), submission.getFileContent());
-//        verify(assignmentRepository, times(1)).findById(assignmentId);
-//        verify(studentRepository, times(1)).findById(studentId);
-//        verify(assignmentSubmissionRepository, times(1)).save(any(AssignmentSubmission.class));
-//    }
 
 
     @Test
