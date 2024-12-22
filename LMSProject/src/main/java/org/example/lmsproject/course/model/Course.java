@@ -11,6 +11,7 @@ import java.util.List;
 @Entity
 public class Course {
     @Getter
+    @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long courseId;
