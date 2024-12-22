@@ -1,6 +1,8 @@
-package project_software.main.Notification.Entities;
+package org.example.lmsproject.Notification.Entities;
 
 import java.time.LocalDate;
+
+import org.example.lmsproject.Notification.TextMappers.MessageMapper;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,7 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import project_software.main.Notification.MessageMapper.MessageMapper;
+
 
 @Entity
 @Table
@@ -29,7 +31,7 @@ public class Notification {
 
     private Long id;
     private Boolean isRead;
-    private Object message;
+    private String message;
     private LocalDate date;
 
     @ManyToOne
@@ -56,7 +58,7 @@ public class Notification {
         this.isRead = isRead;
     }
 
-    public Object getMessage() {
+    public String getMessage() {
         return message;
     }
 

@@ -1,28 +1,30 @@
-package project_software.main.Notification.Services;
+package org.example.lmsproject.Notification.Services;
 
 import java.util.List;
 
+import org.example.lmsproject.Notification.Entities.Mailbox;
+import org.example.lmsproject.Notification.Entities.Notification;
+import org.example.lmsproject.Notification.Repositories.MailboxRepository;
+import org.example.lmsproject.Notification.TextMappers.EmailMapper;
+import org.example.lmsproject.Notification.TextMappers.MessageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import project_software.main.Notification.Entities.Mailbox;
-import project_software.main.Notification.Entities.Notification;
-import project_software.main.Notification.Repositories.MailboxRepository;
-import project_software.main.Notification.Repositories.NotificationRepository;
 
 @Service
 public class MailboxService {
     private final MailboxRepository mailboxRepository;
     // private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Autowired
-    public MailboxService(MailboxRepository mailboxRepository, NotificationRepository notificationRepository,
-            NotificationService notificationService) {
+    public MailboxService(MailboxRepository mailboxRepository,
+                          NotificationService notificationService,
+                          EmailService emailService) {
         this.mailboxRepository = mailboxRepository;
-        // this.notificationRepository = notificationRepository;
         this.notificationService = notificationService;
+        this.emailService = emailService;
     }
 
 
@@ -41,6 +43,11 @@ public class MailboxService {
         Mailbox mailbox = mailboxRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
         notificationService.createNotification(mailbox, message);
+
+        String email = mailbox.getUser().getEmail();
+        String subject = EmailMapper.getSubject(message);
+        String body = EmailMapper.getBody(message);
+        emailService.sendEmail(email, subject, body);
     }
 
     public void addBulkNotifications(List<Long> userIds, Object message) {
@@ -48,6 +55,11 @@ public class MailboxService {
             Mailbox mailbox = mailboxRepository.findByUserId(userId)
                     .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
             notificationService.createNotification(mailbox, message);
+
+            String email = mailbox.getUser().getEmail();
+            String subject = EmailMapper.getSubject(message);
+            String body = EmailMapper.getBody(message);
+            emailService.sendEmail(email, subject, body);
         });
     }
 

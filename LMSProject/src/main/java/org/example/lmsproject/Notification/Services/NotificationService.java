@@ -1,15 +1,11 @@
-package project_software.main.Notification.Services;
+package org.example.lmsproject.Notification.Services;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.example.lmsproject.Notification.Entities.Mailbox;
+import org.example.lmsproject.Notification.Entities.Notification;
+import org.example.lmsproject.Notification.Repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import project_software.main.Notification.Entities.Mailbox;
-import project_software.main.Notification.Entities.Notification;
-import project_software.main.Notification.Repositories.NotificationRepository;
 
 @Service
 public class NotificationService {

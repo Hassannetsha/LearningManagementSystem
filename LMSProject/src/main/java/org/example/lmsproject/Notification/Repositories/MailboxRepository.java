@@ -1,11 +1,12 @@
-package project_software.main.Notification.Repositories;
+package org.example.lmsproject.Notification.Repositories;
 
 import java.util.Optional;
 
+import org.example.lmsproject.Notification.Entities.Mailbox;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import project_software.main.Notification.Entities.Mailbox;
+
 
 @Repository
 public interface MailboxRepository extends JpaRepository<Mailbox, Long> {
