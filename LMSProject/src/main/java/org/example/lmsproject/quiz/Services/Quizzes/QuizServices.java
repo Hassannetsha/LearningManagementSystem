@@ -41,7 +41,7 @@ public class QuizServices {
 	private final StudentService studentService;
 
 	// added Notification Logic
-	private MailboxService mailboxService;
+	private final MailboxService mailboxService;
 	//
 	@Autowired
 	public QuizServices(
@@ -120,7 +120,7 @@ public class QuizServices {
 					FeedBack feedBack = new FeedBack(quizSubmission.getQuiz(), student);
 					feedBack.setGrade(calculateGrade(quizSubmission, feedBack));
 					System.out.println(feedBack.toString());
-					//notificationController.send(feedBack);
+					mailboxService.addNotification(student.getId(), feedBack);
 					feedBackRepository.save(feedBack);
 				}
 				else{
