@@ -104,7 +104,7 @@ public class CourseController {
         return fileResponse;
     }
 
-    @DeleteMapping("/instructor/courses/{id}/materials/{filename}")
+    @DeleteMapping("/instructor/courses/{courseId}/materials/{filename}")
     public ResponseEntity<String> removeMaterial(@PathVariable long courseId, @PathVariable String filename) {
         if (courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
