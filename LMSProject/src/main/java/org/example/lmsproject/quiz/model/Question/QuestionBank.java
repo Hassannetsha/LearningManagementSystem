@@ -14,8 +14,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "question_bank", uniqueConstraints = @UniqueConstraint(columnNames = {"questionBankName", "courseId"}))
 public class QuestionBank {
     @Id
@@ -63,5 +67,9 @@ public class QuestionBank {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

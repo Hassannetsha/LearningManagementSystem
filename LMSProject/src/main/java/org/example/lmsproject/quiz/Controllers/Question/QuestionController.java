@@ -65,12 +65,12 @@ public class QuestionController {
         questionServices.addNewQuestion(question);
     }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/{id}")
     public void deleteQuestion(@PathVariable("id") Long id) {
         questionServices.deleteQuestion(id);
     }
 
-    @PutMapping(path = "{id}")
+    @PutMapping(path = "/{id}")
     public void updateQuestion(@PathVariable("id") Long id, @RequestParam(required = false) String question,
             @RequestParam(required = false)String rightTfAnswer,
             @RequestParam(required = false) String rightMcqAnswer,@RequestParam(required = false) List<String> answers) {

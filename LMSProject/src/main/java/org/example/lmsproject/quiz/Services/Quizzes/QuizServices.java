@@ -55,7 +55,7 @@ public class QuizServices {
 		return quizRepository.findAll();
 	}
 
-	public void addNewQuiz(QuizCreationDTO quizCreationDTO) {
+	public QuizEntity addNewQuiz(QuizCreationDTO quizCreationDTO) {
 		QuizEntity quiz = new QuizEntity();
 		QuestionBank questionBank = questionServices.findQuestionBankByid(quizCreationDTO.getQuestionBankId());
 		Course course = courseService.getCourseById(quizCreationDTO.getCourseId());
@@ -72,6 +72,7 @@ public class QuizServices {
 			quiz.setQuizName(quizCreationDTO.getQuizName());
 			quiz.setQuestionBank(questionBank);
 			quizRepository.save(quiz);
+			return quiz;
 		} else {
 			throw new IllegalStateException(
 					"There is no question bank with this ID: " + quizCreationDTO.getQuestionBankId());

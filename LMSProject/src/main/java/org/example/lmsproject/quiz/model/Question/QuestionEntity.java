@@ -10,9 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.ManyToOne;
-// import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-// import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -20,6 +20,8 @@ import jakarta.persistence.Table;
         name = "question"
         
 )
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class QuestionEntity {
 
     @Id
@@ -77,5 +79,9 @@ public abstract class QuestionEntity {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
