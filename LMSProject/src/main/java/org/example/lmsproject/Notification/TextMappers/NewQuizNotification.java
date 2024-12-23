@@ -1,6 +1,6 @@
-package org.example.lmsproject.quiz.model.Quiz;
+package org.example.lmsproject.Notification.TextMappers;
 
-import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
+import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 
 
 public class NewQuizNotification implements NotificationAndEmailMapper {

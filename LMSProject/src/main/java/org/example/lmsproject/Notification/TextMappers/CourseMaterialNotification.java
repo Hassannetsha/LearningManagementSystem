@@ -1,6 +1,6 @@
-package org.example.lmsproject.course.model;
+package org.example.lmsproject.Notification.TextMappers;
 
-import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
+import org.example.lmsproject.course.model.CourseMaterial;
 
 import lombok.AllArgsConstructor;
 @AllArgsConstructor

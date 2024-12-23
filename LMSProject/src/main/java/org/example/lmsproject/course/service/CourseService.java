@@ -5,12 +5,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.CourseEnrollRequestNotification;
+import org.example.lmsproject.Notification.TextMappers.CourseMaterialNotification;
 import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
-import org.example.lmsproject.course.model.CourseEnrollRequestNotification;
 import org.example.lmsproject.course.model.CourseMaterial;
-import org.example.lmsproject.course.model.CourseMaterialNotification;
 import org.example.lmsproject.course.repository.CourseEnrollRequestRepository;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.Instructor;

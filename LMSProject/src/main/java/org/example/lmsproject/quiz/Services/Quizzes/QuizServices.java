@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.AutomatedFeedBackNotification;
+import org.example.lmsproject.Notification.TextMappers.NewQuizNotification;
 import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.service.CourseService;
@@ -20,8 +22,6 @@ import org.example.lmsproject.quiz.model.Question.QuestionBank;
 import org.example.lmsproject.quiz.model.Question.QuestionEntity;
 import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
 import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBack;
-import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBackNotification;
-import org.example.lmsproject.quiz.model.Quiz.NewQuizNotification;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.quiz.model.Quiz.QuizSubmission;
 import org.example.lmsproject.userPart.model.Student;

@@ -1,6 +1,4 @@
-package org.example.lmsproject.userPart.model;
-
-import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
+package org.example.lmsproject.Notification.TextMappers;
 
 public class ResponseNotification implements NotificationAndEmailMapper{
     @Override
