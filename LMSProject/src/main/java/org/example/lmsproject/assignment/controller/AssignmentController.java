@@ -59,8 +59,9 @@ public class AssignmentController {
     public ResponseEntity<AssignmentSubmission> gradesubmission(
             @RequestParam Long submissionid,
             @RequestParam Integer grade,
-            @RequestParam String feedback) {
-        AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade, feedback);
+            @RequestParam String feedback,
+            @RequestParam Integer total) {
+        AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade,total, feedback);
         return ResponseEntity.ok(submission);
     }
     @PutMapping("/instructor/update")

@@ -146,21 +146,4 @@ public class AnalyticsController {
                 .contentType(MediaType.IMAGE_PNG)
                 .body(chartImage);
     }
-
-    @PostMapping("/progress-radar/{courseId}")
-    public ResponseEntity<byte[]> generateProgressRadarChart(@PathVariable Long courseId) throws Exception {
-        List<Student> students = courseRepository.findById(courseId).map(Course::getStudents).orElse(null);
-        if (students == null || students.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No students found for the given course.".getBytes());  // Return a custom error message
-
-        }
-        List<StudentPerformance> performanceList = performanceTrackingService.getPerformanceForStudents(students);
-        byte[] chartImage = chartService.generateProgressChart(performanceList);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"progress_radar_chart.png\"")
-                .contentType(MediaType.IMAGE_PNG)
-                .body(chartImage);
-    }
 }

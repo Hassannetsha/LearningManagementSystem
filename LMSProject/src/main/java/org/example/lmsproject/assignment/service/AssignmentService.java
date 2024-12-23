@@ -87,12 +87,13 @@ public class AssignmentService {
 
 
     // Grade a submission
-    public AssignmentSubmission gradesubmission(Long submissionid, Integer grade, String feedback) {
+    public AssignmentSubmission gradesubmission(Long submissionid, Integer grade,Integer total, String feedback) {
         AssignmentSubmission submission = submissionrepo.findById(submissionid)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
 
         submission.setGrade(grade);
         submission.setFeedback(feedback);
+        submission.setTotal(total);
 
         // added Notification Logic //////////////////////////////////////////////////////////////////////////
 

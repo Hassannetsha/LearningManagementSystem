@@ -64,19 +64,6 @@ public class ChartService {
     }
 
 
-    public byte[] generateProgressChart(List<StudentPerformance> performanceList) throws Exception {
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-
-        for (StudentPerformance performance : performanceList) {
-            dataset.addValue(performance.getQuizGradePercentage(), performance.getUsername(), "Quiz Grade");
-            dataset.addValue(performance.getAttendancePercentage(), performance.getUsername(), "Attendance");
-            dataset.addValue(performance.getAssignmentScorePercentage(), performance.getUsername(), "Assignments");
-        }
-
-        JFreeChart radarChart = createRadarChart(dataset);
-        return createChartImage(radarChart);
-    }
-
     private byte[] createChartImage(JFreeChart chart) throws Exception {
         BufferedImage chartImage = chart.createBufferedImage(800, 600);
         ByteArrayOutputStream image = new ByteArrayOutputStream();
@@ -84,17 +71,4 @@ public class ChartService {
         return image.toByteArray();
     }
 
-    private JFreeChart createRadarChart(DefaultCategoryDataset dataset) {
-        JFreeChart radarChart = new JFreeChart(
-                "Student Progress",   // Chart title
-                JFreeChart.DEFAULT_TITLE_FONT,
-                new SpiderWebPlot(dataset), // Create SpiderWebPlot to simulate radar chart
-                false
-        );
-        // Customize the radar chart (SpiderWebPlot)
-        SpiderWebPlot plot = (SpiderWebPlot) radarChart.getPlot();
-        plot.setOutlineVisible(false); // Hide the plot outline
-
-        return radarChart;
-    }
 }

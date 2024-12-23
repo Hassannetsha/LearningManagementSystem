@@ -1,5 +1,6 @@
 package org.example.lmsproject.userPart.service;
 
+import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.userPart.model.*;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.repository.UserRepository;
@@ -24,8 +25,12 @@ class AdminServiceTest {
     private UserRepository userRepository;
     @Mock
     private RequestRepository requestRepo;
+    @Mock
+    private MailboxService mailboxService;
     @InjectMocks
     private AdminService adminService;
+
+
 
     @BeforeEach
     void setUp() {
@@ -123,10 +128,23 @@ class AdminServiceTest {
     // Test for sendRequest
     @Test
     public void testSendRequest_ValidRequest() {
+        // Arrange
         Request request = new Request(1L, "username", "password", "email@example.com", User.Role.ROLE_STUDENT);
+        Admin admin1 =new Admin("admin1", "admin1@example.com", "ROLE_ADMIN");
+        Admin admin2 =new Admin("admin2", "admin2@example.com", "ROLE_ADMIN");
+        admin1.setId(1L);
+        admin2.setId(2L);
+        List<Admin> mockAdmins = List.of(admin1, admin2);
+        when(userRepository.findByusername("username")).thenReturn(Optional.empty());
+        when(adminService.getAllAdmins()).thenReturn(mockAdmins);
+        // Act
         adminService.sendRequest(request);
-        verify(requestRepo, times(1)).save(request);
+        // Assert
+        verify(requestRepo, times(1)).save(request); // Verify request is saved
+        verify(mailboxService, times(1))
+                .addBulkNotifications(eq(List.of(1L, 2L)), eq(request)); // Verify notifications are sent to all admins
     }
+
 
     @Test
     public void testSendRequest_InvalidRequest() {
