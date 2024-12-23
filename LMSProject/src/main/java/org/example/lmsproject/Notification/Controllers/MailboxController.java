@@ -5,6 +5,7 @@ import java.util.List;
 import org.example.lmsproject.Notification.Entities.Mailbox;
 import org.example.lmsproject.Notification.Entities.Notification;
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,23 +31,23 @@ public class MailboxController {
         this.mailboxService = mailboxService;
     }
 
-    @GetMapping(path = "getNotifications/{mailboxID}")
+    @GetMapping(path = "{mailboxID}")
     public Mailbox  getMailbox(@PathVariable("mailboxID") Long id) {
         return mailboxService.getMailbox(id);
     }
 
-    @GetMapping(path = "{userID}")
+    @GetMapping(path = "getNotifications/{userID}")
     public List<Notification> getNotifications(@PathVariable("userID") Long id) {
         return mailboxService.getNotifications(id);
     }
 
     @PostMapping
-    public void addNotification(@RequestParam Long userId, @RequestParam Object message) {
+    public void addNotification(@RequestParam Long userId, @RequestParam NotificationAndEmailMapper message) {
         mailboxService.addNotification(userId, message);
     }
 
     @PostMapping(path = "bulk")
-    public void addBulkNotifications(@RequestParam List<Long> userIDs, @RequestParam String message) {
+    public void addBulkNotifications(@RequestParam List<Long> userIDs, @RequestParam NotificationAndEmailMapper message) {
         mailboxService.addBulkNotifications(userIDs, message);
     }
 

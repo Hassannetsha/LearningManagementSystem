@@ -34,13 +34,6 @@ public class QuestionBank {
     public Long getId() {
         return id;
     }
-    // public Long getCourseId() {
-    //     return courseId;
-    // }
-
-    // public void setCourseId(Long courseId) {
-    //     this.courseId = courseId;
-    // }
 
     public List<QuestionEntity> getQuestions() {
         return questions;

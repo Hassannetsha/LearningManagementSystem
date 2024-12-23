@@ -12,16 +12,16 @@ public class StudentPerformance {
     private String username;
     @Id
     private Long id;
-    private double quizGrade;
+    private double quizGradePercentage;
     private double attendancePercentage;
-    private double assignmentScore;  // if you want to track assignments
+    private double assignmentScorePercentage;  // if you want to track assignments
 
     // Constructor, getters, and setters
-    public StudentPerformance(String username,Long id, double quizGrade, double attendancePercentage, double assignmentScore) {
+    public StudentPerformance(String username,Long id, double quizGradePercentage, double attendancePercentage, double assignmentScorePercentage) {
         this.username = username;
-        this.quizGrade = quizGrade;
+        this.quizGradePercentage = quizGradePercentage;
         this.attendancePercentage = attendancePercentage;
-        this.assignmentScore = assignmentScore;
+        this.assignmentScorePercentage = assignmentScorePercentage;
         this.id = id;
     }
 

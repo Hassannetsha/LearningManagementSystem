@@ -3,6 +3,7 @@ package org.example.lmsproject.Notification.Services;
 import org.example.lmsproject.Notification.Entities.Mailbox;
 import org.example.lmsproject.Notification.Entities.Notification;
 import org.example.lmsproject.Notification.Repositories.NotificationRepository;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +29,8 @@ public class NotificationService {
     // notificationRepository.save(notification);
     // }
 
-    public Notification createNotification(Mailbox mailbox, Object message) {
-        Notification notification = new Notification(mailbox, message);
+    public Notification createNotification(Mailbox mailbox, NotificationAndEmailMapper notificationAndEmailMapper) {
+        Notification notification = new Notification(mailbox, notificationAndEmailMapper);
         return notificationRepository.save(notification);
     }
 

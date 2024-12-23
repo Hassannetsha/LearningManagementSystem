@@ -3,16 +3,16 @@ package org.example.lmsproject.quiz.Repositories.Quiz;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import org.example.lmsproject.quiz.model.Quiz.FeedBack;
+import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBack;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.userPart.model.Student;
 
 import java.util.List;
 
 @Repository
-public interface  FeedBackRepository extends JpaRepository<FeedBack, Long>  {
-    FeedBack findByquiz(QuizEntity quizEntity);
-    FeedBack findBystudent(Student student);
+public interface  FeedBackRepository extends JpaRepository<AutomatedFeedBack, Long>  {
+    AutomatedFeedBack findByquiz(QuizEntity quizEntity);
+    AutomatedFeedBack findBystudent(Student student);
 
-    List<FeedBack> findByStudentId(Long studentId);
+    List<AutomatedFeedBack> findByStudentId(Long studentId);
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.example.lmsproject.quiz.DTOs.Quizzes.QuizCreationDTO;
 import org.example.lmsproject.quiz.DTOs.Quizzes.QuizSubmissionDTO;
 import org.example.lmsproject.quiz.Services.Quizzes.QuizServices;
-import org.example.lmsproject.quiz.model.Quiz.FeedBack;
+import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBack;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.quiz.model.Quiz.QuizSubmission;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-// @RequestMapping(path = "/instructor/quizzes")
 public class QuizController {
     @Autowired
     private QuizServices quizServices;
@@ -57,7 +54,7 @@ public class QuizController {
     }
 
     @GetMapping(path = "/student/quizzes/Feedbacks")
-    public List<FeedBack> getAllFeedBacks() {
+    public List<AutomatedFeedBack> getAllFeedBacks() {
         return quizServices.getAllFeedBacks();
     }
 }

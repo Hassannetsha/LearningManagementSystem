@@ -6,9 +6,7 @@ import java.util.Optional;
 import org.example.lmsproject.Notification.Entities.Mailbox;
 import org.example.lmsproject.Notification.Entities.Notification;
 import org.example.lmsproject.Notification.Repositories.MailboxRepository;
-import org.example.lmsproject.Notification.TextMappers.EmailMapper;
-import org.example.lmsproject.Notification.TextMappers.MessageMapper;
-import org.example.lmsproject.userPart.model.Response;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,22 +16,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MailboxService {
     private final MailboxRepository mailboxRepository;
-    // private final NotificationRepository notificationRepository;
     private final NotificationService notificationService;
     private final EmailService emailService;
     private final UserService userService;
 
     @Autowired
     public MailboxService(MailboxRepository mailboxRepository,
-                          NotificationService notificationService,
-                          EmailService emailService,
-                          UserService userService) {
+            NotificationService notificationService,
+            EmailService emailService,
+            UserService userService) {
         this.mailboxRepository = mailboxRepository;
         this.notificationService = notificationService;
         this.emailService = emailService;
         this.userService = userService;
     }
-
 
     public Mailbox getMailbox(Long mailboxId) {
         return mailboxRepository.findById(mailboxId)
@@ -46,7 +42,7 @@ public class MailboxService {
         return mailbox.getNotifications();
     }
 
-    public void addNotification(Long userId, Object message) {
+    public void addNotification(Long userId, NotificationAndEmailMapper notificationAndEmailMapper) {
         Optional<Mailbox> mailboxOptional = mailboxRepository.findByUserId(userId);
 
         Mailbox mailbox;
@@ -63,20 +59,19 @@ public class MailboxService {
             mailbox = mailboxOptional.get();
         }
 
-        if (!(message instanceof Response)) {
-            notificationService.createNotification(mailbox, message);
-        }
+        notificationService.createNotification(mailbox, notificationAndEmailMapper);
 
         String email = mailbox.getUser().getEmail();
-        String subject = EmailMapper.getSubject(message);
-        String body = EmailMapper.getBody(message);
+        String subject = notificationAndEmailMapper.getSubject();
+        String body = notificationAndEmailMapper.getBody();
         emailService.sendEmail(email, subject, body);
     }
 
-    public void addBulkNotifications(List<Long> userIds, Object message) {
+    public void addBulkNotifications(List<Long> userIds, NotificationAndEmailMapper notificationAndEmailMapper) {
         userIds.forEach(userId -> {
             Optional<Mailbox> mailboxID = mailboxRepository.findByUserId(userId);
-//                    .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
+            // .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID "
+            // + userId));
             Mailbox mailbox;
             if (mailboxID.isEmpty()) {
                 User user = userService.getUser(userId);
@@ -88,11 +83,11 @@ public class MailboxService {
             } else {
                 mailbox = mailboxID.get();
             }
-            notificationService.createNotification(mailbox, message);
+            notificationService.createNotification(mailbox, notificationAndEmailMapper);
 
             String email = mailbox.getUser().getEmail();
-            String subject = EmailMapper.getSubject(message);
-            String body = EmailMapper.getBody(message);
+            String subject = notificationAndEmailMapper.getSubject();
+            String body = notificationAndEmailMapper.getBody();
             emailService.sendEmail(email, subject, body);
         });
     }

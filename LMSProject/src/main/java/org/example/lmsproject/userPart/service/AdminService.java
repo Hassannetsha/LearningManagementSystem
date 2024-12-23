@@ -1,23 +1,23 @@
 package org.example.lmsproject.userPart.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.userPart.model.Admin;
 import org.example.lmsproject.userPart.model.Instructor;
+import org.example.lmsproject.userPart.model.Request;
+import org.example.lmsproject.userPart.model.RequestNotification;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.User;
+import static org.example.lmsproject.userPart.model.User.Role.ROLE_ADMIN;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.example.lmsproject.userPart.model.Request;
-
-import static org.example.lmsproject.userPart.model.User.Role.ROLE_ADMIN;
 
 @Service
 public class AdminService {
@@ -92,6 +92,7 @@ public class AdminService {
 
 
     public void sendRequest(Request userRequest) {
+        System.out.println(userRequest.getUsername());
         if (userRequest.getUsername()!=null&&userRequest.getPassword()!=null&&userRequest.getEmail()!=null&&userRequest.getRole()!=null) {
             if (userRepo.findByusername(userRequest.getUsername()).isPresent()){
                 throw new IllegalArgumentException("Username already exists");
@@ -102,8 +103,8 @@ public class AdminService {
                     .map(Admin::getId)
                     .toList();
             if (adminUserIds.isEmpty()) { throw new IllegalStateException("No Admin Level Users Found"); }
-
-            mailboxService.addBulkNotifications(adminUserIds, userRequest);
+            NotificationAndEmailMapper requestNotification = new RequestNotification(userRequest);
+            mailboxService.addBulkNotifications(adminUserIds, requestNotification);
             /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         }

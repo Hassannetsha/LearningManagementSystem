@@ -17,29 +17,25 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "feedback", uniqueConstraints = @UniqueConstraint(columnNames = {"quizId", "studentId"}))
-public class FeedBack {
+public class AutomatedFeedBack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
     @JoinColumn(name = "quizId", referencedColumnName = "quizId", nullable = false)
     private QuizEntity quiz;
-    // @Column(nullable = false)
     @ManyToOne
     private Student student;
-    // private Long studentId;
     @Column(nullable = false)
     private List<String> answers;
     @Column(nullable = false)
     private int grade;
-    public FeedBack(){
+    public AutomatedFeedBack(){
 
     }
-    public FeedBack(QuizEntity quiz, Student student) {
+    public AutomatedFeedBack(QuizEntity quiz, Student student) {
         this.quiz = quiz;
         this.student = student;
-        // this.studentId = id;
-        // this.message = message;
     } 
 
     public QuizEntity getQuiz() {
@@ -57,15 +53,6 @@ public class FeedBack {
     public void setAnswers(List<String> answers) {
         this.answers = answers;
     }
-
-    // public Long getStudentId() {
-    //     return studentId;
-    // }
-
-    // public void setStudentId(Long id) {
-    //     this.studentId = id;
-    // }
-
     public Long getId() {
         return id;
     }
@@ -85,21 +72,15 @@ public class FeedBack {
     public void setGrade(int grade) {
         this.grade = grade;
     }
-
-    // public User getStudent() {
-    //     return student;
-    // }
-
-    // public void setStudent(User student) {
-    //     this.student = student;
-    // }
-
     public Student getStudent() {
         return student;
     }
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+    public int getTotalNumberOfQuestions(){
+        return quiz.getQuestionBank().getQuestions().size();
     }
     
 }

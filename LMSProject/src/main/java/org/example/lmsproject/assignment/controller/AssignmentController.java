@@ -44,33 +44,34 @@ public class AssignmentController {
     }
 
     @PostMapping("/student/submitassignment")
-    public ResponseEntity<AssignmentSubmission> submitassignment(
+    public ResponseEntity<String> submitassignment(
             @RequestParam Long assignmentid,
             @RequestParam Long studentid,
             @RequestParam("file") MultipartFile file) {
         try {
             AssignmentSubmission submission = assignmentservice.submitAssignment(assignmentid, studentid, file);
-            return ResponseEntity.ok(submission);
+            return ResponseEntity.ok(submission.toString());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
     @PostMapping("/instructor/gradesubmission")
-    public ResponseEntity<AssignmentSubmission> gradesubmission(
+    public ResponseEntity<String> gradesubmission(
             @RequestParam Long submissionid,
             @RequestParam Integer grade,
-            @RequestParam String feedback) {
-        AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade, feedback);
-        return ResponseEntity.ok(submission);
+            @RequestParam String feedback,
+            @RequestParam Integer total) {
+        AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade,total, feedback);
+        return ResponseEntity.ok(submission.toString());
     }
     @PutMapping("/instructor/update")
-    public ResponseEntity<Assignment> updateAssignment(
+    public ResponseEntity<String> updateAssignment(
             @RequestParam Long assignmentId,
             @RequestParam String title,
             @RequestParam String description,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadline) {
         Assignment updatedAssignment = assignmentservice.updateassignment(assignmentId, title, description, deadline);
-        return ResponseEntity.ok(updatedAssignment);
+        return ResponseEntity.ok(updatedAssignment.toString());
     }
     @DeleteMapping("/instructor/deleteassignment")
     public ResponseEntity<Void> deleteAssignment(@RequestParam Long assignmentId) {
@@ -79,9 +80,9 @@ public class AssignmentController {
     }
 
     @GetMapping("/student/feedback_grade")
-    public ResponseEntity<FeedbackResponse> getFeedback(@RequestParam Long submissionId) {
+    public ResponseEntity<String> getFeedback(@RequestParam Long submissionId) {
         FeedbackResponse feedbackResponse = assignmentservice.getsubmissionfeedbackandgrade(submissionId);
-        return ResponseEntity.ok(feedbackResponse);
+        return ResponseEntity.ok(feedbackResponse.toString());
     }
 
     @GetMapping("/instructor/getsubmitedfilecontent")

@@ -6,12 +6,8 @@ import org.example.lmsproject.course.model.Course;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-// import lombok.AllArgsConstructor;
-// import lombok.NoArgsConstructor;
 
 @Entity
-// @AllArgsConstructor
-// @NoArgsConstructor
 public class MCQQuestionEntity extends QuestionEntity{
     @Column(nullable=false)
     private List<String>answers;

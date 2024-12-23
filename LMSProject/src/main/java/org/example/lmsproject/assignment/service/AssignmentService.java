@@ -21,6 +21,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
+import org.example.lmsproject.assignment.model.AssignmentNotification;
+import org.example.lmsproject.assignment.model.AssignmentSubmissionNotification;
+
 @Service
 public class AssignmentService {
     @Autowired
@@ -55,8 +59,8 @@ public class AssignmentService {
                 .map(Student::getId)
                 .collect(Collectors.toList());
         if (studentIds.isEmpty()) { throw new IllegalStateException("No students are enrolled in this course"); }
-
-        mailboxService.addBulkNotifications(studentIds, assignment);
+        NotificationAndEmailMapper assignmentNotification = new AssignmentNotification(assignment);
+        mailboxService.addBulkNotifications(studentIds, assignmentNotification);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
         return assignmentrepo.save(assignment);
@@ -87,12 +91,13 @@ public class AssignmentService {
 
 
     // Grade a submission
-    public AssignmentSubmission gradesubmission(Long submissionid, Integer grade, String feedback) {
+    public AssignmentSubmission gradesubmission(Long submissionid, Integer grade,Integer total, String feedback) {
         AssignmentSubmission submission = submissionrepo.findById(submissionid)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
 
         submission.setGrade(grade);
         submission.setFeedback(feedback);
+        submission.setTotal(total);
 
         // added Notification Logic //////////////////////////////////////////////////////////////////////////
 
@@ -100,8 +105,8 @@ public class AssignmentService {
 
         User student = submission.getStudent();
         if (student == null) { throw new IllegalStateException("No student associated with this submission"); }
-
-        mailboxService.addNotification(student.getId(), submission);
+        AssignmentSubmissionNotification assignmentSubmissionNotification = new AssignmentSubmissionNotification(submission);
+        mailboxService.addNotification(student.getId(), assignmentSubmissionNotification);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 
