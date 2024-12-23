@@ -3,6 +3,7 @@ package org.example.lmsproject.Notification.TextMappers;
 import org.example.lmsproject.assignment.model.Assignment;
 import org.example.lmsproject.assignment.model.AssignmentSubmission;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
+import org.example.lmsproject.course.model.CourseMaterial;
 import org.example.lmsproject.quiz.model.Question.MCQQuestionEntity;
 import org.example.lmsproject.quiz.model.Question.QuestionEntity;
 import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
@@ -44,6 +45,9 @@ public class EmailMapper {
         } else if (message instanceof FeedBack) {
             return String.format("Feedback for Quiz: %s",
                     ((FeedBack) message).getQuiz().getQuizName());
+        }
+        else if(message instanceof CourseMaterial courseMaterial){
+            return String.format("New material has been uploaded for course: %s", courseMaterial.getCourse().getTitle());
         }
         return "LMS Notification";
     }
@@ -104,6 +108,9 @@ public class EmailMapper {
                     feedback.getStudent().getId(),
                     feedbackDetails.toString(),
                     feedback.getGrade());
+        }
+        else if(message instanceof CourseMaterial courseMaterial){
+            return String.format("A New file has been uploaded: %s \nplease check course  %s for details.",courseMaterial.getFilename() ,courseMaterial.getCourse().getTitle());
         }
 
         return "You have a new notification. Please check the LMS for more details.";

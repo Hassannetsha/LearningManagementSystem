@@ -1,27 +1,32 @@
 package org.example.lmsproject.course.model;
 
-import org.example.lmsproject.*;
-import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Lesson {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;  
+    private Long id;
 
-    private String title;  
-    private String description;  
-    private LocalDateTime dateTime;  
+    private String title;
+    private String description;
+    private LocalDateTime dateTime;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
-    private Course course;  
+    private Course course;
 
     @OneToMany(mappedBy = "lesson")
-    private List<Attendance> attendances;  
+    private List<Attendance> attendances;
 
     // Getters and setters
     public Long getId() {
@@ -71,4 +76,11 @@ public class Lesson {
     public void setAttendances(List<Attendance> attendances) {
         this.attendances = attendances;
     }
+
+    @Override
+    public String toString() {
+        return "{\n\tid:" + this.id + "\n\title: " + this.title + "\n\tdescription: " + this.description
+                + "\n\tdateTim: " + this.dateTime.toString() + "\n}";
+    }
+
 }

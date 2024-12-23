@@ -62,24 +62,24 @@ public class LessonController {
     }
 
     @PostMapping("/instructor/createlesson")
-    public ResponseEntity<Lesson> createLesson(
+    public ResponseEntity<String> createLesson(
             @RequestParam Long courseId,
             @RequestBody Lesson lesson) {
         try {
             Lesson createdLesson = lessonService.createLesson(courseId, lesson);
-            return ResponseEntity.ok(createdLesson);
+            return ResponseEntity.ok(createdLesson.toString());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
     }
 
     @PutMapping("/instructor/updatelesson/{id}")
-    public ResponseEntity<Lesson> updateLesson(
+    public ResponseEntity<String> updateLesson(
             @PathVariable Long id,
             @RequestBody Lesson updatedLesson) {
         try {
             Lesson lesson = lessonService.updateLesson(id, updatedLesson);
-            return ResponseEntity.ok(lesson);
+            return ResponseEntity.ok(lesson.toString());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }

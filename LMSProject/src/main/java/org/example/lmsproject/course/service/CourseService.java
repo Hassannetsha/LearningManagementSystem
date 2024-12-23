@@ -1,20 +1,23 @@
 package org.example.lmsproject.course.service;
 
-import  lombok.AllArgsConstructor;
+import  java.util.List;
+import java.util.stream.Collectors;
+
 import org.example.lmsproject.Notification.Services.MailboxService;
-import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.Course;
+import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.CourseMaterial;
-import org.example.lmsproject.userPart.model.Student;
-import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.course.repository.CourseRepository;
+import org.example.lmsproject.userPart.model.Instructor;
+import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.StudentService;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import lombok.AllArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -176,6 +179,10 @@ public class CourseService {
         if (courseMaterial != null) {
             course.addMaterial(courseMaterial);
             courseRepository.save(course);
+            List<Long> studentIds = course.getStudents().stream()
+                .map(Student::getId)
+                .collect(Collectors.toList());
+            mailboxService.addBulkNotifications(studentIds, courseMaterial);
             return ResponseEntity.ok("File uploaded and associated with the course successfully");
         }
 
