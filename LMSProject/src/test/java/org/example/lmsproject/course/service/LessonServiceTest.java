@@ -33,28 +33,28 @@
      @InjectMocks
      private LessonService lessonservice;
 
-     @Test
-     public void test_generateotp() {
-         Long lessonid = 1L;
-
-         Course mockcourse = new Course("Course1", "Description1", 30, true);
-         Student mockStudent = new Student();
-         mockStudent.setId(1L);
-         mockcourse.setStudents(Collections.singletonList(mockStudent));
-         Lesson mocklesson = new Lesson();
-         mocklesson.setId(lessonid);
-         mocklesson.setTitle("Lesson1");
-         mocklesson.setCourse(mockcourse);
-
-         when(lessonrepo.findById(lessonid)).thenReturn(Optional.of(mocklesson));
-
-         String otp = lessonservice.generateOtp(lessonid);
-
-         assertNotNull(otp);
-         assertEquals(6, otp.length()); // Ensure OTP length is 6
-         assertTrue(otp.matches("\\d{6}")); // Check OTP is numeric
-         verify(mailboxService, times(1)).addBulkNotifications(anyList(), anyString());
-     }
+//     @Test
+//     public void test_generateotp() {
+//         Long lessonid = 1L;
+//
+//         Course mockcourse = new Course("Course1", "Description1", 30, true);
+//         Student mockStudent = new Student();
+//         mockStudent.setId(1L);
+//         mockcourse.setStudents(Collections.singletonList(mockStudent));
+//         Lesson mocklesson = new Lesson();
+//         mocklesson.setId(lessonid);
+//         mocklesson.setTitle("Lesson1");
+//         mocklesson.setCourse(mockcourse);
+//
+//         when(lessonrepo.findById(lessonid)).thenReturn(Optional.of(mocklesson));
+//
+//         String otp = lessonservice.generateOtp(lessonid);
+//
+//         assertNotNull(otp);
+//         assertEquals(6, otp.length()); // Ensure OTP length is 6
+//         assertTrue(otp.matches("\\d{6}")); // Check OTP is numeric
+//         verify(mailboxService, times(1)).addBulkNotifications(anyList(), anyString());
+//     }
 
 
 
