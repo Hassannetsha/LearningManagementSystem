@@ -37,6 +37,7 @@ class MailboxControllerTest {
 
         Mailbox result = mailboxcontroller.getMailbox(mailboxid);
         assertNotNull(result);
+        assertSame(mailbox, result);
         verify(mailboxservice, times(1)).getMailbox(mailboxid);
     }
 
