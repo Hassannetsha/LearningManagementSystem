@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.example.lmsproject.userPart.model.AuthRequest;
 import org.example.lmsproject.userPart.model.Request;
-import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.AdminService;
 import org.example.lmsproject.userPart.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AuthController {
     private final AuthService authenticationService;
-    // @Autowired
     private final AdminService adminService;
 
     @Autowired

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 // import java.util.List;
 import java.util.Optional;
 
-// import java.util.function.Function;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findUserByid(Long id);

@@ -66,7 +66,7 @@ class LessonControllerTest {
 
         when(lessonService.generateOtp(lessonId)).thenReturn(otp);
 
-        mockMvc.perform(post("/student/generate-otp")
+        mockMvc.perform(post("/instructor/generate-otp")
                         .param("lessonId", String.valueOf(lessonId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

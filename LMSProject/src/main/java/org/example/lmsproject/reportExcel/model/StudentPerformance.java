@@ -1,13 +1,11 @@
 package org.example.lmsproject.reportExcel.model;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-@Entity
 public class StudentPerformance {
     private String username;
     @Id
