@@ -265,11 +265,19 @@ public class CourseService {
     }
 
     public String deleteCourse(String instructorUsername, long id) {
-        Optional<Course> course = courseRepository.findById(id);
+        Course course = courseRepository.findById(id).orElse(null);
         Instructor instructor = instructorService.findByUsername(instructorUsername);
-        if (course.isPresent() && course.get().getInstructor() != instructor)
+        if ( course.getInstructor() != instructor)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
+        for (Student student : course.getStudents()) {
+            student.getCourses().remove(course);
+        }
+        System.out.println(course.getCourseId());
+        studentService.saveAll(course.getStudents());
+        course.getStudents().clear();
+        courseRepository.save(course);
         courseRepository.deleteById(id);
+        courseRepository.delete(course);
         return "Course deleted successfully";
     }
 }
