@@ -47,6 +47,7 @@ public class Notification {
         this.isRead = false;
         this.mailbox = mailbox;
         this.message = notificationAndEmailMapper.getBody();
+        this.date = LocalDate.now();
     }
 
     public Long getId() {
