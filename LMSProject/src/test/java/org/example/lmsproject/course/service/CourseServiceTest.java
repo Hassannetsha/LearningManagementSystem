@@ -7,6 +7,7 @@ import org.example.lmsproject.course.model.CourseMaterial;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
+import org.example.lmsproject.userPart.service.InstructorService;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -35,6 +37,8 @@ public class CourseServiceTest {
     private CourseEnrollRequestService courseEnrollRequestService;
     @Mock
     private MailboxService mailboxService;
+    @Mock
+    private InstructorService instructorService;
 
     @InjectMocks
     private CourseService courseService;
@@ -46,10 +50,12 @@ public class CourseServiceTest {
         Course savedCourse = new Course("math", "math description", 9, true);
         course.setCourseId(null);
         savedCourse.setCourseId(1L);
+        course.setInstructor(instructor);
 
         when(courseRepository.save(course)).thenReturn(savedCourse);
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        courseService.createCourse(course, instructor);
+        courseService.createCourse(course, instructor.getUsername());
 
         assertNotNull(course.getInstructor());
         assertEquals(instructor, course.getInstructor());
@@ -66,8 +72,9 @@ public class CourseServiceTest {
         existingCourse.setInstructor(instructor);
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(existingCourse));
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        courseService.updateCourse(courseId, updatedCourse, instructor);
+        courseService.updateCourse(courseId, updatedCourse, instructor.getUsername());
 
         assert "advanced math".equals(existingCourse.getTitle());
         assert existingCourse.getDuration() == 20;
@@ -122,9 +129,9 @@ public class CourseServiceTest {
         when(studentService.findStudentByUsername(studentUsername)).thenReturn(student);
         when(courseEnrollRequestService.save(any(CourseEnrollRequest.class))).thenReturn(request);
 
-        ResponseEntity<String> response = courseService.enrollStudentInCourse(id, studentUsername);
+        String response = courseService.enrollStudentInCourse(id, studentUsername);
 
-        assertEquals("A new enrollment request has been sent to the instructor", response.getBody());
+        assertEquals("A new enrollment request has been sent to the instructor", response);
 
         verify(courseEnrollRequestService, times(1)).save(any(CourseEnrollRequest.class));
         verify(studentService, times(1)).findStudentByUsername(studentUsername);
@@ -135,7 +142,7 @@ public class CourseServiceTest {
     public void testEnrollStudentInCourse_CourseUnavailable() {
         long id = 1L;
         String studentUsername = "student1";
-        Course course = new Course("math", "math description", 9, false);
+        Course course = new Course("math", "math description", 9, false); // course.setAvailable(false)
         course.setCourseId(id);
         Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
         course.setInstructor(instructor);
@@ -145,14 +152,18 @@ public class CourseServiceTest {
 
         when(courseRepository.findById(id)).thenReturn(Optional.of(course));
 
-        ResponseEntity<String> response = courseService.enrollStudentInCourse(id, studentUsername);
+        Exception exception = assertThrows(ResponseStatusException.class, () -> {
+            courseService.enrollStudentInCourse(id, studentUsername);
+        });
 
-        assertEquals("Course is not available", response.getBody());
+        assertEquals("404 NOT_FOUND \"Course not available\"", exception.getMessage());
 
+        // Verify no changes in the repository
         verify(courseRepository, times(0)).save(course);
         verify(studentService, times(0)).findStudentByUsername(studentUsername);
         verify(mailboxService, times(0)).addNotification(eq(instructor.getId()), any(CourseEnrollRequest.class));
     }
+
 
     @Test
     public void updateEnrollmentStatus_StudentAccepted() {
@@ -171,10 +182,11 @@ public class CourseServiceTest {
         request.setCourseEnrollmentId(id);
 
         when(courseEnrollRequestService.findById(id)).thenReturn(request);
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        ResponseEntity<String> response = courseService.updateEnrollmentStatus(instructor, id, isAccepted);
+        String response = courseService.updateEnrollmentStatus(instructor.getUsername(), id, isAccepted);
 
-        assert "Student has been accepted".equals(response.getBody());
+        assert "Student has been accepted".equals(response);
         verify(courseEnrollRequestService, times(1)).save(any(CourseEnrollRequest.class));
         verify(studentService, times(1)).save(student);
         verify(courseRepository, times(1)).save(course);
@@ -198,10 +210,11 @@ public class CourseServiceTest {
         request.setCourseEnrollmentId(id);
 
         when(courseEnrollRequestService.findById(id)).thenReturn(request);
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        ResponseEntity<String> response = courseService.updateEnrollmentStatus(instructor, id, isAccepted);
+        String response = courseService.updateEnrollmentStatus(instructor.getUsername(), id, isAccepted);
 
-        assert "Student has been rejected".equals(response.getBody());
+        assert "Student has been rejected".equals(response);
         verify(courseEnrollRequestService, times(1)).save(any(CourseEnrollRequest.class));
         verify(studentService, times(1)).save(student);
     }
@@ -214,11 +227,14 @@ public class CourseServiceTest {
         course.setCourseId(id);
         Student student = new Student("student1", "password2", "student1@example.com");
         student.setId(id);
+        Instructor instructor = new Instructor("instructor1", "password2", "instructor1@example.com");
+        course.setInstructor(instructor);
 
         when(courseRepository.findById(id)).thenReturn(Optional.of(course));
         when(studentService.getStudentById(id)).thenReturn(student);
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        courseService.removeStudentFromCourse(id, student.getId());
+        courseService.removeStudentFromCourse(id, instructor.getUsername(), student.getId());
 
         assertFalse(course.getStudents().contains(student));
         assertFalse(student.getCourses().contains(course));
@@ -236,31 +252,38 @@ public class CourseServiceTest {
 
         Course course = new Course("Math", "Math course description", 10, true);
         course.setCourseId(courseId);
+        Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
+        course.setInstructor(instructor);
 
         CourseMaterial courseMaterial = new CourseMaterial();
         courseMaterial.setFilename(filename);
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
-        when(courseMaterialService.uploadMaterial(course, file)).thenReturn(ResponseEntity.ok("Upload successful"));
+        when(courseMaterialService.uploadMaterial(course, file)).thenReturn("File uploaded successfully");
         when(courseMaterialService.getByFilename(filename)).thenReturn(courseMaterial);
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        ResponseEntity<String> response = courseService.uploadMaterial(courseId, file);
+        String response = courseService.uploadMaterial(courseId, instructor.getUsername(), file);
 
-        verify(courseRepository, times(1)).save(course);  // Verify course was saved
-        assertEquals("File uploaded and associated with the course successfully", response.getBody());
+        verify(courseRepository, times(1)).save(course);
+        assertEquals("File uploaded and associated with the course successfully", response);
     }
 
     @Test
     public void uploadMaterial_CourseNotFound() {
         long courseId = 1L;
         MultipartFile file = mock(MultipartFile.class);
+        Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-        ResponseEntity<String> response = courseService.uploadMaterial(courseId, file);
+        Exception exception = assertThrows(ResponseStatusException.class, () -> {
+            courseService.uploadMaterial(courseId, instructor.getUsername(), file);
+        });
 
-        assertEquals("Course not found", response.getBody());
+        assertEquals("404 NOT_FOUND \"Course not found\"", exception.getMessage());
     }
+
 
     @Test
     public void uploadMaterial_FailureToAssociate() {
@@ -270,17 +293,21 @@ public class CourseServiceTest {
 
         when(file.getOriginalFilename()).thenReturn(filename);
 
+
         Course course = new Course("Math", "Math course description", 10, true);
         course.setCourseId(courseId);
+        Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
+        course.setInstructor(instructor);
 
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
-        when(courseMaterialService.uploadMaterial(course, file)).thenReturn(ResponseEntity.ok("Upload successful"));
+        when(courseMaterialService.uploadMaterial(course, file)).thenReturn("File uploaded successfully");
         when(courseMaterialService.getByFilename(filename)).thenReturn(null);  // Return null to simulate failure
 
-        ResponseEntity<String> response = courseService.uploadMaterial(courseId, file);
+        String response = courseService.uploadMaterial(courseId, instructor.getUsername(), file);
 
         verify(courseRepository, times(0)).save(course);  // Verify course was saved
-        assertEquals("File upload failed to associate with the course", response.getBody());
+        assertEquals("File upload failed to associate with the course", response);
     }
 
     @Test
@@ -288,10 +315,13 @@ public class CourseServiceTest {
         long courseId = 1L;
         Course course = new Course("math", "math description", 9, true);
         course.setCourseId(courseId);
+        Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
+        course.setInstructor(instructor);
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
+        when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
 
-        courseService.deleteCourse(courseId);
+        courseService.deleteCourse(instructor.getUsername(), courseId);
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
