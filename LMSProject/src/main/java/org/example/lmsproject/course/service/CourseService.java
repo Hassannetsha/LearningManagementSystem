@@ -15,13 +15,14 @@ import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.model.User;
+import org.example.lmsproject.userPart.service.InstructorService;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @AllArgsConstructor
@@ -33,6 +34,7 @@ public class CourseService {
     private final CourseEnrollRequestService courseEnrollRequestService;
 
     private final MailboxService mailboxService;
+    private final InstructorService instructorService;
 
     public boolean courseExists(long courseId) {
         return courseRepository.existsById(courseId);
@@ -57,10 +59,14 @@ public class CourseService {
                 .collect(Collectors.joining(",\n\n    ", "[\n    ", "]\n"));
     }
 
+    public String getEnrolledCourses(String studentUsername) {
+        return studentService.getEnrolledCourses(studentUsername);
+    }
+
     public String viewCourse(long id) {
         Course course = courseRepository.findById(id).orElse(null);
         if (course == null) {
-            return "";
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found");
         }
         return course.toString();
     }
@@ -69,7 +75,7 @@ public class CourseService {
         Optional<Course> course = courseRepository.findById(id);
 
         if (course.isPresent() && !course.get().getAvailable()) {
-            return "This course is not available";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This course is not available");
         }
         return course.toString();
     }
@@ -82,31 +88,34 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public void createCourse(Course course, Instructor instructor) { // done
+    public void createCourse(Course course, String instructorUsername) {
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
         course.setInstructor(instructor);
         courseRepository.save(course);
     }
 
-    public String updateCourse(long id, Course updatedCourse, Instructor instructor) { // done
-//        Course existingCourse = getCourseById(id);
+    public String updateCourse(long id, Course updatedCourse, String instructorUsername) {
         Optional<Course> existingCourse = courseRepository.findById(id);
-        if (existingCourse.isPresent()) {
-            if (instructor != existingCourse.get().getInstructor()) {
-                return "You are not allowed to modify this course";
-            }
-            if (updatedCourse.getTitle() != null) existingCourse.get().setTitle(updatedCourse.getTitle());
-            if (updatedCourse.getDescription() != null) existingCourse.get().setDescription(updatedCourse.getDescription());
-            if (updatedCourse.getDuration() != 0) existingCourse.get().setDuration(updatedCourse.getDuration());
-            if (updatedCourse.getAvailable() != null) existingCourse.get().setAvailable(updatedCourse.getAvailable());
-            if (updatedCourse.getStudents() != null) existingCourse.get().setStudents(updatedCourse.getStudents());
-            if (updatedCourse.getInstructor() != null) existingCourse.get().setInstructor(updatedCourse.getInstructor());
-            if (updatedCourse.getAssignments() != null) existingCourse.get().setAssignments(updatedCourse.getAssignments());
-            if (updatedCourse.getLessons() != null) existingCourse.get().setLessons(updatedCourse.getLessons());
-            courseRepository.save(existingCourse.orElse(updatedCourse));
-            NotificationAndEmailMapper courseNotification = new CourseNotification(existingCourse.get());
-            mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), courseNotification);
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
+        if (existingCourse.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found");
         }
-        return "Course doesn't exist";
+        if (instructor != existingCourse.get().getInstructor()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
+        }
+        if (updatedCourse.getTitle() != null) existingCourse.get().setTitle(updatedCourse.getTitle());
+        if (updatedCourse.getDescription() != null) existingCourse.get().setDescription(updatedCourse.getDescription());
+        if (updatedCourse.getDuration() != 0) existingCourse.get().setDuration(updatedCourse.getDuration());
+        if (updatedCourse.getAvailable() != null) existingCourse.get().setAvailable(updatedCourse.getAvailable());
+        if (updatedCourse.getStudents() != null) existingCourse.get().setStudents(updatedCourse.getStudents());
+        if (updatedCourse.getInstructor() != null) existingCourse.get().setInstructor(updatedCourse.getInstructor());
+        if (updatedCourse.getAssignments() != null) existingCourse.get().setAssignments(updatedCourse.getAssignments());
+        if (updatedCourse.getLessons() != null) existingCourse.get().setLessons(updatedCourse.getLessons());
+        courseRepository.save(existingCourse.orElse(updatedCourse));
+        NotificationAndEmailMapper courseNotification = new CourseNotification(existingCourse.get());
+        mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), courseNotification);
+
+        return existingCourse.get().toString();
     }
 
     public String viewEnrolledStudents(long id) {
@@ -118,15 +127,15 @@ public class CourseService {
         return "{\"students\": " + studentIds + "}";
     }
 
-    public ResponseEntity<String> enrollStudentInCourse(long courseId, String studentUsername) { // done
+    public String enrollStudentInCourse(long courseId, String studentUsername) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null)
-            return ResponseEntity.badRequest().body("Course not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found");
         if (!course.getAvailable())
-            return ResponseEntity.badRequest().body("Course is not available");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not available");
         Student student = studentService.findStudentByUsername(studentUsername);
         if (student == null)
-            return ResponseEntity.badRequest().body("Student not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found");
 
         CourseEnrollRequest enrollRequest = new CourseEnrollRequest();
         enrollRequest.setStatus("Pending");
@@ -139,17 +148,19 @@ public class CourseService {
         studentService.save(student);
 
         User instructor = course.getInstructor();
-        if (instructor==null) { throw new IllegalStateException("No Instructor Affiliated With This Course"); }
+        if (instructor==null)
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found");
+
+
         NotificationAndEmailMapper courseEnrollNotification = new CourseEnrollRequestNotification(enrollRequest);
         mailboxService.addNotification(instructor.getId(), courseEnrollNotification);
-
-        return ResponseEntity.ok("A new enrollment request has been sent to the instructor");
+        return "A new enrollment request has been sent to the instructor";
     }
 
-    public ResponseEntity<String> updateEnrollmentStatus(Instructor instructor, long requestId, boolean isAccepted) { //done
+    public String updateEnrollmentStatus(String instructorUsername, long requestId, boolean isAccepted) {
         CourseEnrollRequest enrollRequest = courseEnrollRequestService.findById(requestId);
         if (enrollRequest == null) {
-            return ResponseEntity.badRequest().body("Enrollment request not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Enrollment request not found");
         }
 
         enrollRequest.setStatus((isAccepted)? "Accepted" : "Rejected");
@@ -157,8 +168,9 @@ public class CourseService {
 
         Course course = enrollRequest.getCourse();
         Student student = enrollRequest.getStudent();
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
         if (instructor != course.getInstructor()) {
-            return ResponseEntity.badRequest().body("You are not allowed to modify this course");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
         }
         NotificationAndEmailMapper courseEnrollNotification = new CourseEnrollRequestNotification(enrollRequest);
         mailboxService.addNotification(student.getId(), courseEnrollNotification);
@@ -168,64 +180,93 @@ public class CourseService {
             student.getCourses().add(course);
             courseRepository.save(course);
             studentService.save(student);
-            return ResponseEntity.ok("Student has been accepted");
+            return "Student has been accepted";
         }
         courseRepository.save(course);
         studentService.save(student);
 
-        return ResponseEntity.ok("Student has been rejected");
+        return "Student has been rejected";
     }
 
-    public void removeStudentFromCourse(long courseId, long studentId) {
+    public void removeStudentFromCourse(long courseId, String instructorUsername, long studentId) {
         Course course = getCourseById(courseId);
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
+        if (course.getInstructor() != instructor)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
         Student student = studentService.getStudentById(studentId);
-        if (student != null) {
-            course.removeStudent(student);
-            student.getCourses().remove(course);
-            courseRepository.save(course);
-            studentService.save(student);
+        if (student == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found");
         }
+        course.removeStudent(student);
+        student.getCourses().remove(course);
+        courseRepository.save(course);
+        studentService.save(student);
     }
 
-    public ResponseEntity<String> uploadMaterial(long id, MultipartFile file) {
-        Course course = courseRepository.findById(id).orElse(null);
-        if (course == null) {
-            return ResponseEntity.status(404).body("Course not found");
-        }
+    public String uploadMaterial(long id, String instructorUsername, MultipartFile file) {
+        Optional<Course> course = courseRepository.findById(id);
+        if (course.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found");
 
-        ResponseEntity<String> uploadResponse = courseMaterialService.uploadMaterial(course, file);
-        if (uploadResponse.getStatusCode() != HttpStatus.OK) {
-            return uploadResponse;
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
+        if (course.get().getInstructor() != instructor) {
+            System.out.println("test");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
         }
+        courseMaterialService.uploadMaterial(course.get(), file);
 
         CourseMaterial courseMaterial = courseMaterialService.getByFilename(file.getOriginalFilename());
         if (courseMaterial != null) {
-            course.addMaterial(courseMaterial);
-            courseRepository.save(course);
-            List<Long> studentIds = course.getStudents().stream()
+            course.get().addMaterial(courseMaterial);
+            courseRepository.save(course.get());
+            List<Long> studentIds = course.get().getStudents().stream()
                 .map(Student::getId)
                 .collect(Collectors.toList());
             NotificationAndEmailMapper courseMaterialNotification = new CourseMaterialNotification(courseMaterial);
             mailboxService.addBulkNotifications(studentIds, courseMaterialNotification);
-            return ResponseEntity.ok("File uploaded and associated with the course successfully");
+            return "File uploaded and associated with the course successfully";
         }
 
-        return ResponseEntity.ok("File upload failed to associate with the course");
+        return "File upload failed to associate with the course";
     }
 
-    public ResponseEntity<byte[]> getMaterial(String filename) {
+    public Optional<byte[]> getMaterial(long courseId, String studentUsername, String filename) {
+        // Check if the course exists
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (course.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Student student = studentService.findStudentByUsername(studentUsername);
+        if (!course.get().getStudents().contains(student)) {
+            return Optional.empty();
+        }
+
         return courseMaterialService.getMaterial(filename);
     }
 
-    public String getEnrollments(Course course) {
+
+    public String getEnrollments(String instructorUsername, Course course) {
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
+        if (course.getInstructor() != instructor)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
         return courseEnrollRequestService.getEnrollments(course);
     }
 
-    public ResponseEntity<String> deleteMaterial(String filename) {
+    public String deleteMaterial(String instructorUsername, long courseId, String filename) {
+        Optional<Course> course = courseRepository.findById(courseId);
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
+        if (course.isPresent() && course.get().getInstructor() != instructor)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
         return courseMaterialService.deleteMaterial(filename);
     }
 
-    public void deleteCourse(long id) {
+    public String deleteCourse(String instructorUsername, long id) {
+        Optional<Course> course = courseRepository.findById(id);
+        Instructor instructor = instructorService.findByUsername(instructorUsername);
+        if (course.isPresent() && course.get().getInstructor() != instructor)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not allowed to modify this course");
         courseRepository.deleteById(id);
+        return "Course deleted successfully";
     }
 }

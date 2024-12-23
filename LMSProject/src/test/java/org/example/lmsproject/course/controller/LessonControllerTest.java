@@ -1,113 +1,121 @@
-// package org.example.lmsproject.Lesson;
+ package org.example.lmsproject.course.controller;
 
-// import com.fasterxml.jackson.databind.ObjectMapper;
-// import org.example.lmsproject.course.controller.LessonController;
-// import org.example.lmsproject.course.model.Lesson;
-// import org.example.lmsproject.course.repository.AttendanceRepository;
-// import org.example.lmsproject.course.repository.LessonRepository;
-// import org.example.lmsproject.course.service.LessonService;
-// import org.example.lmsproject.userPart.model.User;
-// import org.example.lmsproject.userPart.repository.UserRepository;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.mockito.InjectMocks;
-// import org.mockito.Mock;
-// import org.mockito.MockitoAnnotations;
-// import org.springframework.http.MediaType;
-// import org.springframework.test.web.servlet.MockMvc;
-// import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+ import com.fasterxml.jackson.databind.ObjectMapper;
+ import org.example.lmsproject.course.controller.LessonController;
+ import org.example.lmsproject.course.model.Course;
+ import org.example.lmsproject.course.model.Lesson;
+ import org.example.lmsproject.course.repository.AttendanceRepository;
+ import org.example.lmsproject.course.repository.CourseRepository;
+ import org.example.lmsproject.course.repository.LessonRepository;
+ import org.example.lmsproject.course.service.LessonService;
+ import org.example.lmsproject.userPart.model.User;
+ import org.example.lmsproject.userPart.repository.UserRepository;
+ import org.junit.jupiter.api.BeforeEach;
+ import org.junit.jupiter.api.Test;
+ import org.mockito.InjectMocks;
+ import org.mockito.Mock;
+ import org.mockito.MockitoAnnotations;
+ import org.springframework.http.MediaType;
+ import org.springframework.test.web.servlet.MockMvc;
+ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-// import java.util.Optional;
+ import java.util.Optional;
 
-// import static org.mockito.Mockito.when;
-// import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-// import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+ import static org.hamcrest.Matchers.any;
+ import static org.junit.jupiter.api.Assertions.assertTrue;
+ import static org.mockito.ArgumentMatchers.eq;
+ import static org.mockito.Mockito.when;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-// class LessonControllerTest {
+ class LessonControllerTest {
 
-//     private MockMvc mockMvc;
+     private MockMvc mockMvc;
 
-//     @Mock
-//     private LessonService lessonService;
+     @Mock
+     private LessonService lessonService;
 
-//     @Mock
-//     private LessonRepository lessonRepository;
+     @Mock
+     private LessonRepository lessonRepository;
 
-//     @Mock
-//     private UserRepository userRepository;
+     @Mock
+     private UserRepository userRepository;
 
-//     @Mock
-//     private AttendanceRepository attendanceRepo;
+     @Mock
+     private AttendanceRepository attendanceRepo;
 
-//     @InjectMocks
-//     private LessonController lessonController;
+     @Mock
+     private CourseRepository courseRepository;
 
-//     private ObjectMapper objectMapper;
+     @InjectMocks
+     private LessonController lessonController;
 
-//     @BeforeEach
-//     void setUp() {
-//         MockitoAnnotations.openMocks(this);
-//         mockMvc = MockMvcBuilders.standaloneSetup(lessonController).build();
-//         objectMapper = new ObjectMapper();
-//     }
+     private ObjectMapper objectMapper;
 
-//     @Test
-//     void testGenerateOtp() throws Exception {
-//         Long lessonId = 1L;
-//         String otp = "123456";
+     @BeforeEach
+     void setUp() {
+         MockitoAnnotations.openMocks(this);
+         mockMvc = MockMvcBuilders.standaloneSetup(lessonController).build();
+         objectMapper = new ObjectMapper();
+     }
 
-//         when(lessonService.generateOtp(lessonId)).thenReturn(otp);
+     @Test
+     void testGenerateOtp() throws Exception {
+         Long lessonId = 1L;
+         String otp = "123456";
 
-//         mockMvc.perform(post("/student/generate-otp")
-//                         .param("lessonId", String.valueOf(lessonId))
-//                         .contentType(MediaType.APPLICATION_JSON))
-//                 .andExpect(status().isOk())
-//                 .andExpect(content().string("OTP generated: " + otp));
-//     }
+         when(lessonService.generateOtp(lessonId)).thenReturn(otp);
 
-//     @Test
-//     void testEnrollInLesson() throws Exception {
-//         Long lessonId = 1L;
-//         Long studentId = 1L;
-//         String otp = "123456";
+         mockMvc.perform(post("/instructor/generate-otp")
+                         .param("lessonId", String.valueOf(lessonId))
+                         .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().string("OTP generated: " + otp));
+     }
 
-//         Lesson lesson = new Lesson();
-//         lesson.setId(lessonId);
+     @Test
+     void testEnrollInLesson() throws Exception {
+         Long lessonId = 1L;
+         Long studentId = 1L;
+         String otp = "123456";
 
-//         User student = new User();
-//         student.setId(studentId);
-//         student.setUsername("john_doe");
+         Lesson lesson = new Lesson();
+         lesson.setId(lessonId);
 
-//         when(lessonService.validateOtp(lessonId, otp)).thenReturn(true);
-//         when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lesson));
-//         when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
+         User student = new User();
+         student.setId(studentId);
+         student.setUsername("john_doe");
 
-//         mockMvc.perform(post("/student/enroll")
-//                         .param("lessonId", String.valueOf(lessonId))
-//                         .param("otp", otp)
-//                         .param("studentId", String.valueOf(studentId))
-//                         .contentType(MediaType.APPLICATION_JSON))
-//                 .andExpect(status().isOk())
-//                 .andExpect(content().string("Student successfully enrolled in the lesson."));
-//     }
+         when(lessonService.validateOtp(lessonId, otp)).thenReturn(true);
+         when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lesson));
+         when(userRepository.findById(studentId)).thenReturn(Optional.of(student));
 
-//     @Test
-//     void testEnrollInLessonInvalidOtp() throws Exception {
-//         Long lessonId = 1L;
-//         Long studentId = 1L;
-//         String otp = "123456";
+         mockMvc.perform(post("/student/enroll")
+                         .param("lessonId", String.valueOf(lessonId))
+                         .param("otp", otp)
+                         .param("studentId", String.valueOf(studentId))
+                         .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                 .andExpect(content().string("Student successfully enrolled in the lesson."));
+     }
 
-//         when(lessonService.validateOtp(lessonId, otp)).thenReturn(false);
+     @Test
+     void testEnrollInLessonInvalidOtp() throws Exception {
+         Long lessonId = 1L;
+         Long studentId = 1L;
+         String otp = "123456";
 
-//         mockMvc.perform(post("/student/enroll")
-//                         .param("lessonId", String.valueOf(lessonId))
-//                         .param("otp", otp)
-//                         .param("studentId", String.valueOf(studentId))
-//                         .contentType(MediaType.APPLICATION_JSON))
-//                 .andExpect(status().isBadRequest())
-//                 .andExpect(content().string("Invalid or expired OTP."));
-//     }
+         when(lessonService.validateOtp(lessonId, otp)).thenReturn(false);
+
+         mockMvc.perform(post("/student/enroll")
+                         .param("lessonId", String.valueOf(lessonId))
+                         .param("otp", otp)
+                         .param("studentId", String.valueOf(studentId))
+                         .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isBadRequest())
+                 .andExpect(content().string("Invalid or expired OTP."));
+     }
 
 //     @Test
 //     void testCreateLesson() throws Exception {
@@ -115,17 +123,22 @@
 //         Lesson lesson = new Lesson();
 //         lesson.setTitle("Test Lesson");
 //         lesson.setDescription("Test Description");
-
-//         when(lessonService.createLesson(courseId, lesson)).thenReturn(lesson);
-
+//         lesson.setId(courseId);
+//         Course course = new Course();
+//         course.setCourseId(courseId);
+//         lesson.setCourse(course);
+//
+//         when(lessonService.createLesson(eq(courseId), (Lesson) any(Lesson.class))).thenReturn(lesson);
+//
 //         mockMvc.perform(post("/instructor/createlesson")
 //                         .param("courseId", String.valueOf(courseId))
 //                         .contentType(MediaType.APPLICATION_JSON)
 //                         .content(objectMapper.writeValueAsString(lesson)))
-//                 .andExpect(status().isOk()) // Expecting HTTP 200 status
+//                 .andExpect(status().isOk())
 //                 .andDo(result -> {
 //                     String responseBody = result.getResponse().getContentAsString();
 //                     System.out.println("Response Body: " + responseBody);
+//                     assertTrue(responseBody.contains("Test Lesson"));
 //                 });
 //     }
 
@@ -142,12 +155,12 @@
 //                 .andExpect(status().isOk());
 //     }
 
-//     @Test
-//     void testDeleteLesson() throws Exception {
-//         Long lessonId = 1L;
+     @Test
+     void testDeleteLesson() throws Exception {
+         Long lessonId = 1L;
 
-//         mockMvc.perform(delete("/instructor/deletelesson/{id}", lessonId))
-//                 .andExpect(status().isOk())
-//                 .andExpect(content().string("Lesson deleted successfully"));
-//     }
-// }
+         mockMvc.perform(delete("/instructor/deletelesson/{id}", lessonId))
+                 .andExpect(status().isOk())
+                 .andExpect(content().string("Lesson deleted successfully"));
+     }
+ }

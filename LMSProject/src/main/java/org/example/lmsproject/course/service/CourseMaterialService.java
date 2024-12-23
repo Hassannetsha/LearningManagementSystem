@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.Optional;
 
 @Service
 public class CourseMaterialService {
@@ -27,17 +29,17 @@ public class CourseMaterialService {
         return courseMaterialRepository.findByFilename(filename);
     }
 
-    public ResponseEntity<String> uploadMaterial(Course course, MultipartFile file) {
+    public String uploadMaterial(Course course, MultipartFile file) {
         String filename = file.getOriginalFilename();
         if (filename == null || filename.isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid file name");
+            throw new RuntimeException("Filename cannot be empty");
         }
 
         try {
             File directory = new File(uploadDirectory);
             if (!directory.exists() && !directory.mkdirs()) {
                 System.out.println("Failed to create directory: {}"+ uploadDirectory);
-                return ResponseEntity.status(500).body("Failed to create upload directory");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to create directory: " + uploadDirectory);
             }
 
             byte[] bytes = file.getBytes();
@@ -48,24 +50,23 @@ public class CourseMaterialService {
             courseMaterial.setCourse(course);
             courseMaterialRepository.save(courseMaterial);
 
-            return ResponseEntity.ok("File uploaded successfully");
+            return "File uploaded successfully";
 
         } catch (IOException e) {
-            System.out.println("Error occurred while uploading the file: {}"+ e.getMessage());
-            return ResponseEntity.status(500).body("Internal server error occurred while uploading file");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error occurred while uploading the file: " + e.getMessage());
         }
     }
-    public ResponseEntity<byte[]> getMaterial(String filename) {
+    public Optional<byte[]> getMaterial(String filename) {
         CourseMaterial courseMaterial = courseMaterialRepository.findByFilename(filename);
         if (courseMaterial == null) {
-            return ResponseEntity.status(404).body(null); // Not found
+            return Optional.empty();
         }
 
         Path filePath = Paths.get(courseMaterial.getPath()).toAbsolutePath().normalize();
 
         if (!Files.exists(filePath)) {
             System.out.println("File not found on the server: {}" +  filePath);
-            return ResponseEntity.status(404).body(null);
+            return Optional.empty();
         }
         try {
             byte[] fileContent = Files.readAllBytes(filePath);
@@ -76,28 +77,25 @@ public class CourseMaterialService {
                 contentType = "application/octet-stream";
             }
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
-                    .body(fileContent);
+            return Optional.of(fileContent);
 
         } catch (IOException e) {
-            return ResponseEntity.status(500).body(null); // Internal server error
+            return Optional.empty();
         }
     }
 
-    public ResponseEntity<String> deleteMaterial(String filename) {
+    public String deleteMaterial(String filename) {
         CourseMaterial courseMaterial = courseMaterialRepository.findByFilename(filename);
         if (courseMaterial == null) {
-            return ResponseEntity.status(404).body("Invalid file name");
+            return "Invalid file name";
         }
         File file = new File(courseMaterial.getPath());
         boolean deleted = file.delete();
         if (!deleted) {
-            return ResponseEntity.badRequest().body("Failed to delete file");
+            return "Failed to delete file";
         }
         courseMaterialRepository.delete(courseMaterial);
-        return ResponseEntity.ok("File deleted successfully");
+        return "File deleted successfully";
     }
 
 
