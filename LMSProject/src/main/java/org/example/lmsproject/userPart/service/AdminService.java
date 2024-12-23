@@ -93,17 +93,17 @@ public class AdminService {
 
     public void sendRequest(Request userRequest) {
         if (userRequest.getUsername()!=null&&userRequest.getPassword()!=null&&userRequest.getEmail()!=null&&userRequest.getRole()!=null) {
+            if (userRepo.findByusername(userRequest.getUsername()).isPresent()){
+                throw new IllegalArgumentException("Username already exists");
+            }
             requestRepo.save(userRequest);
-
             // added Notification Logic //////////////////////////////////////////////////////////////////////////
-
             List<Long> adminUserIds = getAllAdmins().stream()
                     .map(Admin::getId)
                     .toList();
             if (adminUserIds.isEmpty()) { throw new IllegalStateException("No Admin Level Users Found"); }
 
             mailboxService.addBulkNotifications(adminUserIds, userRequest);
-
             /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         }
@@ -112,7 +112,6 @@ public class AdminService {
         }
         // notificationController
     }
-
 
 
     // added FOR Notification Logic //////////////////////////////////////////////////////////////////////////

@@ -54,7 +54,8 @@ public class CourseController {
 
     @PutMapping("/instructor/courses/{courseId}") // instructor
     public ResponseEntity<String> updateCourse(@PathVariable long courseId, @RequestBody Course course) {
-        if (courseService.courseExists(courseId))
+        System.out.println("Coursr id== "+courseId);
+        if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
         courseService.updateCourse(courseId, course);
         return ResponseEntity.ok(courseService.viewCourse(courseId));
@@ -62,7 +63,7 @@ public class CourseController {
 
     @GetMapping("api/courses/{courseId}/students")
     public ResponseEntity<String> viewEnrolledStudents(@PathVariable long courseId) {
-        if (courseService.courseExists(courseId))
+        if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
         return ResponseEntity.ok(courseService.viewEnrolledStudents(courseId));
     }

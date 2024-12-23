@@ -51,6 +51,7 @@ public class MailboxService {
 
         Mailbox mailbox;
         if (mailboxOptional.isEmpty()) {
+            System.out.println(userId);
             User user = userService.getUser(userId);
             if (user == null) {
                 throw new IllegalArgumentException("User not found for ID: " + userId);
@@ -74,8 +75,19 @@ public class MailboxService {
 
     public void addBulkNotifications(List<Long> userIds, Object message) {
         userIds.forEach(userId -> {
-            Mailbox mailbox = mailboxRepository.findByUserId(userId)
-                    .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
+            Optional<Mailbox> mailboxID = mailboxRepository.findByUserId(userId);
+//                    .orElseThrow(() -> new IllegalStateException("Mailbox not found for user ID " + userId));
+            Mailbox mailbox;
+            if (mailboxID.isEmpty()) {
+                User user = userService.getUser(userId);
+                if (user == null) {
+                    throw new IllegalArgumentException("User not found for ID: " + userId);
+                }
+                mailbox = new Mailbox(user);
+                mailboxRepository.save(mailbox);
+            } else {
+                mailbox = mailboxID.get();
+            }
             notificationService.createNotification(mailbox, message);
 
             String email = mailbox.getUser().getEmail();

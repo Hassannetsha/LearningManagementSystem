@@ -14,4 +14,13 @@ public class Response {
     private Long id;
     @Column(nullable=false)
     private int state;
+
+    public Response(Long id, int state) {
+        this.id = id;
+        this.state = state;
+    }
+
+    public Response() {
+
+    }
 }
