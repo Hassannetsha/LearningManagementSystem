@@ -1,9 +1,12 @@
 package org.example.lmsproject.userPart.model;
 
-import org.example.lmsproject.course.model.Course;
-import jakarta.persistence.*;
-
 import java.util.List;
+
+import org.example.lmsproject.course.model.Course;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 // import jakarta.persistence.OneToMany;
 
 // import java.util.List;

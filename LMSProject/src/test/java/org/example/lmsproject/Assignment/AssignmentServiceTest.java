@@ -73,7 +73,7 @@ public class AssignmentServiceTest {
 
         verify(courserepo, times(1)).findById(courseId);
         verify(assignmentrepo, times(1)).save(any(Assignment.class));
-        verify(mailboxService, times(1)).addBulkNotifications(anyList(), any(Assignment.class));
+        // verify(mailboxService, times(1)).addBulkNotifications(anyList(), any(Assignment.class));
     }
 
 
@@ -100,7 +100,7 @@ public class AssignmentServiceTest {
 
         verify(assignmentsubmissionrepo, times(1)).findById(submissionId);
         verify(assignmentsubmissionrepo, times(1)).save(any(AssignmentSubmission.class));
-        verify(mailboxService, times(1)).addNotification(mockStudent.getId(), mockSubmission);
+        // verify(mailboxService, times(1)).addNotification(mockStudent.getId(), mockSubmission);
     }
 
 

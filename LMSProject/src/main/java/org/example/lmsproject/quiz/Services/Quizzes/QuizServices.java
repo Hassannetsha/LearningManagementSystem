@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.quiz.DTOs.Quizzes.QuizCreationDTO;
@@ -18,7 +19,9 @@ import org.example.lmsproject.quiz.model.Question.MCQQuestionEntity;
 import org.example.lmsproject.quiz.model.Question.QuestionBank;
 import org.example.lmsproject.quiz.model.Question.QuestionEntity;
 import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
-import org.example.lmsproject.quiz.model.Quiz.FeedBack;
+import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBack;
+import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBackNotification;
+import org.example.lmsproject.quiz.model.Quiz.NewQuizNotification;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.quiz.model.Quiz.QuizSubmission;
 import org.example.lmsproject.userPart.model.Student;
@@ -34,7 +37,6 @@ public class QuizServices {
 
 	private final QuizRepository quizRepository;
 	private final QuestionServices questionServices;
-	// private final QuestionBankRepository questionBankRepository;
 	private final QuizSubmissionRepository quizSubmissionRepository;
 	private final FeedBackRepository feedBackRepository;
 	private final CourseService courseService;
@@ -55,10 +57,7 @@ public class QuizServices {
 		this.feedBackRepository = feedBackRepository;
 		this.courseService = courseService;
 		this.studentService = studentService;
-
-		// added Notification Logic
 		this.mailboxService = mailboxService;
-		//
 
 	}
 
@@ -70,8 +69,6 @@ public class QuizServices {
 		QuizEntity quiz = new QuizEntity();
 		QuestionBank questionBank = questionServices.findQuestionBankByid(quizCreationDTO.getQuestionBankId());
 		Course course = courseService.getCourseById(quizCreationDTO.getCourseId());
-		// CourseEntity course =
-		// courseRepository.findByid(quizSubmissionDTO.getCourseId());
 		if (questionBank != null) {
 			if (course != null) {
 
@@ -83,18 +80,13 @@ public class QuizServices {
 			quiz.setQuizName(quizCreationDTO.getQuizName());
 			quiz.setQuestionBank(questionBank);
 
-			// added Notification Logic //////////////////////////////////////////////////////////////////////////
-
-			//7a get el users in course
+			quizRepository.save(quiz);
 			List<Long> studentIds = course.getStudents().stream()
 					.map(Student::getId)
 					.collect(Collectors.toList());
 			if (studentIds.isEmpty()) { throw new IllegalStateException("No students are enrolled in this course"); }
-
-			mailboxService.addBulkNotifications(studentIds, quiz);
-
-			/////////////////////////////////////////////////////////////////////////////////////////////////////
-			quizRepository.save(quiz);
+			NotificationAndEmailMapper newQuizNotification = new NewQuizNotification(quiz);
+			mailboxService.addBulkNotifications(studentIds, newQuizNotification);
 			return quiz;
 		} else {
 			throw new IllegalStateException(
@@ -117,10 +109,11 @@ public class QuizServices {
 					System.out.println("before save quiz submission");
 					quizSubmissionRepository.save(quizSubmission);
 					System.out.println("before feedback");
-					FeedBack feedBack = new FeedBack(quizSubmission.getQuiz(), student);
+					AutomatedFeedBack feedBack = new AutomatedFeedBack(quizSubmission.getQuiz(), student);
 					feedBack.setGrade(calculateGrade(quizSubmission, feedBack));
 					System.out.println(feedBack.toString());
-					mailboxService.addNotification(student.getId(), feedBack);
+					NotificationAndEmailMapper automatedFeedBack = new AutomatedFeedBackNotification(feedBack);
+					mailboxService.addNotification(student.getId(), automatedFeedBack);
 					feedBackRepository.save(feedBack);
 				}
 				else{
@@ -138,7 +131,7 @@ public class QuizServices {
 		QuizEntity quiz = quizRepository.findByquizId(quizId);
 		if (quiz != null) {
 			QuizSubmission quizSubmission = findInQuizSubmission(quiz);
-			FeedBack feedBack = findInFeedBacks(quiz);
+			AutomatedFeedBack feedBack = findInFeedBacks(quiz);
 			deleteFeedBack(feedBack);
 			deleteQuizSubmission(quizSubmission);
 			quizRepository.delete(quiz);
@@ -151,7 +144,7 @@ public class QuizServices {
 		return quizSubmissionRepository.findAll();
 	}
 
-	public int calculateGrade(QuizSubmission quizSubmission, FeedBack feedBack) {
+	public int calculateGrade(QuizSubmission quizSubmission, AutomatedFeedBack feedBack) {
 		int totalScore = 0;
 		List<QuestionEntity> questions = quizSubmission.getQuiz().getQuestionBank().getQuestions();
 		List<String> answers = new ArrayList<>();
@@ -171,7 +164,7 @@ public class QuizServices {
 		return totalScore;
 	}
 
-	public List<FeedBack> getAllFeedBacks() {
+	public List<AutomatedFeedBack> getAllFeedBacks() {
 		return feedBackRepository.findAll();
 	}
 
@@ -235,11 +228,11 @@ public class QuizServices {
 		return quizSubmissionRepository.findByquiz(quizEntity);
 	}
 
-	public FeedBack findInFeedBacks(QuizEntity quizEntity) {
+	public AutomatedFeedBack findInFeedBacks(QuizEntity quizEntity) {
 		return feedBackRepository.findByquiz(quizEntity);
 	}
 
-	public void deleteFeedBack(FeedBack feedBack) {
+	public void deleteFeedBack(AutomatedFeedBack feedBack) {
 		feedBackRepository.delete(feedBack);
 	}
 

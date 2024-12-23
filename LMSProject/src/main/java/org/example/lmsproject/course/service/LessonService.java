@@ -3,6 +3,7 @@ package org.example.lmsproject.course.service;
 import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.Lesson;
+import org.example.lmsproject.course.model.MessageNotification;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.course.repository.LessonRepository;
 import org.example.lmsproject.userPart.model.Student;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 
 @Service
 public class LessonService {
@@ -62,8 +65,8 @@ public class LessonService {
                 lesson.getTitle(),
                 course.getTitle(),
                 otp);
-
-        mailboxService.addBulkNotifications(studentIds, message);
+        NotificationAndEmailMapper messageNotification = new MessageNotification(message);
+        mailboxService.addBulkNotifications(studentIds, messageNotification);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////
 

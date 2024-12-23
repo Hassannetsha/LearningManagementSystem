@@ -2,8 +2,6 @@ package org.example.lmsproject.quiz.model.Question;
 
 import org.example.lmsproject.course.model.Course;
 
-// import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 

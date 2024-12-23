@@ -25,11 +25,8 @@ public class QuizSubmission {
     private QuizEntity quiz;
     @ManyToOne
     private Course course;
-    // private Long courseId;
-    // @Column(nullable=false)
     @ManyToOne
     private Student student;
-    // private Long studentId;
     @Column(nullable=false)
     private List<String> answers;
     public QuizSubmission(){
@@ -40,20 +37,10 @@ public class QuizSubmission {
         this.course = course;
         this.answers = answers;
         this.student = student;
-        // this.studentId = StudentId;
     }
     public Long getId() {
         return id;
     }
-
-    // public Long getCourseId() {
-    //     return courseId;
-    // }
-
-    // public void setCourseId(Long courseId) {
-    //     this.courseId = courseId;
-    // }
-
     public List<String> getAnswers() {
         return answers;
     }
@@ -61,15 +48,6 @@ public class QuizSubmission {
     public void setAnswers(List<String> answers) {
         this.answers = answers;
     }
-
-    // public Long getStudentId() {
-    //     return studentId;
-    // }
-
-    // public void setStudentId(Long StudentId) {
-    //     this.studentId = StudentId;
-    // }
-
     public QuizEntity getQuiz() {
         return quiz;
     }

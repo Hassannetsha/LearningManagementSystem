@@ -1,6 +1,5 @@
 package org.example.lmsproject.quiz.DTOs.Quizzes;
 
-// import java.util.List;
 
 public class QuizCreationDTO {
     private long courseId;

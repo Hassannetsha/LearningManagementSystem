@@ -31,10 +31,8 @@ public abstract class QuestionEntity {
     private String question;
     @Column(nullable = false)
     private String type;
-    // @Column(nullable = false)
     @ManyToOne
     private Course course;
-    // private Long courseId;
     public String getQuestion() {
         return question;
     }
@@ -56,22 +54,6 @@ public abstract class QuestionEntity {
     }
 
     public abstract int calculateScore(Object userAnswer);
-
-    // public Long getCourseId() {
-    //     return courseId;
-    // }
-
-    // public void setCourseId(Long courseId) {
-    //     this.courseId = courseId;
-    // }
-
-    // public Course getCourse() {
-    //     return course;
-    // }
-
-    // public void setCourse(Course course) {
-    //     this.course = course;
-    // }
 
     public Course getCourse() {
         return course;

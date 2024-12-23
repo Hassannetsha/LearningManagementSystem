@@ -27,22 +27,16 @@ public class QuizEntity {
     private Long quizId;
     @ManyToOne
     private Course course;
-//    private Long courseId;
     @Column(nullable = false)
     private String quizName;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private QuestionBank questionBank;
-    // public long getCourse() {
-    //     return getCourseId();
-    // }
+
 
     public String getQuizName() {
         return this.quizName;
     }
 
-//    public void setCourseId(Long courseId) {
-//        this. = courseId;
-//    }
 
     public void setQuizName(String quizName) {
         this.quizName = quizName;

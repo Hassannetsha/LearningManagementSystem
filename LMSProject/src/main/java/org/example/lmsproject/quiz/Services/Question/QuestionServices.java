@@ -5,11 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.example.lmsproject.course.model.Course;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import jakarta.transaction.Transactional;
-
 import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.quiz.DTOs.Questions.QuestionBankDTO;
 import org.example.lmsproject.quiz.DTOs.Questions.QuestionDTO;
@@ -21,6 +16,10 @@ import org.example.lmsproject.quiz.model.Question.QuestionBank;
 import org.example.lmsproject.quiz.model.Question.QuestionEntity;
 import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
 import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class QuestionServices {
@@ -62,7 +61,6 @@ public class QuestionServices {
                 questionEntity = tf;
                 questionRepository.save(questionEntity);
             } else {
-                // System.out.println("didn't enter");
                 throw new IllegalStateException("Invalid question type: " + question.getType());
             }
             
@@ -157,51 +155,6 @@ public class QuestionServices {
         QuestionEntity questionEntity = questionRepository.findByid(id);
         Boolean alreadyEntered = false;
         if (questionEntity != null) {
-            // if (type != null) {
-            // if (!type.equalsIgnoreCase(questionEntity.getType())) {
-            // QuestionEntity newQuestionEntity;
-            // if (type.equalsIgnoreCase("mcq")) {
-            // MCQQuestionEntity mcqQuestionEntity = new MCQQuestionEntity();
-            // mcqQuestionEntity.setQuestion(questionEntity.getQuestion());
-            // if (answers != null) {
-            // mcqQuestionEntity.setAnswers(answers);
-            // } else {
-            // throw new IllegalStateException("Can't change the type without answers for
-            // the new type");
-            // }
-            // if (rightMcqAnswer != null) {
-            // mcqQuestionEntity.setRightAnswer(rightTfAnswer);
-            // } else {
-            // throw new IllegalStateException(
-            // "Can't change the type without the right answer for the new type");
-            // }
-            // mcqQuestionEntity.setType(type);
-            // newQuestionEntity = mcqQuestionEntity;
-            // } else if (type.equalsIgnoreCase("TrueOrFalse")) {
-            // TrueOrFalseQuestionEntity trueOrFalseQuestionEntity = new
-            // TrueOrFalseQuestionEntity();
-            // trueOrFalseQuestionEntity.setQuestion(questionEntity.getQuestion());
-            // if (rightTfAnswer != null) {
-            // trueOrFalseQuestionEntity.setRightAnswer(rightTfAnswer.equalsIgnoreCase("true"));
-            // } else {
-            // throw new IllegalStateException(
-            // "Can't change the type without right answer for the new type");
-            // }
-            // trueOrFalseQuestionEntity.setType(type);
-            // newQuestionEntity = trueOrFalseQuestionEntity;
-            // } else {
-            // throw new IllegalStateException("The system doesn't support this type of
-            // questions");
-            // }
-            // alreadyEntered = true;
-            // deleteQuestion(questionEntity.getId());
-            // questionRepository.save(newQuestionEntity);
-            // questionEntity = questionRepository.findByid(newQuestionEntity.getId());
-            // } else {
-            // throw new IllegalStateException("The question with id: " + id + " has the
-            // same question type");
-            // }
-            // }
             if (question != null) {
                 if (!question.equalsIgnoreCase(questionEntity.getQuestion())) {
                     questionEntity.setQuestion(question);
@@ -243,14 +196,6 @@ public class QuestionServices {
             } else {
                 throw new IllegalStateException("Course not found");
             }
-            // if (courseId != null) {
-            // if (!Objects.equals(courseId, questionBank.getCourseId())) {
-            // questionBank.setCourseId(courseId);
-            // } else {
-            // throw new IllegalStateException("The question bank with id: " + id + " has
-            // the same course id");
-            // }
-            // }
             if (questionBankName != null) {
                 if (!questionBankName.equalsIgnoreCase(questionBank.getQuestionBankName())) {
                     questionBank.setQuestionBankName(questionBankName);
@@ -283,14 +228,6 @@ public class QuestionServices {
             throw new IllegalStateException("Invalid question bank ID: " + id);
         }
     }
-
-    // public QuestionBank findByQuestionBankId(Long questionBankId) {
-    //     QuestionBank questionBank = questionBankRepository.findByid(questionBankId);
-    //     if (questionBank != null) {
-    //         return questionBank;
-    //     }
-    //     throw new IllegalStateException("Question not found");
-    // }
 
     public List<QuestionEntity> findQuestionByCourse(Course course) {
         List<QuestionEntity> questionEntity = questionRepository.findBycourse(course);

@@ -18,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// import org.example.lmsproject.quiz.DTOs.Questions.QuestionDTO;
-// import org.example.lmsproject.quiz.Entities.Question.QuestionEntity;
-// import org.example.lmsproject.quiz.Services.Question.QuestionServices;
 
 @RestController
 @RequestMapping(path = "/instructor/questions")

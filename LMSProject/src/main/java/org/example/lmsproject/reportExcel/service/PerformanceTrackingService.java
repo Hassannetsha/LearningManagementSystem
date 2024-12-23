@@ -8,7 +8,7 @@ import org.example.lmsproject.course.repository.AttendanceRepository;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.quiz.Repositories.Quiz.FeedBackRepository;
 import org.example.lmsproject.quiz.Repositories.Quiz.QuizSubmissionRepository;
-import org.example.lmsproject.quiz.model.Quiz.FeedBack;
+import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBack;
 import org.example.lmsproject.quiz.model.Quiz.QuizSubmission;
 import org.example.lmsproject.reportExcel.model.StudentPerformance;
 import org.example.lmsproject.userPart.model.Student;
@@ -54,9 +54,9 @@ public class PerformanceTrackingService {
 
 
     public double calculateQuizGrade(Long studentId) {
-        List<FeedBack> allQuizzes = feedBackRepository.findByStudentId(studentId);
+        List<AutomatedFeedBack> allQuizzes = feedBackRepository.findByStudentId(studentId);
         double totalGrade = 0;
-        for (FeedBack quizFeedback : allQuizzes) {
+        for (AutomatedFeedBack quizFeedback : allQuizzes) {
             totalGrade += quizFeedback.getGrade();
         }
         return totalGrade / allQuizzes.size(); // Average grade

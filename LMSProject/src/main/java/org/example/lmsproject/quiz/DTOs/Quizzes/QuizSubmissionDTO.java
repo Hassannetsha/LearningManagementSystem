@@ -2,14 +2,12 @@ package org.example.lmsproject.quiz.DTOs.Quizzes;
 
 import java.util.List;
 
-// import org.example.lmsproject.quiz.Entities.Quiz.QuizEntity;
 
 public class QuizSubmissionDTO {
     private Long courseId;
     private List<String> answers;
     private Long quiz;
     private Long StudentId;
-    // private List<Boolean> TfAnswers;
     public long getCourseId() {
         return courseId;
     }
@@ -45,12 +43,4 @@ public class QuizSubmissionDTO {
     public String toString(){
         return courseId.toString() + "\n" + answers + "\n" + quiz.toString() + "\n" + StudentId.toString() + "\n" ;
     }
-
-    // public List<Boolean> getTfAnswers() {
-    //     return TfAnswers;
-    // }
-
-    // public void setTfAnswers(List<Boolean> TfAnswers) {
-    //     this.TfAnswers = TfAnswers;
-    // }
 }

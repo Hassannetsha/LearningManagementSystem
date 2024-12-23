@@ -5,9 +5,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
+import org.example.lmsproject.course.model.CourseEnrollRequestNotification;
 import org.example.lmsproject.course.model.CourseMaterial;
+import org.example.lmsproject.course.model.CourseMaterialNotification;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
@@ -100,8 +103,8 @@ public class CourseService {
             if (updatedCourse.getAssignments() != null) existingCourse.get().setAssignments(updatedCourse.getAssignments());
             if (updatedCourse.getLessons() != null) existingCourse.get().setLessons(updatedCourse.getLessons());
             courseRepository.save(existingCourse.orElse(updatedCourse));
-            String message = "Course " + existingCourse.get().getTitle() + " has been updated";
-            mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), message);
+            NotificationAndEmailMapper courseNotification = new CourseNotification(existingCourse.get());
+            mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), courseNotification);
         }
         return "Course doesn't exist";
     }
@@ -137,8 +140,8 @@ public class CourseService {
 
         User instructor = course.getInstructor();
         if (instructor==null) { throw new IllegalStateException("No Instructor Affiliated With This Course"); }
-
-        mailboxService.addNotification(instructor.getId(), enrollRequest);
+        NotificationAndEmailMapper courseEnrollNotification = new CourseEnrollRequestNotification(enrollRequest);
+        mailboxService.addNotification(instructor.getId(), courseEnrollNotification);
 
         return ResponseEntity.ok("A new enrollment request has been sent to the instructor");
     }
@@ -157,8 +160,8 @@ public class CourseService {
         if (instructor != course.getInstructor()) {
             return ResponseEntity.badRequest().body("You are not allowed to modify this course");
         }
-
-        mailboxService.addNotification(student.getId(), enrollRequest);
+        NotificationAndEmailMapper courseEnrollNotification = new CourseEnrollRequestNotification(enrollRequest);
+        mailboxService.addNotification(student.getId(), courseEnrollNotification);
 
         if (isAccepted) {
             course.addStudent(student);
@@ -202,7 +205,8 @@ public class CourseService {
             List<Long> studentIds = course.getStudents().stream()
                 .map(Student::getId)
                 .collect(Collectors.toList());
-            mailboxService.addBulkNotifications(studentIds, courseMaterial);
+            NotificationAndEmailMapper courseMaterialNotification = new CourseMaterialNotification(courseMaterial);
+            mailboxService.addBulkNotifications(studentIds, courseMaterialNotification);
             return ResponseEntity.ok("File uploaded and associated with the course successfully");
         }
 

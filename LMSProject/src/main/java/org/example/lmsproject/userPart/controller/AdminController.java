@@ -1,9 +1,10 @@
 package org.example.lmsproject.userPart.controller;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
-import org.example.lmsproject.userPart.model.Admin;
+// import org.example.lmsproject.userPart.model.Admin;
 import org.example.lmsproject.userPart.model.Request;
 import org.example.lmsproject.userPart.model.Response;
+import org.example.lmsproject.userPart.model.ResponseNotification;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.service.AdminService;
@@ -51,7 +52,7 @@ public class AdminController {
                 String responseMessage = adminService.addUser(user);
                 requestRepository.delete(request);
                 // Notification Logic
-                mailboxService.addNotification(user.getId(), new Response(request.getId(), state));
+                mailboxService.addNotification(user.getId(), new ResponseNotification());
 
                 result.append(user.getUsername()).append(" Added Successfully\n").append(responseMessage).append("\n");
             } else { // Rejected state
@@ -78,8 +79,8 @@ public class AdminController {
                 String responseMessage = adminService.addUser(user);
                 requestRepository.delete(request);
                 // added Notification Logic //////////////////////////////////////////////////////////////////////////
-
-                mailboxService.addNotification(user.getId(), response);
+                // NotificationAndEmailMapper responsNotification = new ResponseNotification();
+                mailboxService.addNotification(user.getId(), new ResponseNotification());
 
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
 

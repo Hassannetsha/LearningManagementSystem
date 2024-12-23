@@ -2,8 +2,9 @@ package org.example.lmsproject.Notification.Entities;
 
 import java.time.LocalDate;
 
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.example.lmsproject.Notification.TextMappers.MessageMapper;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,10 +43,10 @@ public class Notification {
 
     public Notification() {}
 
-    public Notification(Mailbox mailbox, Object messageObject) {
+    public Notification(Mailbox mailbox, NotificationAndEmailMapper notificationAndEmailMapper) {
         this.isRead = false;
         this.mailbox = mailbox;
-        this.message = MessageMapper.toString(messageObject);
+        this.message = notificationAndEmailMapper.getBody();
     }
 
     public Long getId() {
