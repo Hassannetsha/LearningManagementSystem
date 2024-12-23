@@ -101,5 +101,8 @@ public class FeedBack {
     public void setStudent(Student student) {
         this.student = student;
     }
+    public int getTotalNumberOfQuestions(){
+        return quiz.getQuestionBank().getQuestions().size();
+    }
     
 }

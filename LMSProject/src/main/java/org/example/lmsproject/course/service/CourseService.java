@@ -1,6 +1,7 @@
 package org.example.lmsproject.course.service;
 
 import  java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
@@ -61,6 +62,15 @@ public class CourseService {
         return course.toString();
     }
 
+    public String viewAvailableCourse(long id) {
+        Optional<Course> course = courseRepository.findById(id);
+
+        if (course.isPresent() && !course.get().getAvailable()) {
+            return "This course is not available";
+        }
+        return course.toString();
+    }
+
     public Course getCourseById(long id) {
         return courseRepository.findById(id).orElse(null);
     }
@@ -74,19 +84,26 @@ public class CourseService {
         courseRepository.save(course);
     }
 
-    public void updateCourse(long id, Course updatedCourse) { // done
-        Course existingCourse = getCourseById(id);
-        if (existingCourse != null) {
-            if (updatedCourse.getTitle() != null) existingCourse.setTitle(updatedCourse.getTitle());
-            if (updatedCourse.getDescription() != null) existingCourse.setDescription(updatedCourse.getDescription());
-            if (updatedCourse.getDuration() != 0) existingCourse.setDuration(updatedCourse.getDuration());
-            if (updatedCourse.getAvailable() != null) existingCourse.setAvailable(updatedCourse.getAvailable());
-            if (updatedCourse.getStudents() != null) existingCourse.setStudents(updatedCourse.getStudents());
-            if (updatedCourse.getInstructor() != null) existingCourse.setInstructor(updatedCourse.getInstructor());
-            if (updatedCourse.getAssignments() != null) existingCourse.setAssignments(updatedCourse.getAssignments());
-            if (updatedCourse.getLessons() != null) existingCourse.setLessons(updatedCourse.getLessons());
-            courseRepository.save(existingCourse);
+    public String updateCourse(long id, Course updatedCourse, Instructor instructor) { // done
+//        Course existingCourse = getCourseById(id);
+        Optional<Course> existingCourse = courseRepository.findById(id);
+        if (existingCourse.isPresent()) {
+            if (instructor != existingCourse.get().getInstructor()) {
+                return "You are not allowed to modify this course";
+            }
+            if (updatedCourse.getTitle() != null) existingCourse.get().setTitle(updatedCourse.getTitle());
+            if (updatedCourse.getDescription() != null) existingCourse.get().setDescription(updatedCourse.getDescription());
+            if (updatedCourse.getDuration() != 0) existingCourse.get().setDuration(updatedCourse.getDuration());
+            if (updatedCourse.getAvailable() != null) existingCourse.get().setAvailable(updatedCourse.getAvailable());
+            if (updatedCourse.getStudents() != null) existingCourse.get().setStudents(updatedCourse.getStudents());
+            if (updatedCourse.getInstructor() != null) existingCourse.get().setInstructor(updatedCourse.getInstructor());
+            if (updatedCourse.getAssignments() != null) existingCourse.get().setAssignments(updatedCourse.getAssignments());
+            if (updatedCourse.getLessons() != null) existingCourse.get().setLessons(updatedCourse.getLessons());
+            courseRepository.save(existingCourse.orElse(updatedCourse));
+            String message = "Course " + existingCourse.get().getTitle() + " has been updated";
+            mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), message);
         }
+        return "Course doesn't exist";
     }
 
     public String viewEnrolledStudents(long id) {
@@ -126,7 +143,7 @@ public class CourseService {
         return ResponseEntity.ok("A new enrollment request has been sent to the instructor");
     }
 
-    public ResponseEntity<String> updateEnrollmentStatus(long requestId, boolean isAccepted) { //done
+    public ResponseEntity<String> updateEnrollmentStatus(Instructor instructor, long requestId, boolean isAccepted) { //done
         CourseEnrollRequest enrollRequest = courseEnrollRequestService.findById(requestId);
         if (enrollRequest == null) {
             return ResponseEntity.badRequest().body("Enrollment request not found");
@@ -137,6 +154,9 @@ public class CourseService {
 
         Course course = enrollRequest.getCourse();
         Student student = enrollRequest.getStudent();
+        if (instructor != course.getInstructor()) {
+            return ResponseEntity.badRequest().body("You are not allowed to modify this course");
+        }
 
         mailboxService.addNotification(student.getId(), enrollRequest);
 
