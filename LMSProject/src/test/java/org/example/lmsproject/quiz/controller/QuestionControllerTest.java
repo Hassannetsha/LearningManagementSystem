@@ -62,7 +62,8 @@ public class QuestionControllerTest {
         instructor.setEmail("menna@example.com");
         instructor.setRole(User.Role.ROLE_INSTRUCTOR);
         instructor.setPassword("password123");
-        Course course = new Course("science", "nn", 7, true, instructor);
+        Course course = new Course("science", "nn", 7, true);
+        course.setInstructor(instructor);
         course.setCourseId(1L);
         QuestionEntity question = new MCQQuestionEntity(1L, "What is the capital of Egypt?", "mcq", course,
                 Arrays.asList("Cairo", "giza", "Alexandria", "Luxor"), "Cairo");

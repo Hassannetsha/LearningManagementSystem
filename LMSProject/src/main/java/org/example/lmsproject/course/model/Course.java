@@ -6,6 +6,8 @@ import org.example.lmsproject.quiz.model.Quiz.QuizEntity;
 import org.example.lmsproject.userPart.model.*;
 import org.example.lmsproject.assignment.model.Assignment;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -70,10 +72,23 @@ public class Course {
         this.description = description;
         this.duration = duration;
         this.available = available;
+        this.instructor = new Instructor();
+        this.students = new ArrayList<>();
+        this.assignments = new ArrayList<>();
+        this.lessons = new ArrayList<>();
+        this.quizzes = new ArrayList<>();
+        this.courseMaterials = new ArrayList<>();
+        this.courseEnrollRequests = new ArrayList<>();
     }
 
     public Course() {
-
+//        this.instructor = new Instructor();
+//        this.students = new ArrayList<>();
+//        this.assignments = new ArrayList<>();
+//        this.lessons = new ArrayList<>();
+//        this.quizzes = new ArrayList<>();
+//        this.courseMaterials = new ArrayList<>();
+//        this.courseEnrollRequests = new ArrayList<>();
     }
 
     public void addStudent(Student student) {
