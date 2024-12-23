@@ -8,20 +8,18 @@ import org.example.lmsproject.userPart.model.Student;
 @Entity
 public class CourseEnrollRequest {
 
+    @Getter @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long courseEnrollmentId;
-    @Getter
-    @Setter
+    @Getter @Setter
     @ManyToOne
     Course course;
-    @Setter
-    @Getter
+    @Setter @Getter
     @ManyToOne
     Student student;
 
-    @Setter
-    @Getter
+    @Setter @Getter
     String status;
 
     public CourseEnrollRequest() {}
@@ -33,7 +31,7 @@ public class CourseEnrollRequest {
                 "\n    courseEnrollId=" + courseEnrollmentId +
                 ",\n    course=" + course.getCourseId() +
                 ",\n    student=" +  student.getId() +
-                ",\n    isEnrolled=" + status +
+                ",\n    Status=" + status +
                 "}";
     }
 }

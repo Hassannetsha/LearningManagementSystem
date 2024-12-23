@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.Course;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,8 @@ public class Student extends User {
 
     public Student(String username, String password, String email) {
         super(username, password, email, Role.ROLE_STUDENT);
+        this.courses = new ArrayList<Course>();
+        this.courseEnrollRequests = new ArrayList<>();
     }
 
     public Student() {

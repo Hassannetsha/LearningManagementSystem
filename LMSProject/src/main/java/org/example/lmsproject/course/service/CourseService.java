@@ -1,5 +1,6 @@
 package org.example.lmsproject.course.service;
 
+import  lombok.AllArgsConstructor;
 import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.Course;
@@ -9,7 +10,6 @@ import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class CourseService {
 
     private final CourseRepository courseRepository;
@@ -24,20 +25,7 @@ public class CourseService {
     private final CourseMaterialService courseMaterialService;
     private final CourseEnrollRequestService courseEnrollRequestService;
 
-    // added for Notification Logic (& added in constructor)
     private final MailboxService mailboxService;
-    //
-    @Autowired
-    public CourseService(CourseRepository courseRepository, StudentService studentService,
-                         CourseMaterialService courseMaterialService,
-                         CourseEnrollRequestService courseEnrollRequestService,
-                         MailboxService mailboxService) {
-        this.courseRepository = courseRepository;
-        this.studentService = studentService;
-        this.courseMaterialService = courseMaterialService;
-        this.courseEnrollRequestService = courseEnrollRequestService;
-        this.mailboxService = mailboxService;
-    }
 
     public boolean courseExists(long courseId) {
         return courseRepository.existsById(courseId);
@@ -78,12 +66,12 @@ public class CourseService {
         return courseRepository.save(course);
     }
 
-    public void createCourse(Course course, Instructor instructor) {
+    public void createCourse(Course course, Instructor instructor) { // done
         course.setInstructor(instructor);
         courseRepository.save(course);
     }
 
-    public void updateCourse(long id, Course updatedCourse) {
+    public void updateCourse(long id, Course updatedCourse) { // done
         Course existingCourse = getCourseById(id);
         if (existingCourse != null) {
             if (updatedCourse.getTitle() != null) existingCourse.setTitle(updatedCourse.getTitle());
@@ -107,10 +95,7 @@ public class CourseService {
         return "{\"students\": " + studentIds + "}";
     }
 
-    public ResponseEntity<String> enrollStudentInCourse(long courseId, String studentUsername) {
-        // send a notification to instructor that a new enrollment request has been made
-        // get instructor from course.getInstructor()
-
+    public ResponseEntity<String> enrollStudentInCourse(long courseId, String studentUsername) { // done
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null)
             return ResponseEntity.badRequest().body("Course not found");
@@ -130,21 +115,15 @@ public class CourseService {
         courseRepository.save(course);
         studentService.save(student);
 
-        // added Notification Logic //////////////////////////////////////////////////////////////////////////
-
-        //7a get el instructor & ill send the enrollRequest to the mapper
         User instructor = course.getInstructor();
         if (instructor==null) { throw new IllegalStateException("No Instructor Affiliated With This Course"); }
 
         mailboxService.addNotification(instructor.getId(), enrollRequest);
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
-
         return ResponseEntity.ok("A new enrollment request has been sent to the instructor");
     }
 
-    public ResponseEntity<String> updateEnrollmentStatus(long requestId, boolean isAccepted) {
-        // send a notification to student that he has been accepted or rejected
+    public ResponseEntity<String> updateEnrollmentStatus(long requestId, boolean isAccepted) { //done
         CourseEnrollRequest enrollRequest = courseEnrollRequestService.findById(requestId);
         if (enrollRequest == null) {
             return ResponseEntity.badRequest().body("Enrollment request not found");
@@ -156,12 +135,7 @@ public class CourseService {
         Course course = enrollRequest.getCourse();
         Student student = enrollRequest.getStudent();
 
-        // added Notification Logic //////////////////////////////////////////////////////////////////////////
-
-        // Mapper Should Handle Acceptance or Refusal
         mailboxService.addNotification(student.getId(), enrollRequest);
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if (isAccepted) {
             course.addStudent(student);

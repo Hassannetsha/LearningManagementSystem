@@ -80,7 +80,7 @@ public class AssignmentService {
         } catch (IOException e) {
             throw new RuntimeException("Error while reading file content", e);
         }
-        submission.setsubmissiontime(LocalDateTime.now());
+        submission.setSubmissiontime(LocalDateTime.now());
 
         return submissionrepo.save(submission);
     }

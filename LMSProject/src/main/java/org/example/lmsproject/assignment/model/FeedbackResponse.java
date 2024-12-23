@@ -1,5 +1,10 @@
 package org.example.lmsproject.assignment.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class FeedbackResponse {
     private String feedback;
     private Integer grade;
@@ -9,19 +14,11 @@ public class FeedbackResponse {
         this.grade = grade;
     }
 
-    public String getFeedback() {
-        return feedback;
-    }
-
-    public void setFeedback(String feedback) {
-        this.feedback = feedback;
-    }
-
-    public Integer getGrade() {
-        return grade;
-    }
-
-    public void setGrade(Integer grade) {
-        this.grade = grade;
+    @Override
+    public String toString() {
+        return "FeedbackResponse{" +
+                "\n    feedback=" + feedback +
+                ",\n    grade=" + grade +
+                "\n}";
     }
 }

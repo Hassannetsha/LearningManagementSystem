@@ -54,7 +54,6 @@ public class CourseController {
 
     @PutMapping("/instructor/courses/{courseId}") // instructor
     public ResponseEntity<String> updateCourse(@PathVariable long courseId, @RequestBody Course course) {
-        System.out.println("Coursr id== "+courseId);
         if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
         courseService.updateCourse(courseId, course);
@@ -78,7 +77,7 @@ public class CourseController {
 
     @DeleteMapping("/instructor/courses/{courseId}/students/{studentId}")
     public ResponseEntity<String> removeStudentFromCourse(@PathVariable long courseId, @PathVariable long studentId) {
-        if (courseService.courseExists(courseId))
+        if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
         courseService.removeStudentFromCourse(courseId, studentId);
         return ResponseEntity.ok(courseService.viewEnrolledStudents(courseId));
@@ -89,7 +88,7 @@ public class CourseController {
         if (file.isEmpty()){
             return ResponseEntity.badRequest().body("File is empty");
         }
-        if (courseService.courseExists(courseId)){
+        if (!courseService.courseExists(courseId)){
             return ResponseEntity.badRequest().body("Course does not exist");
         }
         return courseService.uploadMaterial(courseId, file);
@@ -97,7 +96,7 @@ public class CourseController {
 
     @GetMapping("/student/courses/{courseId}/materials/{filename}")
     public ResponseEntity<byte[]> getMaterial(@PathVariable long courseId, @PathVariable String filename) {
-        if (courseService.courseExists(courseId)) {
+        if (!courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body(null);
         }
         ResponseEntity<byte[]> fileResponse = courseService.getMaterial(filename);
@@ -107,7 +106,7 @@ public class CourseController {
 
     @DeleteMapping("/instructor/courses/{courseId}/materials/{filename}")
     public ResponseEntity<String> removeMaterial(@PathVariable long courseId, @PathVariable String filename) {
-        if (courseService.courseExists(courseId)) {
+        if (!courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
         }
         return courseService.deleteMaterial(filename);
@@ -129,7 +128,6 @@ public class CourseController {
             return ResponseEntity.badRequest().body("Course does not exist");
         }
         return courseService.updateEnrollmentStatus(requestId, isAccepted);
-
     }
 
     @DeleteMapping("/instructor/courses/{courseId}") // instructor

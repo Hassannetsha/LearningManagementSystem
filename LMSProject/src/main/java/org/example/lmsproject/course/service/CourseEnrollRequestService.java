@@ -18,8 +18,8 @@ public class CourseEnrollRequestService {
         this.courseEnrollRequestRepository = courseEnrollRequestRepository;
     }
 
-    public void save(CourseEnrollRequest enrollRequest) {
-        courseEnrollRequestRepository.save(enrollRequest);
+    public CourseEnrollRequest save(CourseEnrollRequest enrollRequest) {
+        return courseEnrollRequestRepository.save(enrollRequest);
     }
 
     public CourseEnrollRequest findById(long requestId) {
