@@ -1,9 +1,12 @@
 package org.example.lmsproject.course.controller;
 
 import java.security.Principal;
+import java.util.Optional;
+
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.service.CourseService;
 import org.example.lmsproject.userPart.model.Instructor;
+import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.service.InstructorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -14,12 +17,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class CourseController {
 
     private final CourseService courseService;
-    private final InstructorService instructorService;
 
     @Autowired
     CourseController(CourseService courseService, InstructorService instructorService) {
         this.courseService = courseService;
-        this.instructorService = instructorService;
     }
 
     @GetMapping("/admin/courses")// for admin only
@@ -27,9 +28,14 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
-    @GetMapping("/student/courses")
+    @GetMapping("/student/courses/available")
     public ResponseEntity<String> getAvailableCourses() {
         return ResponseEntity.ok(courseService.getAvailableCourses());
+    }
+
+    @GetMapping("/student/courses/enrolled")
+    public ResponseEntity<String> getEnrolledCourses(Principal principal) {
+        return ResponseEntity.ok(courseService.getEnrolledCourses(principal.getName()));
     }
 
     @GetMapping("/api/{courseId}")
@@ -40,7 +46,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.viewCourse(courseId));
     }
 
-    @GetMapping("/student/{courseId}")
+    @GetMapping("/student/courses/{courseId}")
     public ResponseEntity<String> viewAvailableCourse(@PathVariable long courseId) {
         return ResponseEntity.ok(courseService.viewAvailableCourse(courseId));
     }
@@ -52,11 +58,7 @@ public class CourseController {
         if (courseService.courseExists(course.getTitle()))
             return ResponseEntity.badRequest().body("Course already exists");
         String instructorUsername = principal.getName();
-        Instructor instructor = instructorService.findByUsername(instructorUsername);
-        if (instructor == null) {
-            return ResponseEntity.badRequest().body("Instructor not found");
-        }
-        courseService.createCourse(course, instructor);  // Delegate to CourseService
+        courseService.createCourse(course, instructorUsername);
         return ResponseEntity.ok("Course created successfully with ID of " + course.getCourseId());
     }
 
@@ -64,9 +66,8 @@ public class CourseController {
     public ResponseEntity<String> updateCourse(@PathVariable long courseId, @RequestBody Course course, Principal principal) {
         if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
-        Instructor instructor = instructorService.findByUsername(principal.getName());
-        courseService.updateCourse(courseId, course, instructor);
-        return ResponseEntity.ok(courseService.viewCourse(courseId));
+        String instructorUsername = principal.getName();
+        return ResponseEntity.ok(courseService.updateCourse(courseId, course, instructorUsername));
     }
 
     @GetMapping("api/courses/{courseId}/students")
@@ -81,53 +82,61 @@ public class CourseController {
         if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
         String studentUsername = principal.getName();
-        return courseService.enrollStudentInCourse(courseId, studentUsername);
+        return ResponseEntity.ok(courseService.enrollStudentInCourse(courseId, studentUsername));
     }
 
     @DeleteMapping("/instructor/courses/{courseId}/students/{studentId}")
-    public ResponseEntity<String> removeStudentFromCourse(@PathVariable long courseId, @PathVariable long studentId) {
+    public ResponseEntity<String> removeStudentFromCourse(@PathVariable long courseId, Principal principal,
+                                                          @PathVariable long studentId) {
         if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
-        courseService.removeStudentFromCourse(courseId, studentId);
+        String instructorUsername = principal.getName();
+        courseService.removeStudentFromCourse(courseId, instructorUsername, studentId);
         return ResponseEntity.ok(courseService.viewEnrolledStudents(courseId));
     }
 
     @PutMapping("/instructor/courses/{courseId}/upload")
-    public ResponseEntity<String> uploadMaterial(@PathVariable long courseId, @RequestParam("file") MultipartFile file) {
-        if (file.isEmpty()){
+    public ResponseEntity<String> uploadMaterial(@PathVariable long courseId, Principal principal,
+                                                 @RequestParam("file") MultipartFile file) {
+        if (file.isEmpty())
             return ResponseEntity.badRequest().body("File is empty");
-        }
-        if (!courseService.courseExists(courseId)){
+        if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course does not exist");
-        }
-        return courseService.uploadMaterial(courseId, file);
+        String instructorUsername = principal.getName();
+        return ResponseEntity.ok(courseService.uploadMaterial(courseId, instructorUsername, file));
     }
 
     @GetMapping("/student/courses/{courseId}/materials/{filename}")
-    public ResponseEntity<byte[]> getMaterial(@PathVariable long courseId, @PathVariable String filename) {
-        if (!courseService.courseExists(courseId)) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        ResponseEntity<byte[]> fileResponse = courseService.getMaterial(filename);
-        fileResponse.getStatusCode();
-        return fileResponse;
+    public ResponseEntity<byte[]> getMaterial(
+            @PathVariable long courseId,
+            Principal principal,
+            @PathVariable String filename
+    ) {
+        String studentUsername = principal.getName();
+
+        Optional<byte[]> material = courseService.getMaterial(courseId, studentUsername, filename);
+
+        return material.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().body(null));
+
     }
 
+
     @DeleteMapping("/instructor/courses/{courseId}/materials/{filename}")
-    public ResponseEntity<String> removeMaterial(@PathVariable long courseId, @PathVariable String filename) {
+    public ResponseEntity<String> removeMaterial(@PathVariable long courseId, Principal principal, @PathVariable String filename) {
         if (!courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
         }
-        return courseService.deleteMaterial(filename);
+        String instructorUsername = principal.getName();
+        return ResponseEntity.ok(courseService.deleteMaterial(instructorUsername, courseId, filename));
     }
 
     @GetMapping("/instructor/courses/{courseId}/enrollments")
     public ResponseEntity<String> getEnrollments(@PathVariable long courseId, Principal principal) {
         Course course = courseService.getCourseById(courseId);
-        if (course == null) {
+        if (course == null)
             return ResponseEntity.badRequest().body("Course not found");
-        }
-        return ResponseEntity.ok(courseService.getEnrollments(course));
+        String instructorUsername = principal.getName();
+        return ResponseEntity.ok(courseService.getEnrollments(instructorUsername, course));
     }
 
     @PutMapping("/instructor/courses/{courseId}/enrollments/{requestId}/")
@@ -137,12 +146,13 @@ public class CourseController {
         if (!courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
         }
-        Instructor instructor = instructorService.findByUsername(principal.getName());
-        return courseService.updateEnrollmentStatus(instructor, requestId, isAccepted);
+        String instructorUsername = principal.getName();
+        return ResponseEntity.ok(courseService.updateEnrollmentStatus(instructorUsername, requestId, isAccepted));
     }
 
     @DeleteMapping("/instructor/courses/{courseId}") // instructor
-    public void deleteCourse(@PathVariable long courseId) {
-        courseService.deleteCourse(courseId);
+    public ResponseEntity<String> deleteCourse(Principal principal, @PathVariable long courseId) {
+        String instructorUsername = principal.getName();
+        return ResponseEntity.ok(courseService.deleteCourse(instructorUsername, courseId));
     }
 }

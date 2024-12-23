@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 public class LessonController {
 
@@ -27,7 +29,7 @@ public class LessonController {
     @Autowired
     private AttendanceRepository attendanceRepo;
 
-    @PostMapping("/student/generate-otp")
+    @PostMapping("/instructor/generate-otp")
     public ResponseEntity<String> generateOtp(@RequestParam Long lessonId) {
         String otp = lessonService.generateOtp(lessonId);
         return ResponseEntity.ok("OTP generated: " + otp);
