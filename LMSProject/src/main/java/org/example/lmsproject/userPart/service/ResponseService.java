@@ -1,14 +1,15 @@
 package org.example.lmsproject.userPart.service;
 
-import jakarta.transaction.Transactional;
+import java.util.List;
+
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.userPart.model.Request;
 import org.example.lmsproject.userPart.model.Response;
+import org.example.lmsproject.userPart.model.ResponseNotification;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ResponseService {
@@ -48,7 +49,8 @@ public class ResponseService {
             User newUser = createUserFromRequest(request);
             String responseMessage = adminService.addUser(newUser);
             requestRepository.delete(request);
-            mailboxService.addNotification(newUser.getId(), response);
+            NotificationAndEmailMapper responseNotification = new ResponseNotification();
+            mailboxService.addNotification(newUser.getId(), responseNotification);
 
             return newUser.getUsername() + " Added Successfully\n" + responseMessage;
         } else {

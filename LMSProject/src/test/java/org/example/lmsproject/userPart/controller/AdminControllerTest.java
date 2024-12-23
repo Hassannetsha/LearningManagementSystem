@@ -2,8 +2,10 @@ package org.example.lmsproject.userPart.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.lmsproject.Notification.Services.MailboxService;
+import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.userPart.model.Request;
 import org.example.lmsproject.userPart.model.Response;
+import org.example.lmsproject.userPart.model.ResponseNotification;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.service.AdminService;
@@ -18,6 +20,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -94,7 +97,9 @@ class AdminControllerTest {
         when(adminService.addUser(any(User.class))).thenReturn("Admin user added");
 
         doNothing().when(requestRepository).delete(mockRequest);
-        doNothing().when(mailboxService).addNotification(anyLong(), any(Response.class));
+        NotificationAndEmailMapper responseNotification = new ResponseNotification();
+
+        doNothing().when(mailboxService).addNotification(anyLong(), any(ResponseNotification.class));
 
         // Perform the request and verify results
         mockMvc.perform(post("/admin/response")

@@ -2,9 +2,6 @@ package org.example.lmsproject.userPart.model;
 
 import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 
-import lombok.AllArgsConstructor;
-
-@AllArgsConstructor
 public class ResponseNotification implements NotificationAndEmailMapper{
     @Override
     public String getSubject() {

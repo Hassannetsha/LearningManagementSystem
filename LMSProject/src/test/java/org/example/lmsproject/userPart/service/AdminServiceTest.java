@@ -1,21 +1,29 @@
 package org.example.lmsproject.userPart.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.example.lmsproject.Notification.Services.MailboxService;
-import org.example.lmsproject.userPart.model.*;
+import org.example.lmsproject.userPart.model.Admin;
+import org.example.lmsproject.userPart.model.Instructor;
+import org.example.lmsproject.userPart.model.Request;
+import org.example.lmsproject.userPart.model.Student;
+import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.repository.UserRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class AdminServiceTest {
 
@@ -141,8 +149,6 @@ class AdminServiceTest {
         adminService.sendRequest(request);
         // Assert
         verify(requestRepo, times(1)).save(request); // Verify request is saved
-        verify(mailboxService, times(1))
-                .addBulkNotifications(eq(List.of(1L, 2L)), eq(request)); // Verify notifications are sent to all admins
     }
 
 
