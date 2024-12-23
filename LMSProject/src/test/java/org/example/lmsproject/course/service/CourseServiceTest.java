@@ -62,10 +62,12 @@ public class CourseServiceTest {
         Course existingCourse = new Course("math", "math description", 9, true);
         Course updatedCourse = new Course("advanced math", "math description", 20, false);
         existingCourse.setCourseId(courseId);
+        Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
+        existingCourse.setInstructor(instructor);
 
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(existingCourse));
 
-        courseService.updateCourse(courseId, updatedCourse);
+        courseService.updateCourse(courseId, updatedCourse, instructor);
 
         assert "advanced math".equals(existingCourse.getTitle());
         assert existingCourse.getDuration() == 20;
@@ -86,15 +88,6 @@ public class CourseServiceTest {
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
 
         String result = courseService.viewCourse(courseId);
-        System.out.println(result);
-        System.out.println("Course{" +
-                "\n    courseId=" + courseId +
-                ",\n    title='" + "math" + '\'' +
-                ",\n    description='" + "math description" + '\'' +
-                ",\n    duration=" + 9 +
-                ",\n    available=" + true +
-                ",\n    instructorId=" + instructor.getId() +
-                "}");
 
         assertNotNull(result);
         assertEquals("Course{" +
@@ -170,6 +163,8 @@ public class CourseServiceTest {
         course.setCourseId(id);
         Student student = new Student("student1", "password2", "student1@example.com");
         CourseEnrollRequest request = new CourseEnrollRequest();
+        Instructor instructor = new Instructor("instructor1", "password1", "instructor1@example.com");
+        course.setInstructor(instructor);
         request.setStatus("Accepted");
         request.setCourse(course);
         request.setStudent(student);
@@ -177,7 +172,7 @@ public class CourseServiceTest {
 
         when(courseEnrollRequestService.findById(id)).thenReturn(request);
 
-        ResponseEntity<String> response = courseService.updateEnrollmentStatus(id, isAccepted);
+        ResponseEntity<String> response = courseService.updateEnrollmentStatus(instructor, id, isAccepted);
 
         assert "Student has been accepted".equals(response.getBody());
         verify(courseEnrollRequestService, times(1)).save(any(CourseEnrollRequest.class));
@@ -195,6 +190,8 @@ public class CourseServiceTest {
         course.setCourseId(id);
         Student student = new Student("student1", "password2", "student1@example.com");
         CourseEnrollRequest request = new CourseEnrollRequest();
+        Instructor instructor = new Instructor("instructor1", "password2", "instructor1@example.com");
+        course.setInstructor(instructor);
         request.setStatus("Accepted");
         request.setCourse(course);
         request.setStudent(student);
@@ -202,7 +199,7 @@ public class CourseServiceTest {
 
         when(courseEnrollRequestService.findById(id)).thenReturn(request);
 
-        ResponseEntity<String> response = courseService.updateEnrollmentStatus(id, isAccepted);
+        ResponseEntity<String> response = courseService.updateEnrollmentStatus(instructor, id, isAccepted);
 
         assert "Student has been rejected".equals(response.getBody());
         verify(courseEnrollRequestService, times(1)).save(any(CourseEnrollRequest.class));

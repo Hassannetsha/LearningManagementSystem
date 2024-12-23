@@ -32,9 +32,17 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAvailableCourses());
     }
 
-    @GetMapping("/{courseId}")
+    @GetMapping("/api/{courseId}")
     public ResponseEntity<String> viewCourse(@PathVariable long courseId) {
+        if (!courseService.courseExists(courseId)) {
+            return ResponseEntity.badRequest().body("Course does not exist");
+        }
         return ResponseEntity.ok(courseService.viewCourse(courseId));
+    }
+
+    @GetMapping("/student/{courseId}")
+    public ResponseEntity<String> viewAvailableCourse(@PathVariable long courseId) {
+        return ResponseEntity.ok(courseService.viewAvailableCourse(courseId));
     }
 
     @PostMapping("/instructor/courses")
@@ -53,10 +61,11 @@ public class CourseController {
     }
 
     @PutMapping("/instructor/courses/{courseId}") // instructor
-    public ResponseEntity<String> updateCourse(@PathVariable long courseId, @RequestBody Course course) {
+    public ResponseEntity<String> updateCourse(@PathVariable long courseId, @RequestBody Course course, Principal principal) {
         if (!courseService.courseExists(courseId))
             return ResponseEntity.badRequest().body("Course not found");
-        courseService.updateCourse(courseId, course);
+        Instructor instructor = instructorService.findByUsername(principal.getName());
+        courseService.updateCourse(courseId, course, instructor);
         return ResponseEntity.ok(courseService.viewCourse(courseId));
     }
 
@@ -123,11 +132,13 @@ public class CourseController {
 
     @PutMapping("/instructor/courses/{courseId}/enrollments/{requestId}/")
     public ResponseEntity<String> handleEnrollmentRequest(@PathVariable long courseId, @PathVariable long requestId,
-                                                          @RequestParam boolean isAccepted) {
+                                                          @RequestParam boolean isAccepted,
+                                                          Principal principal) {
         if (!courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
         }
-        return courseService.updateEnrollmentStatus(requestId, isAccepted);
+        Instructor instructor = instructorService.findByUsername(principal.getName());
+        return courseService.updateEnrollmentStatus(instructor, requestId, isAccepted);
     }
 
     @DeleteMapping("/instructor/courses/{courseId}") // instructor
