@@ -44,11 +44,11 @@ public class NotificationController {
     //     return notificationService.getNotificationsByUserID(id);
     // }
 
-    @PostMapping
-    public Notification createNotification(@RequestParam Long mailboxId, @RequestBody NotificationAndEmailMapper messageObject) {
-        Mailbox mailbox = mailboxService.getMailbox(mailboxId); 
-        return notificationService.createNotification(mailbox, messageObject);
-    }
+//    @PostMapping
+//    public Notification createNotification(@RequestParam Long mailboxId, @RequestBody NotificationAndEmailMapper messageObject) {
+//        Mailbox mailbox = mailboxService.getMailbox(mailboxId);
+//        return notificationService.createNotification(mailbox, messageObject);
+//    }
 
     // @PostMapping(path = "bulk")
     // public void postBulkNotifications(@RequestParam List<Long> userIDs, @RequestParam String message) {

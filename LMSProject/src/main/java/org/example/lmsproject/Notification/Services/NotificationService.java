@@ -29,9 +29,10 @@ public class NotificationService {
     // notificationRepository.save(notification);
     // }
 
-    public Notification createNotification(Mailbox mailbox, NotificationAndEmailMapper notificationAndEmailMapper) {
+    public void createNotification(Mailbox mailbox, NotificationAndEmailMapper notificationAndEmailMapper) {
         Notification notification = new Notification(mailbox, notificationAndEmailMapper);
-        return notificationRepository.save(notification);
+        notificationRepository.save(notification);
+//        return notificationRepository.save(notification);
     }
 
     // public void postBulkNotifications(List<Long> userIDs, String message) {

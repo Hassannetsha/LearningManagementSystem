@@ -11,6 +11,7 @@ import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.CourseEnrollRequestNotification;
 import org.example.lmsproject.course.model.CourseMaterial;
 import org.example.lmsproject.course.model.CourseMaterialNotification;
+import org.example.lmsproject.course.repository.CourseEnrollRequestRepository;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
@@ -32,6 +33,7 @@ public class CourseService {
     private final StudentService studentService;
     private final CourseMaterialService courseMaterialService;
     private final CourseEnrollRequestService courseEnrollRequestService;
+    private final CourseEnrollRequestRepository courseEnrollRequestRepo;
 
     private final MailboxService mailboxService;
     private final InstructorService instructorService;
@@ -180,6 +182,7 @@ public class CourseService {
             student.getCourses().add(course);
             courseRepository.save(course);
             studentService.save(student);
+            courseEnrollRequestRepo.delete(enrollRequest);
             return "Student has been accepted";
         }
         courseRepository.save(course);

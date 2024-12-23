@@ -28,14 +28,14 @@ public class ChartService {
         }
 
         JFreeChart barChart = ChartFactory.createBarChart(
-                "Student Performance",   // Chart title
-                "Student",               // X-axis label
-                "Score",                 // Y-axis label
-                dataset,                 // Data
-                PlotOrientation.VERTICAL, // Orientation
-                true,                    // Include legend
-                true,                    // Tooltips
-                false                    // URLs
+                "Student Performance",
+                "Student",
+                "Score",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true,
+                true,
+                false
         );
 
         return createChartImage(barChart);

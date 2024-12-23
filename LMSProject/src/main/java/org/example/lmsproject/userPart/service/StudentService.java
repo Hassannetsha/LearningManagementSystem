@@ -3,6 +3,7 @@ package org.example.lmsproject.userPart.service;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.repository.StudentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class StudentService {
     private final StudentRepository studentRepository;
 
+    @Autowired
     StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }

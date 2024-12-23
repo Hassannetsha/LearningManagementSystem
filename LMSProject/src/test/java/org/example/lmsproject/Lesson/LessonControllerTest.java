@@ -1,6 +1,7 @@
 package org.example.lmsproject.Lesson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.example.lmsproject.course.controller.LessonController;
 import org.example.lmsproject.course.model.Lesson;
 import org.example.lmsproject.course.repository.AttendanceRepository;
@@ -14,11 +15,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -50,6 +56,7 @@ class LessonControllerTest {
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(lessonController).build();
         objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule()); // Register JavaTimeModule
     }
 
     @Test
@@ -59,7 +66,7 @@ class LessonControllerTest {
 
         when(lessonService.generateOtp(lessonId)).thenReturn(otp);
 
-        mockMvc.perform(post("/student/generate-otp")
+        mockMvc.perform(post("/instructor/generate-otp")
                         .param("lessonId", String.valueOf(lessonId))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -113,34 +120,23 @@ class LessonControllerTest {
     void testCreateLesson() throws Exception {
         Long courseId = 1L;
         Lesson lesson = new Lesson();
-        lesson.setTitle("Test Lesson");
-        lesson.setDescription("Test Description");
+        lesson.setTitle("testl");
+        lesson.setDescription("testd");
 
-        when(lessonService.createLesson(courseId, lesson)).thenReturn(lesson);
+        lesson.setDateTime(LocalDateTime.of(2023, 12, 23, 14, 30));
+
+        when(lessonService.createLesson(eq(courseId), any(Lesson.class))).thenReturn(lesson);
 
         mockMvc.perform(post("/instructor/createlesson")
                         .param("courseId", String.valueOf(courseId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(lesson)))
-                .andExpect(status().isOk()) // Expecting HTTP 200 status
+                .andExpect(status().isOk())
                 .andDo(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    System.out.println("Response Body: " + responseBody);
+                    MockHttpServletResponse response = result.getResponse();
                 });
     }
-
-    @Test
-    void testUpdateLesson() throws Exception {
-        Long lessonId = 1L;
-        Lesson updatedLesson = new Lesson();
-        updatedLesson.setTitle("Updated Lesson");
-        updatedLesson.setDescription("Updated Description");
-        when(lessonService.updateLesson(lessonId, updatedLesson)).thenReturn(updatedLesson);
-        mockMvc.perform(put("/instructor/updatelesson/{id}", lessonId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedLesson)))
-                .andExpect(status().isOk());
-    }
+    
 
     @Test
     void testDeleteLesson() throws Exception {

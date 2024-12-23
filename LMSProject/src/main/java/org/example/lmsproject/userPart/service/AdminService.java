@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.example.lmsproject.Notification.Repositories.MailboxRepository;
 import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.userPart.model.Admin;
@@ -24,16 +25,16 @@ public class AdminService {
     private final  PasswordEncoder encoder;
     private final UserRepository userRepo;
     private final RequestRepository requestRepo;
-
-
+    private final MailboxRepository mailboxRepository;
     // added for Notification Logic (& added in constructor)
     private final MailboxService mailboxService;
     //
     @Autowired
-    public AdminService(PasswordEncoder encoder, UserRepository userRepo,RequestRepository requestRepo, MailboxService mailboxService) {
+    public AdminService(PasswordEncoder encoder, UserRepository userRepo, RequestRepository requestRepo, MailboxRepository mailboxRepository, MailboxService mailboxService) {
         this.encoder = encoder;
         this.userRepo = userRepo;
         this.requestRepo = requestRepo;
+        this.mailboxRepository = mailboxRepository;
         this.mailboxService = mailboxService;
     }
 
@@ -83,6 +84,8 @@ public class AdminService {
     public String deleteUser(Long id) {
         User user = userRepo.findById(id).orElse(null);
         if (user != null) {
+            mailboxRepository.deleteById(user.getId());
+
             userRepo.delete(user);
             return "User deleted successfully: " + user.getUsername();
         } else {
