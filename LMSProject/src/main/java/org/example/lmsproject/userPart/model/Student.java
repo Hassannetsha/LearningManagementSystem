@@ -14,7 +14,8 @@ import java.util.List;
 @PrimaryKeyJoinColumn(name = "id") // Maps the Student's id to the User's id
 public class Student extends User {
 
-    @ManyToMany
+//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = CascadeType.ALL)
     private List<Course> courses;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)

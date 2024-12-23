@@ -42,7 +42,8 @@ public class Course {
 
     @Setter
     @Getter
-    @ManyToMany(mappedBy = "courses")
+//    @ManyToMany(mappedBy = "courses", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(mappedBy = "courses", cascade = CascadeType.ALL)
     List<Student> students;
 
     @Getter
