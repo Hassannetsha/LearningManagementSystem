@@ -22,9 +22,9 @@ public class ChartService {
     public byte[] generatePerformanceChart(List<StudentPerformance> performanceList) throws Exception {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         for (StudentPerformance performance : performanceList) {
-            dataset.addValue(performance.getQuizGrade(), performance.getUsername(), "Quiz Grade");
+            dataset.addValue(performance.getQuizGradePercentage(), performance.getUsername(), "Quiz Grade");
             dataset.addValue(performance.getAttendancePercentage(), performance.getUsername(), "Attendance Percentage");
-            dataset.addValue(performance.getAssignmentScore(), performance.getUsername(), "Assignment Score");
+            dataset.addValue(performance.getAssignmentScorePercentage(), performance.getUsername(), "Assignment Score");
         }
 
         JFreeChart barChart = ChartFactory.createBarChart(
@@ -68,9 +68,9 @@ public class ChartService {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         for (StudentPerformance performance : performanceList) {
-            dataset.addValue(performance.getQuizGrade(), performance.getUsername(), "Quiz Grade");
+            dataset.addValue(performance.getQuizGradePercentage(), performance.getUsername(), "Quiz Grade");
             dataset.addValue(performance.getAttendancePercentage(), performance.getUsername(), "Attendance");
-            dataset.addValue(performance.getAssignmentScore(), performance.getUsername(), "Assignments");
+            dataset.addValue(performance.getAssignmentScorePercentage(), performance.getUsername(), "Assignments");
         }
 
         JFreeChart radarChart = createRadarChart(dataset);

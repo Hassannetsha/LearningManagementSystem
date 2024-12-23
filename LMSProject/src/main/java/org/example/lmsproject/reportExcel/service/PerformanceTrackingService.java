@@ -125,9 +125,9 @@ public class PerformanceTrackingService {
             Row row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue(performance.getId());
             row.createCell(1).setCellValue(performance.getUsername());
-            row.createCell(2).setCellValue(performance.getQuizGrade());
+            row.createCell(2).setCellValue(performance.getQuizGradePercentage());
             row.createCell(3).setCellValue(performance.getAttendancePercentage());
-            row.createCell(4).setCellValue(performance.getAssignmentScore());
+            row.createCell(4).setCellValue(performance.getAssignmentScorePercentage());
         }
         // Write the output to a byte array
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
