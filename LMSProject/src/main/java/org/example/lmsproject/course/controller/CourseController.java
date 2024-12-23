@@ -80,7 +80,7 @@ public class CourseController {
     @PutMapping("/student/courses/{courseId}")
     public ResponseEntity<String> enrollInCourse(@PathVariable long courseId, Principal principal) {
         if (!courseService.courseExists(courseId))
-            return ResponseEntity.badRequest().body("Course not found");
+            return ResponseEntity.badRequest().body("Course not founddddd");
         String studentUsername = principal.getName();
         return ResponseEntity.ok(courseService.enrollStudentInCourse(courseId, studentUsername));
     }
