@@ -11,11 +11,10 @@ import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.service.InstructorService;
 import org.example.lmsproject.userPart.service.StudentService;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

@@ -1,6 +1,5 @@
 package org.example.lmsproject.course.service;
 
-import java.awt.desktop.SystemEventListener;
 import  java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,7 +18,6 @@ import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.service.InstructorService;
 import org.example.lmsproject.userPart.service.StudentService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -115,7 +113,7 @@ public class CourseService {
         if (updatedCourse.getLessons() != null) existingCourse.get().setLessons(updatedCourse.getLessons());
         courseRepository.save(existingCourse.orElse(updatedCourse));
         NotificationAndEmailMapper courseNotification = new CourseNotification(existingCourse.get());
-        mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), message);
+        mailboxService.addBulkNotifications(existingCourse.get().getStudents().stream().map(Student::getId).toList(), courseNotification);
 
         return existingCourse.get().toString();
     }
