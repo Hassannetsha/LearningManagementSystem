@@ -6,24 +6,28 @@ import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.course.model.Course;
 import org.example.lmsproject.course.model.CourseEnrollRequest;
 import org.example.lmsproject.course.model.CourseMaterial;
+import org.example.lmsproject.course.repository.CourseEnrollRequestRepository;
 import org.example.lmsproject.course.repository.CourseRepository;
 import org.example.lmsproject.userPart.model.Instructor;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.service.InstructorService;
 import org.example.lmsproject.userPart.service.StudentService;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -43,9 +47,12 @@ public class CourseServiceTest {
     private MailboxService mailboxService;
     @Mock
     private InstructorService instructorService;
+    @Mock
+    private CourseEnrollRequestRepository courseEnrollRequestRepo;
 
     @InjectMocks
     private CourseService courseService;
+
 
     @Test
     public void testCreateCourse() {
@@ -187,6 +194,7 @@ public class CourseServiceTest {
 
         when(courseEnrollRequestService.findById(id)).thenReturn(request);
         when(instructorService.findByUsername("instructor1")).thenReturn(instructor);
+        doNothing().when(courseEnrollRequestRepo).delete(request);
 
         String response = courseService.updateEnrollmentStatus(instructor.getUsername(), id, isAccepted);
 
