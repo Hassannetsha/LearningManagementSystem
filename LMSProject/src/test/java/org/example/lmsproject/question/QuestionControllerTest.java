@@ -1,4 +1,4 @@
-package org.example.lmsproject.quiz.controller;
+package org.example.lmsproject.question;
 
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -62,9 +62,12 @@ public class QuestionControllerTest {
         instructor.setEmail("menna@example.com");
         instructor.setRole(User.Role.ROLE_INSTRUCTOR);
         instructor.setPassword("password123");
-        Course course = new Course("science", "nn", 7, true);
-        course.setInstructor(instructor);
+        Course course = new Course();
         course.setCourseId(1L);
+        course.setDescription("nn");
+        course.setAvailable(true);
+        course.setDuration(7);
+        course.setInstructor(instructor);
         QuestionEntity question = new MCQQuestionEntity(1L, "What is the capital of Egypt?", "mcq", course,
                 Arrays.asList("Cairo", "giza", "Alexandria", "Luxor"), "Cairo");
         QuestionBank questionBank = new QuestionBank(1L, "geography Bank", course, Arrays.asList(question));
