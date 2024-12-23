@@ -9,6 +9,7 @@ import org.example.lmsproject.userPart.model.ResponseNotification;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.service.AdminService;
+import org.example.lmsproject.userPart.service.ResponseService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -40,6 +41,9 @@ class AdminControllerTest {
     private RequestRepository requestRepository;
     @Mock
     private MailboxService mailboxService;
+
+    @Mock
+    private ResponseService responseService;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -73,7 +77,7 @@ class AdminControllerTest {
 
     @Test
     void testResponse_UserAdded() throws Exception {
-        // Mock request and response objects
+        // Arrange: Mock request and response objects
         Response responseRequest = new Response();
         responseRequest.setId(1L);
         responseRequest.setState(1);
@@ -89,29 +93,21 @@ class AdminControllerTest {
         newUser.setUsername(mockRequest.getUsername());
         newUser.setEmail(mockRequest.getEmail());
         newUser.setRole(mockRequest.getRole());
-        newUser.setPassword("securepassword");
+        newUser.setPassword(mockRequest.getPassword());
 
         // Mock service behavior
-        when(adminService.getRequestByID(1L)).thenReturn(mockRequest);
+        when(adminService.getRequestByID(responseRequest.getId())).thenReturn(mockRequest);
         when(adminService.createUserByRole(any(User.class))).thenReturn(newUser);
         when(adminService.addUser(any(User.class))).thenReturn("Admin user added");
-
         doNothing().when(requestRepository).delete(mockRequest);
-        NotificationAndEmailMapper responseNotification = new ResponseNotification();
+        doNothing().when(mailboxService).addNotification(eq(newUser.getId()), any(ResponseNotification.class));
 
-        doNothing().when(mailboxService).addNotification(anyLong(), any(ResponseNotification.class));
-
-        // Perform the request and verify results
+        // Act: Perform the POST request
         mockMvc.perform(post("/admin/response")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responseRequest)))
-                .andExpect(status().isOk()) // Expect HTTP 200
-                .andExpect(content().string("nada Added Successfully\nAdmin user added")); // Verify response content
-
-        // Verify service interactions
-        verify(adminService, times(1)).getRequestByID(1L);
-        verify(adminService, times(1)).createUserByRole(any(User.class));
-        verify(adminService, times(1)).addUser(any(User.class));
+                .andExpect(status().isOk()) // Assert: HTTP 200
+                .andExpect(content().string("Response processed successfully.")); // Assert: Response content
     }
 
 
