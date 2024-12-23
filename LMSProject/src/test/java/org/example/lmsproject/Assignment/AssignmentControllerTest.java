@@ -91,13 +91,14 @@ public class AssignmentControllerTest {
     void test_gradesubmission() throws Exception {
         Long submissionid = 1L;
         Integer grade = 85;
+        Integer total = 85;
         String feedback = "you can do better";
 
         AssignmentSubmission gradedsubmission = new AssignmentSubmission();
         gradedsubmission.setGrade(grade);
         gradedsubmission.setFeedback(feedback);
 
-        when(assignmentservice.gradesubmission(eq(submissionid), eq(grade), eq(feedback)))
+        when(assignmentservice.gradesubmission(eq(submissionid), eq(grade), eq(total) , eq(feedback)))
                 .thenReturn(gradedsubmission);
 
         mockMvc.perform(post("/instructor/gradesubmission")
@@ -108,7 +109,7 @@ public class AssignmentControllerTest {
                 .andExpect(jsonPath("$.grade").value(grade))
                 .andExpect(jsonPath("$.feedback").value(feedback));
 
-        verify(assignmentservice, times(1)).gradesubmission(eq(submissionid), eq(grade), eq(feedback));
+        verify(assignmentservice, times(1)).gradesubmission(eq(submissionid), eq(grade) , eq(total), eq(feedback));
     }
 
     @Test

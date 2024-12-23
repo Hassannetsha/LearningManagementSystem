@@ -53,30 +53,70 @@ public class PerformanceTrackingService {
     }
 
 
-    public double calculateQuizGrade(Long studentId) {
+    public double calculateQuizGradePercentage(Long studentId) {
         List<AutomatedFeedBack> allQuizzes = feedBackRepository.findByStudentId(studentId);
         double totalGrade = 0;
+        double totalMaxGrade = 0;
+
         for (AutomatedFeedBack quizFeedback : allQuizzes) {
             totalGrade += quizFeedback.getGrade();
+            totalMaxGrade += quizFeedback.getTotalNumberOfQuestions(); // Assuming maxGrade exists in FeedBack
         }
-        return totalGrade / allQuizzes.size(); // Average grade
+
+        // Avoid division by zero
+        if (totalMaxGrade == 0) {
+            return 0;
+        }
+
+        return (totalGrade / totalMaxGrade) * 100; // Calculate percentage
     }
 
-    public double calculateAssignmentScore(Long studentId) {
+
+    public double calculateAssignmentScorePercentage(Long studentId) {
         List<AssignmentSubmission> submissions = assignmentSubmissionRepository.findByStudentId(studentId);
         double totalScore = 0;
+        double totalMaxScore = 0;
+
         for (AssignmentSubmission submission : submissions) {
             totalScore += submission.getGrade();
+            totalMaxScore += submission.getTotal(); // Assuming maxGrade exists in AssignmentSubmission
         }
-        return totalScore / submissions.size();  // Average score
+
+        // Avoid division by zero
+        if (totalMaxScore == 0) {
+            return 0;
+        }
+
+        return (totalScore / totalMaxScore) * 100; // Calculate percentage
     }
+
+
+
+
+//    public double calculateQuizGrade(Long studentId) {
+//        List<FeedBack> allQuizzes = feedBackRepository.findByStudentId(studentId);
+//        double totalGrade = 0;
+//        for (FeedBack quizFeedback : allQuizzes) {
+//            totalGrade += quizFeedback.getGrade();
+//        }
+//        return totalGrade / allQuizzes.size(); // Average grade
+//    }
+//
+//    public double calculateAssignmentScore(Long studentId) {
+//        List<AssignmentSubmission> submissions = assignmentSubmissionRepository.findByStudentId(studentId);
+//        double totalScore = 0;
+//        for (AssignmentSubmission submission : submissions) {
+//            totalScore += submission.getGrade();
+//        }
+//        return totalScore / submissions.size();  // Average score
+//    }
 
     //per student
     public StudentPerformance getPerformanceForStudent(Long studentId) {
         String username = studentRepository.findById(studentId).get().getUsername();
-        double quizGrade = calculateQuizGrade(studentId);
+        double quizGrade = calculateQuizGradePercentage(studentId);
         double attendancePercentage = calculateAttendancePercentage(studentId);
-        double assignmentScore = calculateAssignmentScore(studentId);
+        double assignmentScore = calculateAssignmentScorePercentage(studentId);
         return new StudentPerformance(username, studentId, quizGrade, attendancePercentage, assignmentScore);
     }
 
@@ -125,9 +165,9 @@ public class PerformanceTrackingService {
             Row row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue(performance.getId());
             row.createCell(1).setCellValue(performance.getUsername());
-            row.createCell(2).setCellValue(performance.getQuizGrade());
+            row.createCell(2).setCellValue(performance.getQuizGradePercentage());
             row.createCell(3).setCellValue(performance.getAttendancePercentage());
-            row.createCell(4).setCellValue(performance.getAssignmentScore());
+            row.createCell(4).setCellValue(performance.getAssignmentScorePercentage());
         }
         // Write the output to a byte array
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

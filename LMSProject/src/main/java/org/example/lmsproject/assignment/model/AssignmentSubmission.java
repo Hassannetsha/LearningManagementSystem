@@ -38,10 +38,13 @@ public class AssignmentSubmission {
     @Setter
     @Getter
     private Integer grade;
-
+    @Getter
+    @Setter
+    private Integer total;
     @Setter
     @Getter
     private String feedback;
+
 
     @Override
     public String toString() {
@@ -52,5 +55,6 @@ public class AssignmentSubmission {
                 ",\n    feedback" + feedback +
                 ",\n    assignmentId" + assignment.getId();
     }
+
 }
 

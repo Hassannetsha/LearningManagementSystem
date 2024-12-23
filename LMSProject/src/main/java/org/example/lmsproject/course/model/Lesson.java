@@ -79,8 +79,8 @@ public class Lesson {
 
     @Override
     public String toString() {
-        return "{\n\tid:" + this.id + "\n\title: " + this.title + "\n\tdescription: " + this.description
-                + "\n\tdateTim: " + this.dateTime.toString() + "\n}";
+        return "{\n\tid:" + this.id + "\n\ttitle: " + this.title + "\n\tdescription: " + this.description
+                + "\n\tdateTime: " + this.dateTime.toString() + "\n}";
     }
 
 }

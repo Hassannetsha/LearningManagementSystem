@@ -1,9 +1,11 @@
 package org.example.lmsproject.userPart.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.userPart.model.Request;
 import org.example.lmsproject.userPart.model.Response;
 import org.example.lmsproject.userPart.model.User;
+import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.service.AdminService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,15 +28,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AdminControllerTest {
 
     private MockMvc mockMvc;
-
     @Mock
     private AdminService adminService;
-
     @InjectMocks
     private AdminController adminController;
-
     private ObjectMapper objectMapper;
-
+    @Mock
+    private RequestRepository requestRepository;
+    @Mock
+    private MailboxService mailboxService;
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -68,6 +70,7 @@ class AdminControllerTest {
 
     @Test
     void testResponse_UserAdded() throws Exception {
+        // Mock request and response objects
         Response responseRequest = new Response();
         responseRequest.setId(1L);
         responseRequest.setState(1);
@@ -85,20 +88,27 @@ class AdminControllerTest {
         newUser.setRole(mockRequest.getRole());
         newUser.setPassword("securepassword");
 
+        // Mock service behavior
         when(adminService.getRequestByID(1L)).thenReturn(mockRequest);
         when(adminService.createUserByRole(any(User.class))).thenReturn(newUser);
         when(adminService.addUser(any(User.class))).thenReturn("Admin user added");
 
+        doNothing().when(requestRepository).delete(mockRequest);
+        doNothing().when(mailboxService).addNotification(anyLong(), any(Response.class));
+
+        // Perform the request and verify results
         mockMvc.perform(post("/admin/response")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responseRequest)))
-                .andExpect(status().isOk())
-                .andExpect(content().string("nada Added Successfully\nAdmin user added"));
+                .andExpect(status().isOk()) // Expect HTTP 200
+                .andExpect(content().string("nada Added Successfully\nAdmin user added")); // Verify response content
 
+        // Verify service interactions
         verify(adminService, times(1)).getRequestByID(1L);
         verify(adminService, times(1)).createUserByRole(any(User.class));
         verify(adminService, times(1)).addUser(any(User.class));
     }
+
 
     @Test
     void testUpdateUser() throws Exception {

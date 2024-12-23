@@ -82,6 +82,7 @@ public class AssignmentServiceTest {
     public void test_gradesubmission() {
         Long submissionId = 1L;
         Integer grade = 80;
+        Integer total = 80;
         String feedback = "You can do better";
 
         AssignmentSubmission mockSubmission = new AssignmentSubmission();
@@ -92,7 +93,7 @@ public class AssignmentServiceTest {
         when(assignmentsubmissionrepo.findById(submissionId)).thenReturn(Optional.of(mockSubmission));
         when(assignmentsubmissionrepo.save(any(AssignmentSubmission.class))).thenReturn(mockSubmission);
 
-        AssignmentSubmission gradedSubmission = assignmentservice.gradesubmission(submissionId, grade, feedback);
+        AssignmentSubmission gradedSubmission = assignmentservice.gradesubmission(submissionId, grade , total, feedback);
 
         assertNotNull(gradedSubmission);
         assertEquals(grade, gradedSubmission.getGrade());
