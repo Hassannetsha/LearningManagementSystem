@@ -31,12 +31,12 @@ public class MailboxController {
         this.mailboxService = mailboxService;
     }
 
-    @GetMapping(path = "getNotifications/{mailboxID}")
+    @GetMapping(path = "{mailboxID}")
     public Mailbox  getMailbox(@PathVariable("mailboxID") Long id) {
         return mailboxService.getMailbox(id);
     }
 
-    @GetMapping(path = "{userID}")
+    @GetMapping(path = "getNotifications/{userID}")
     public List<Notification> getNotifications(@PathVariable("userID") Long id) {
         return mailboxService.getNotifications(id);
     }
