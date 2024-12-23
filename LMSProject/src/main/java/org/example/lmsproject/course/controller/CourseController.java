@@ -33,12 +33,12 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getAvailableCourses());
     }
 
-    @GetMapping("/student/courses/enrolled")
+    @GetMapping("/student/courses/enrolled") // erg3elha
     public ResponseEntity<String> getEnrolledCourses(Principal principal) {
         return ResponseEntity.ok(courseService.getEnrolledCourses(principal.getName()));
     }
 
-    @GetMapping("/api/{courseId}")
+    @GetMapping("/api/courses/{courseId}")
     public ResponseEntity<String> viewCourse(@PathVariable long courseId) {
         if (!courseService.courseExists(courseId)) {
             return ResponseEntity.badRequest().body("Course does not exist");
@@ -80,7 +80,7 @@ public class CourseController {
     @PutMapping("/student/courses/{courseId}")
     public ResponseEntity<String> enrollInCourse(@PathVariable long courseId, Principal principal) {
         if (!courseService.courseExists(courseId))
-            return ResponseEntity.badRequest().body("Course not founddddd");
+            return ResponseEntity.badRequest().body("Course not found");
         String studentUsername = principal.getName();
         return ResponseEntity.ok(courseService.enrollStudentInCourse(courseId, studentUsername));
     }

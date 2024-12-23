@@ -20,7 +20,7 @@ public class CourseMaterialService {
 
 
     @Value("${upload.directory}")
-    private String uploadDirectory;
+    String uploadDirectory;
 
     @Autowired
     private CourseMaterialRepository courseMaterialRepository;

@@ -32,6 +32,10 @@ public class StudentService {
         studentRepository.save(student);
     }
 
+    public void saveAll(List<Student> students) {
+        studentRepository.saveAll(students);
+    }
+
     public String getEnrolledCourses(String studentUsername) {
         Student student = findStudentByUsername(studentUsername);
         List<Course> courses = student.getCourses();
