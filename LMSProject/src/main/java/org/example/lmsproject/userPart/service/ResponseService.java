@@ -9,6 +9,7 @@ import org.example.lmsproject.userPart.model.Response;
 import org.example.lmsproject.userPart.model.ResponseNotification;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +19,8 @@ public class ResponseService {
     private final AdminService adminService;
     private final MailboxService mailboxService;
 
+
+    @Autowired
     public ResponseService(RequestRepository requestRepository, AdminService adminService, MailboxService mailboxService) {
         this.requestRepository = requestRepository;
         this.adminService = adminService;

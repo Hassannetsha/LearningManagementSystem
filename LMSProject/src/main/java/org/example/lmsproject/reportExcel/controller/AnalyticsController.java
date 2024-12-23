@@ -58,6 +58,7 @@ import org.example.lmsproject.quiz.Services.Quizzes.QuizServices;
 import org.example.lmsproject.reportExcel.service.ChartService;
 import org.example.lmsproject.reportExcel.service.PerformanceTrackingService;
 import org.example.lmsproject.reportExcel.model.StudentPerformance;
+import org.example.lmsproject.reportExcel.service.ReportService;
 import org.example.lmsproject.userPart.model.Student;
 import org.example.lmsproject.userPart.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,13 +81,15 @@ public class AnalyticsController {
     private final ChartService chartService;
     private final PerformanceTrackingService performanceTrackingService;
     private final CourseRepository courseRepository;
+    private final ReportService reportService;
 
     @Autowired
-    public AnalyticsController(StudentRepository studentRepository, ChartService chartService, PerformanceTrackingService performanceTrackingService, CourseRepository courseRepository) {
+    public AnalyticsController(StudentRepository studentRepository, ChartService chartService, PerformanceTrackingService performanceTrackingService, CourseRepository courseRepository, ReportService reportService) {
         this.studentRepository = studentRepository;
         this.chartService = chartService;
         this.performanceTrackingService = performanceTrackingService;
         this.courseRepository = courseRepository;
+        this.reportService = reportService;
     }
 
     @GetMapping("/student/{studentId}")
@@ -107,7 +110,7 @@ public class AnalyticsController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).
                     body("No students found for the given course.".getBytes());  // Return a custom error message
         }
-        byte[] excelReport = performanceTrackingService.generateStudentPerformanceReportForCourse(courseId);
+        byte[] excelReport = reportService.generateStudentPerformanceReportForCourse(courseId);
         return ResponseEntity.ok()
                 .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
                 .header("Content-Disposition", "attachment; filename=student_performance_report.xlsx")

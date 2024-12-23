@@ -57,7 +57,6 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    // Endpoint for deleting a User
     @DeleteMapping("/deleteUser/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         String response = adminService.deleteUser(id);
