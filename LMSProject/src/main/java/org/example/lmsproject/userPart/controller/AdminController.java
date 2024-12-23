@@ -7,6 +7,7 @@ import org.example.lmsproject.userPart.model.Response;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.example.lmsproject.userPart.service.AdminService;
+import org.example.lmsproject.userPart.service.ResponseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,8 @@ public class AdminController {
     @Autowired
     RequestRepository requestRepository;
 
-
+    @Autowired
+    ResponseService responseService;
 
     @PostMapping("/addUser")
     public String addNewUser(@RequestBody User userRequest) {
@@ -35,63 +37,16 @@ public class AdminController {
         return user.getUsername() + " Added Successfully\n" + response;
     }
 
-    @PostMapping("/responses")
-    public String processAllResponses(@RequestBody int state) {
-        List<Request> allRequests = requestRepository.findAll(); // Fetch all requests
-        StringBuilder result = new StringBuilder();
-
-        for (Request request : allRequests) {
-            if (state == 1) { // Approved state
-                User new_user = new User();
-                new_user.setEmail(request.getEmail());
-                new_user.setUsername(request.getUsername());
-                new_user.setRole(request.getRole());
-                new_user.setPassword(request.getPassword());
-                User user = adminService.createUserByRole(new_user);
-                String responseMessage = adminService.addUser(user);
-                requestRepository.delete(request);
-                // Notification Logic
-                mailboxService.addNotification(user.getId(), new Response(request.getId(), state));
-
-                result.append(user.getUsername()).append(" Added Successfully\n").append(responseMessage).append("\n");
-            } else { // Rejected state
-                result.append("Request with ID ").append(request.getId()).append(" was not approved.\n");
-            }
-        }
-
-        return result.toString();
+    @PostMapping("/response")
+    public ResponseEntity<String> processResponse(@RequestBody Response response) {
+        responseService.processResponse(response);
+        return ResponseEntity.ok("Response processed successfully.");
     }
 
-
-    @PostMapping("/response")
-    public String response(@RequestBody Response response) {
-        System.out.println(" ID "+response.getId());
-        Request request = adminService.getRequestByID(response.getId());
-        if (request!=null) {
-            if (response.getState()==1) {
-                User new_user = new User();
-                new_user.setEmail(request.getEmail());
-                new_user.setUsername(request.getUsername());
-                new_user.setRole(request.getRole());
-                new_user.setPassword(request.getPassword());
-                User user = adminService.createUserByRole(new_user);
-                String responseMessage = adminService.addUser(user);
-                requestRepository.delete(request);
-                // added Notification Logic //////////////////////////////////////////////////////////////////////////
-
-                mailboxService.addNotification(user.getId(), response);
-
-                /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-                return user.getUsername() + " Added Successfully\n" + responseMessage;
-            }
-            else{
-                return "User Not Added";
-            }
-        }
-        else{
-            return "Request Not Found";
-        }
+    @PostMapping("/responses")
+    public ResponseEntity<String> processAllResponses(@RequestBody int state) {
+        String response = responseService.processAllResponses(state);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/updateUser/{id}")
