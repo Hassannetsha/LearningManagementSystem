@@ -29,10 +29,12 @@ public class TrueOrFalseQuestionEntity extends QuestionEntity{
     public int calculateScore(Object userAnswer) {
         if(userAnswer instanceof String string){
             if (string.equalsIgnoreCase("true")) {
-                return string.equalsIgnoreCase("true")? 1 : 0; 
+                System.out.println(((String) userAnswer).equalsIgnoreCase("true"));
+                return string.equalsIgnoreCase(rightAnswer.equals(1)?"true":"false")? 1 : 0; 
             }
             else{
-                return ((String) userAnswer).equalsIgnoreCase("false")? 1 : 0; 
+                System.out.println(((String) userAnswer).equalsIgnoreCase("false"));
+                return ((String) userAnswer).equalsIgnoreCase(rightAnswer.equals(1)?"true":"false")? 1 : 0; 
             }
         }
 

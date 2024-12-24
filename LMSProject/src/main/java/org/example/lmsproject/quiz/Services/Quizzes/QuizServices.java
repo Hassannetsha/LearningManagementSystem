@@ -84,9 +84,10 @@ public class QuizServices {
 			List<Long> studentIds = course.getStudents().stream()
 					.map(Student::getId)
 					.collect(Collectors.toList());
-			if (studentIds.isEmpty()) { throw new IllegalStateException("No students are enrolled in this course"); }
-			NotificationAndEmailMapper newQuizNotification = new NewQuizNotification(quiz);
-			mailboxService.addBulkNotifications(studentIds, newQuizNotification);
+			if (!studentIds.isEmpty()) { 
+				NotificationAndEmailMapper newQuizNotification = new NewQuizNotification(quiz);
+				mailboxService.addBulkNotifications(studentIds, newQuizNotification);
+			}
 			return quiz;
 		} else {
 			throw new IllegalStateException(
@@ -94,7 +95,7 @@ public class QuizServices {
 		}
 	}
 
-	public void addNewQuizSubmission(QuizSubmissionDTO quizSubmissionDTO) {
+	public void addNewQuizSubmission(QuizSubmissionDTO quizSubmissionDTO,String userName) {
 		QuizEntity quiz = quizRepository.findByquizId(quizSubmissionDTO.getQuiz());
 		if (quiz != null) {
 			for (String ans : quizSubmissionDTO.getAnswers()) {
@@ -102,19 +103,25 @@ public class QuizServices {
 			}
 			Course course = courseService.getCourseById(quizSubmissionDTO.getCourseId());
 			if (course != null) {
-				Student student = studentService.getStudentById(quizSubmissionDTO.getStudentId());
+				Student student = studentService.findStudentByUsername(userName);
 				if (student != null) {
-					QuizSubmission quizSubmission = new QuizSubmission(quiz, course,
-							quizSubmissionDTO.getAnswers(), student);
-					System.out.println("before save quiz submission");
-					quizSubmissionRepository.save(quizSubmission);
-					System.out.println("before feedback");
-					AutomatedFeedBack feedBack = new AutomatedFeedBack(quizSubmission.getQuiz(), student);
-					feedBack.setGrade(calculateGrade(quizSubmission, feedBack));
-					System.out.println(feedBack.toString());
-					NotificationAndEmailMapper automatedFeedBack = new AutomatedFeedBackNotification(feedBack);
-					mailboxService.addNotification(student.getId(), automatedFeedBack);
-					feedBackRepository.save(feedBack);
+					for (Student student1 : course.getStudents()) {
+						if (student1==student) {
+							QuizSubmission quizSubmission = new QuizSubmission(quiz, course,
+									quizSubmissionDTO.getAnswers(), student);
+							System.out.println("before save quiz submission");
+							System.out.println("before feedback");
+							AutomatedFeedBack feedBack = new AutomatedFeedBack(quizSubmission.getQuiz(), student);
+							feedBack.setGrade(calculateGrade(quizSubmission, feedBack));
+							System.out.println(feedBack.toString());
+							NotificationAndEmailMapper automatedFeedBack = new AutomatedFeedBackNotification(feedBack);
+							quizSubmissionRepository.save(quizSubmission);
+							feedBackRepository.save(feedBack);
+							mailboxService.addNotification(student.getId(), automatedFeedBack);
+							return;
+						}
+					}
+					throw new IllegalStateException("This student is not registered in this course");
 				}
 				else{
 					throw new IllegalStateException("Student not found");
@@ -150,13 +157,15 @@ public class QuizServices {
 		List<String> answers = new ArrayList<>();
 		for (int i = 0; i < questions.size(); i++) {
 			QuestionEntity question = questions.get(i);
+			String answer = quizSubmission.getAnswers().get(i);
 			if (question instanceof MCQQuestionEntity mCQQuestionEntity) {
-				String userAnswer = mCQQuestionEntity.getRightAnswer();
-				totalScore += question.calculateScore(userAnswer);
+				// System.out.println(mCQQuestionEntity.calculateScore(answer));
+				totalScore += mCQQuestionEntity.calculateScore(answer);
 				answers.add(mCQQuestionEntity.getRightAnswer());
 			} else if (question instanceof TrueOrFalseQuestionEntity trueOrFalseQuestionEntity) {
-				Boolean userAnswer = trueOrFalseQuestionEntity.getRightAnswer();
-				totalScore += question.calculateScore(userAnswer);
+				trueOrFalseQuestionEntity.getRightAnswer();
+				// System.out.println(trueOrFalseQuestionEntity.calculateScore(answer));
+				totalScore += trueOrFalseQuestionEntity.calculateScore(answer);
 				answers.add(trueOrFalseQuestionEntity.getRightAnswer() == true ? "True" : "False");
 			}
 		}

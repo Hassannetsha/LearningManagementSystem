@@ -13,10 +13,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+// import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "quiz_submission", uniqueConstraints = @UniqueConstraint(columnNames = {"quiz", "courseId","StudentId"}))
+@Table(name = "quiz_submission")
 public class QuizSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -13,10 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+// import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "feedback", uniqueConstraints = @UniqueConstraint(columnNames = {"quizId", "studentId"}))
+@Table(name = "feedback")
 public class AutomatedFeedBack {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

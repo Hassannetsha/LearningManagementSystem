@@ -7,7 +7,7 @@ public class QuizSubmissionDTO {
     private Long courseId;
     private List<String> answers;
     private Long quiz;
-    private Long StudentId;
+    // private Long StudentId;
     public long getCourseId() {
         return courseId;
     }
@@ -24,13 +24,13 @@ public class QuizSubmissionDTO {
         this.answers = answers;
     }
 
-    public Long getStudentId() {
-        return StudentId;
-    }
+    // public Long getStudentId() {
+    //     return StudentId;
+    // }
 
-    public void setStudentId(Long StudentId) {
-        this.StudentId = StudentId;
-    }
+    // public void setStudentId(Long StudentId) {
+    //     this.StudentId = StudentId;
+    // }
 
     public Long getQuiz() {
         return quiz;
@@ -41,6 +41,6 @@ public class QuizSubmissionDTO {
     }
     @Override
     public String toString(){
-        return courseId.toString() + "\n" + answers + "\n" + quiz.toString() + "\n" + StudentId.toString() + "\n" ;
+        return courseId.toString() + "\n" + answers + "\n" + quiz.toString() + "\n" ;
     }
 }

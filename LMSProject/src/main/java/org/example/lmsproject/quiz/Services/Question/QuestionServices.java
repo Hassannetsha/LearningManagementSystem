@@ -63,7 +63,7 @@ public class QuestionServices {
             } else {
                 throw new IllegalStateException("Invalid question type: " + question.getType());
             }
-            
+
         } else {
             throw new IllegalStateException("Course not found");
         }
@@ -189,12 +189,15 @@ public class QuestionServices {
     public void updateQuestionBank(Long id, Long courseId, String questionBankName, List<Long> questionIds) {
         QuestionBank questionBank = questionBankRepository.findByid(id);
         String Message = "Invalid question IDs: ";
+        System.out.println("entered");
         if (questionBank != null) {
-            Course course = courseService.getCourseById(courseId);
-            if (course != null) {
-                questionBank.setCourse(course);
-            } else {
-                throw new IllegalStateException("Course not found");
+            if (courseId != null) {
+                Course course = courseService.getCourseById(courseId);
+                if (course != null) {
+                    questionBank.setCourse(course);
+                } else {
+                    throw new IllegalStateException("Course not found");
+                }
             }
             if (questionBankName != null) {
                 if (!questionBankName.equalsIgnoreCase(questionBank.getQuestionBankName())) {
@@ -244,6 +247,7 @@ public class QuestionServices {
         }
         throw new IllegalStateException("Question not found");
     }
+
     public QuestionEntity findByQuestionText(String question) {
         QuestionEntity questionEntity = questionRepository.findByquestion(question);
         if (questionEntity != null) {

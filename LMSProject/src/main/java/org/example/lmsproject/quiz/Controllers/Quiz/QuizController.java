@@ -1,5 +1,6 @@
 package org.example.lmsproject.quiz.Controllers.Quiz;
 
+import java.security.Principal;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,8 +46,8 @@ public class QuizController {
     }
 
     @PostMapping(path = "/student/quizzes/Submissions")
-    public void addNewQuizSubmission(@RequestBody QuizSubmissionDTO quizSubmissionDTO) {
-        quizServices.addNewQuizSubmission(quizSubmissionDTO);
+    public void addNewQuizSubmission(@RequestBody QuizSubmissionDTO quizSubmissionDTO,Principal principal) {
+        quizServices.addNewQuizSubmission(quizSubmissionDTO,principal.getName());
     }
 
     @GetMapping(path = "/instructor/quizzes/Submissions")
