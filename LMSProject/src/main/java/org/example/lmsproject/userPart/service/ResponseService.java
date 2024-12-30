@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.example.lmsproject.Notification.Services.MailboxService;
 import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
+import org.example.lmsproject.Notification.TextMappers.ResponseNotification;
 import org.example.lmsproject.userPart.model.Request;
 import org.example.lmsproject.userPart.model.Response;
-import org.example.lmsproject.userPart.model.ResponseNotification;
 import org.example.lmsproject.userPart.model.User;
 import org.example.lmsproject.userPart.repository.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;

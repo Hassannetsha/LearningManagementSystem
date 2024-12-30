@@ -1,11 +1,11 @@
-package org.example.lmsproject.quiz.model.Quiz;
+package org.example.lmsproject.Notification.TextMappers;
 
 import java.util.List;
 
-import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
 import org.example.lmsproject.quiz.model.Question.MCQQuestionEntity;
 import org.example.lmsproject.quiz.model.Question.QuestionEntity;
 import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
+import org.example.lmsproject.quiz.model.Quiz.AutomatedFeedBack;
 
 import lombok.AllArgsConstructor;
 @AllArgsConstructor

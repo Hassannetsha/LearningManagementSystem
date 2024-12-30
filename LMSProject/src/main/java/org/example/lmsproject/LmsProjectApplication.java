@@ -29,7 +29,7 @@ public class LmsProjectApplication {
                 // Add the initial user
                 User user = new Admin();
                 user.setUsername("admin2"); // Set the username
-                user.setEmail("firstAdmin@gmail.com"); // Set the email
+                user.setEmail("zinabelamir3@gmail.com"); // Set the email
                 user.setPassword("zinab27"); // Set the password (encoded)
                 // user.setRole(User.Role.ROLE_ADMIN); // Set the role
                 adminService.addUser(user); // Save the user to the database

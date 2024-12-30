@@ -21,9 +21,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.example.lmsproject.Notification.TextMappers.AssignmentNotification;
+import org.example.lmsproject.Notification.TextMappers.AssignmentSubmissionNotification;
 import org.example.lmsproject.Notification.TextMappers.NotificationAndEmailMapper;
-import org.example.lmsproject.assignment.model.AssignmentNotification;
-import org.example.lmsproject.assignment.model.AssignmentSubmissionNotification;
 
 @Service
 public class AssignmentService {
