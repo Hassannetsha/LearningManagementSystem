@@ -26,6 +26,11 @@ public class QuizController {
         List<QuizEntity> quizzes = quizServices.getAllQuizzes();
         return ResponseEntity.ok(quizzes.toString());
     }
+    @GetMapping("/student/quizzes/{quizId}")
+    public ResponseEntity<String> getQuiz(@PathVariable("quizId") Long quizId) {
+        QuizEntity quiz = quizServices.findById(quizId);
+        return ResponseEntity.ok(quiz.toString());
+    }
 
     @PostMapping("/instructor/quizzes")
     public ResponseEntity<String> addNewQuiz(@RequestBody QuizCreationDTO quiz) {

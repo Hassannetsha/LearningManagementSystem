@@ -1,5 +1,9 @@
 package org.example.lmsproject.assignment.controller;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.example.lmsproject.assignment.model.Assignment;
 import org.example.lmsproject.assignment.model.AssignmentSubmission;
 import org.example.lmsproject.assignment.model.FeedbackResponse;
@@ -10,12 +14,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 public class AssignmentController {
@@ -28,19 +33,22 @@ public class AssignmentController {
         this.submissionrepo = submissionrepo;
     }
 
-
-
     @PostMapping("/instructor/assignments/create")
-    public ResponseEntity<Assignment> createAssignment(@RequestParam Long courseid, @RequestParam String title,
-                                                       @RequestParam String description, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadline) {
+    public ResponseEntity<String> createAssignment(@RequestParam Long courseid, @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate deadline) {
         Assignment assignment = assignmentservice.createAssignment(courseid, title, description, deadline);
-        return ResponseEntity.ok(assignment);
+        return ResponseEntity.ok(assignment.toString());
     }
 
-    @GetMapping("/api/getassignmentbycourse")
-    public ResponseEntity<List<Assignment>> getassignmentsbycourseid(@RequestParam Long courseid) {
+    @GetMapping("/student/getassignmentbycourse")
+    public ResponseEntity<String> getassignmentsbycourseid(@RequestParam Long courseid) {
         List<Assignment> assignments = assignmentservice.getassignmentsbycourseid(courseid);
-        return ResponseEntity.ok(assignments);
+        String message ="";
+        for (Assignment assignment : assignments) {
+            message+=assignment.toString()+'\n';
+        }
+        return ResponseEntity.ok(message);
     }
 
     @PostMapping("/student/submitassignment")
@@ -55,15 +63,17 @@ public class AssignmentController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
     @PostMapping("/instructor/gradesubmission")
     public ResponseEntity<String> gradesubmission(
             @RequestParam Long submissionid,
             @RequestParam Integer grade,
             @RequestParam String feedback,
             @RequestParam Integer total) {
-        AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade,total, feedback);
+        AssignmentSubmission submission = assignmentservice.gradesubmission(submissionid, grade, total, feedback);
         return ResponseEntity.ok(submission.toString());
     }
+
     @PutMapping("/instructor/update")
     public ResponseEntity<String> updateAssignment(
             @RequestParam Long assignmentId,
@@ -73,6 +83,7 @@ public class AssignmentController {
         Assignment updatedAssignment = assignmentservice.updateassignment(assignmentId, title, description, deadline);
         return ResponseEntity.ok(updatedAssignment.toString());
     }
+
     @DeleteMapping("/instructor/deleteassignment")
     public ResponseEntity<Void> deleteAssignment(@RequestParam Long assignmentId) {
         assignmentservice.deleteassignment(assignmentId);
