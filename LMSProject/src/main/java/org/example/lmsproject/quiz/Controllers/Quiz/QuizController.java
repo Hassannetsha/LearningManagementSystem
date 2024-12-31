@@ -26,10 +26,14 @@ public class QuizController {
         List<QuizEntity> quizzes = quizServices.getAllQuizzes();
         return ResponseEntity.ok(quizzes.toString());
     }
-    @GetMapping("/student/quizzes/{quizId}")
-    public ResponseEntity<String> getQuiz(@PathVariable("quizId") Long quizId) {
-        QuizEntity quiz = quizServices.findById(quizId);
-        return ResponseEntity.ok(quiz.toString());
+    @GetMapping("/student/quizzes/{courseId}")
+    public ResponseEntity<String> getQuiz(@PathVariable("courseId") Long courseId) {
+        List<QuizEntity> quizzes = quizServices.findByCourseId(courseId);
+        String message = "";
+        for (QuizEntity quiz : quizzes) {
+            message+=quiz.toString() + '\n';
+        }
+        return ResponseEntity.ok(message);
     }
 
     @PostMapping("/instructor/quizzes")

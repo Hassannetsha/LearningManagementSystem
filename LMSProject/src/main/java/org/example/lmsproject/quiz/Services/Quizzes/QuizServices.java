@@ -221,8 +221,9 @@ public class QuizServices {
 		return quizRepository.findByquizId(quizId);
 	}
 
-	public QuizEntity findByCourse(Course course) {
-		QuizEntity quizEntity = quizRepository.findBycourse(course);
+	public List<QuizEntity> findByCourseId(long courseId) {
+		Course course = courseService.getCourseById(courseId);
+		List<QuizEntity> quizEntity = quizRepository.findBycourse(course);
 		if (quizEntity != null) {
 			return quizEntity;
 		}
