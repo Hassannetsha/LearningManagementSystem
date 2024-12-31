@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface  FeedBackRepository extends JpaRepository<AutomatedFeedBack, Long>  {
-    AutomatedFeedBack findByquiz(QuizEntity quizEntity);
+    List<AutomatedFeedBack> findByquiz(QuizEntity quizEntity);
     AutomatedFeedBack findBystudent(Student student);
 
     List<AutomatedFeedBack> findByStudentId(Long studentId);

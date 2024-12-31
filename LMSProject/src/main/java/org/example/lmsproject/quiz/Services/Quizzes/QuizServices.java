@@ -44,13 +44,15 @@ public class QuizServices {
 
 	// added Notification Logic
 	private final MailboxService mailboxService;
+
 	//
 	@Autowired
 	public QuizServices(
 			QuizRepository quizRepository,
 			@Lazy QuestionServices questionServices,
 			QuizSubmissionRepository quizSubmissionRepository,
-			FeedBackRepository feedBackRepository, CourseService courseService,StudentService studentService, MailboxService mailboxService) {
+			FeedBackRepository feedBackRepository, CourseService courseService, StudentService studentService,
+			MailboxService mailboxService) {
 		this.quizRepository = quizRepository;
 		this.questionServices = questionServices;
 		this.quizSubmissionRepository = quizSubmissionRepository;
@@ -84,7 +86,7 @@ public class QuizServices {
 			List<Long> studentIds = course.getStudents().stream()
 					.map(Student::getId)
 					.collect(Collectors.toList());
-			if (!studentIds.isEmpty()) { 
+			if (!studentIds.isEmpty()) {
 				NotificationAndEmailMapper newQuizNotification = new NewQuizNotification(quiz);
 				mailboxService.addBulkNotifications(studentIds, newQuizNotification);
 			}
@@ -95,7 +97,7 @@ public class QuizServices {
 		}
 	}
 
-	public void addNewQuizSubmission(QuizSubmissionDTO quizSubmissionDTO,String userName) {
+	public void addNewQuizSubmission(QuizSubmissionDTO quizSubmissionDTO, String userName) {
 		QuizEntity quiz = quizRepository.findByquizId(quizSubmissionDTO.getQuiz());
 		if (quiz != null) {
 			for (String ans : quizSubmissionDTO.getAnswers()) {
@@ -106,7 +108,7 @@ public class QuizServices {
 				Student student = studentService.findStudentByUsername(userName);
 				if (student != null) {
 					for (Student student1 : course.getStudents()) {
-						if (student1==student) {
+						if (student1 == student) {
 							QuizSubmission quizSubmission = new QuizSubmission(quiz, course,
 									quizSubmissionDTO.getAnswers(), student);
 							System.out.println("before save quiz submission");
@@ -122,8 +124,7 @@ public class QuizServices {
 						}
 					}
 					throw new IllegalStateException("This student is not registered in this course");
-				}
-				else{
+				} else {
 					throw new IllegalStateException("Student not found");
 				}
 			} else {
@@ -135,12 +136,17 @@ public class QuizServices {
 	}
 
 	public void deleteQuiz(Long quizId) {
+		// System.out.println("entered delete function");
 		QuizEntity quiz = quizRepository.findByquizId(quizId);
 		if (quiz != null) {
-			QuizSubmission quizSubmission = findInQuizSubmission(quiz);
-			AutomatedFeedBack feedBack = findInFeedBacks(quiz);
-			deleteFeedBack(feedBack);
-			deleteQuizSubmission(quizSubmission);
+			List<QuizSubmission> quizSubmissions = findInQuizSubmission(quiz);
+			List<AutomatedFeedBack> feedBacks = findInFeedBacks(quiz);
+			for (AutomatedFeedBack feedBack : feedBacks) {
+				deleteFeedBack(feedBack);
+			}
+			for (QuizSubmission sub : quizSubmissions) {
+				deleteQuizSubmission(sub);
+			}
 			quizRepository.delete(quiz);
 		} else {
 			throw new IllegalStateException("No quiz found in this course");
@@ -202,15 +208,17 @@ public class QuizServices {
 					throw new IllegalStateException("No question Bank found");
 				}
 			}
-			Course course = courseService.getCourseById(courseId);
-			if (course != null) {
-				if (!Objects.equals(quiz.getCourse(), course)) {
-					quiz.setCourse(course);
+			if (courseId != null) {
+				Course course = courseService.getCourseById(courseId);
+				if (course != null) {
+					if (!Objects.equals(quiz.getCourse(), course)) {
+						quiz.setCourse(course);
+					} else {
+						throw new IllegalStateException("The quiz with id: " + quizId + " has the same course id");
+					}
 				} else {
-					throw new IllegalStateException("The quiz with id: " + quizId + " has the same course id");
+					throw new IllegalStateException("No course Bank found");
 				}
-			} else {
-				throw new IllegalStateException("No course Bank found");
 			}
 		} else {
 			throw new IllegalStateException("No quiz found");
@@ -234,11 +242,11 @@ public class QuizServices {
 		return quizRepository.findByquestionBank(questionBank);
 	}
 
-	public QuizSubmission findInQuizSubmission(QuizEntity quizEntity) {
+	public List<QuizSubmission> findInQuizSubmission(QuizEntity quizEntity) {
 		return quizSubmissionRepository.findByquiz(quizEntity);
 	}
 
-	public AutomatedFeedBack findInFeedBacks(QuizEntity quizEntity) {
+	public List<AutomatedFeedBack> findInFeedBacks(QuizEntity quizEntity) {
 		return feedBackRepository.findByquiz(quizEntity);
 	}
 

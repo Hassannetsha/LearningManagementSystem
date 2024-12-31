@@ -29,7 +29,7 @@ public class QuestionBank {
     private String questionBankName;
     @ManyToOne
     private Course course;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
     private List<QuestionEntity> questions;
     public Long getId() {
         return id;

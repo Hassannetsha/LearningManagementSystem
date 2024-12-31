@@ -29,7 +29,7 @@ public class QuizEntity {
     private Course course;
     @Column(nullable = false)
     private String quizName;
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = false)
     private QuestionBank questionBank;
 
 
