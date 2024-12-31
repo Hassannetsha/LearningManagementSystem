@@ -67,7 +67,14 @@ public class QuizController {
 
     @GetMapping(path = "/student/quizzes/Feedbacks")
     public ResponseEntity<String> getAllFeedBacks() {
-        List<AutomatedFeedBack> automatedFeedBack = quizServices.getAllFeedBacks();
-        return ResponseEntity.ok(automatedFeedBack.toString());
+        List<AutomatedFeedBack> automatedFeedBacks = quizServices.getAllFeedBacks();
+        String message = "";
+        for (AutomatedFeedBack feedBack : automatedFeedBacks) {
+            for (String elem : feedBack.getAnswers()) {
+                System.out.println(elem);
+            }
+            message+=feedBack.toString() + '\n';
+        }
+        return ResponseEntity.ok(message);
     }
 }

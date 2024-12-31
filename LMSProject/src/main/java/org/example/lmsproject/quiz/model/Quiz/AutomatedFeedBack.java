@@ -3,6 +3,9 @@ package org.example.lmsproject.quiz.model.Quiz;
 // import java.util.ArrayList;
 import java.util.List;
 
+import org.example.lmsproject.quiz.model.Question.MCQQuestionEntity;
+import org.example.lmsproject.quiz.model.Question.QuestionEntity;
+import org.example.lmsproject.quiz.model.Question.TrueOrFalseQuestionEntity;
 import org.example.lmsproject.userPart.model.Student;
 
 import jakarta.persistence.Column;
@@ -59,10 +62,23 @@ public class AutomatedFeedBack {
     @Override
     public String toString(){
         String ans = "";
-        for (String answer : this.answers) {
-            ans += answer;
+        String questions = "\n";
+        int ctn = 1;
+        for (QuestionEntity question : quiz.getQuestionBank().getQuestions()) {
+            questions+= "Q" + ctn++ + " " + question.getQuestion() + "\nRight answer: "  ;
+            if (question instanceof TrueOrFalseQuestionEntity trueOrFalseQuestionEntity) {
+                questions+= trueOrFalseQuestionEntity.getRightAnswer().equals(1)?"True":"False" + '\n';
+            }
+            if (question instanceof MCQQuestionEntity mCQQuestionEntity) {
+                questions+= mCQQuestionEntity.getRightAnswer() + '\n';
+            }
+            // questions+= "Q" + ctn++ + " ";
         }
-        return quiz.toString() + "\n"  + student.getId() + "\n" + ans + "\n";
+        ctn = 1;
+        for (String answer : this.answers) {
+            ans += "\nQ"  + ctn++ + " " + answer;
+        }
+        return questions + "\n" + "Your answers: " + ans + "\n" + "Grade: " + this.grade + '\n';
     }
 
     public int getGrade() {

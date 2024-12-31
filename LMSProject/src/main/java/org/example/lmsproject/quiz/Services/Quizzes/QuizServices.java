@@ -167,13 +167,14 @@ public class QuizServices {
 			if (question instanceof MCQQuestionEntity mCQQuestionEntity) {
 				// System.out.println(mCQQuestionEntity.calculateScore(answer));
 				totalScore += mCQQuestionEntity.calculateScore(answer);
-				answers.add(mCQQuestionEntity.getRightAnswer());
+				// answers.add(mCQQuestionEntity.getRightAnswer());
 			} else if (question instanceof TrueOrFalseQuestionEntity trueOrFalseQuestionEntity) {
 				trueOrFalseQuestionEntity.getRightAnswer();
 				// System.out.println(trueOrFalseQuestionEntity.calculateScore(answer));
 				totalScore += trueOrFalseQuestionEntity.calculateScore(answer);
-				answers.add(trueOrFalseQuestionEntity.getRightAnswer() == true ? "True" : "False");
+				// answers.add(trueOrFalseQuestionEntity.getRightAnswer() == true ? "True" : "False");
 			}
+			answers.add(answer);
 		}
 		feedBack.setAnswers(answers);
 		return totalScore;
