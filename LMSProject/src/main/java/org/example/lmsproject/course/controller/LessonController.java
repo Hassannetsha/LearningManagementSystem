@@ -29,13 +29,13 @@ public class LessonController {
     @Autowired
     private AttendanceRepository attendanceRepo;
 
-    @PostMapping("/instructor/generate-otp")
+    @PutMapping("/instructor/generate-otp")
     public ResponseEntity<String> generateOtp(@RequestParam Long lessonId) {
         String otp = lessonService.generateOtp(lessonId);
         return ResponseEntity.ok("OTP generated: " + otp);
     }
 
-    @PostMapping("/student/enroll")
+    @PutMapping("/student/enroll")
     public ResponseEntity<String> enrollInLesson(@RequestParam Long lessonId, @RequestParam String otp, @RequestParam Long studentId) {
         System.out.println("Trying to enroll student: " + studentId + " in Lesson: " + lessonId + " with OTP: " + otp);
         boolean isValid = lessonService.validateOtp(lessonId, otp);
